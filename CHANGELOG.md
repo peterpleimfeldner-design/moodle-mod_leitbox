@@ -2,6 +2,20 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.1.0] - 2026-02-28 (Feedback & Onboarding Update)
+
+### Hinzugefügt
+- **Abgestuftes Session-Feedback:** Dynamisches 4-Stufen-Feedback (Starkes Ergebnis, Solide Leistung, Auf dem richtigen Weg, Wiederholung empfohlen) nach Abschluss eines Stapels basierend auf dem Anteil korrekter Antworten.
+- **Masterpiece-Feedback:** Ein spezielles "Meisterwerk"-Erfolgsfenster erscheint, wenn alle Karten des Systems in der Experten-Box liegen und fehlerfrei absolviert wurden.
+- **Visuelle Statistiken:** Zeigt nach dem Absolvieren einen Fortschrittsbalken und Couter für "Gewusst" (Grün), "Nochmal" (Gelb) und "Schwer" (Rot) in der jeweiligen Durchgangs-Zusammenfassung an.
+
+### Geändert
+- **Gezielte Ersteindruck-Kontrolle:** Die "Willkommen bei Recall"-Demokarte wird nun serverseitig *immer* an die erste Stelle gezwungen, selbst wenn die "Karten mischen"-Option in Moodle aktiv ist.
+- **Texte & Sprachpakete:** Sämtliche Demotexte sowie die Feedback-Meldungen wurden sachlicher und erwachsener formuliert ("alle" statt "die meisten"). Vue-Fallbacks hinzugefügt, um Cache-Fehler zu vermeiden.
+- **Logo Update:** Das Recall-Logo in der Moodle-Aktivität verwendet nun die saubere, freigestellte PNG-Version.
+
+---
+
 ## [1.0.0] - 2026-02-27 (Stable Marketplace Release)
 
 ### Hinzugefügt
