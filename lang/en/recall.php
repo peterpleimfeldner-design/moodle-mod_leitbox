@@ -19,13 +19,13 @@
  * @copyright 2026 Recall Author
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['modulename'] = 'Recall Activity';
+$string['modulename'] = 'Recall';
 $string['modulename_help'] = 'The Recall activity allows students to practice flashcards using a spaced repetition system based on the Leitner method. The UI uses a modern single-page application approach.';
-$string['modulenameplural'] = 'Recall Activities';
+$string['modulenameplural'] = 'Recall';
 $string['pluginadministration'] = 'Recall administration';
-$string['pluginname'] = 'Recall Activity';
-$string['recall:addinstance'] = 'Add a new Recall activity';
-$string['recall:view'] = 'View Recall activity';
+$string['pluginname'] = 'Recall';
+$string['recall:addinstance'] = 'Add a new Recall';
+$string['recall:view'] = 'View Recall';
 
 $string['recallname'] = 'Activity Name';
 $string['settings'] = 'Recall Settings';

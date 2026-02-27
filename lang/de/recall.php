@@ -19,13 +19,13 @@
  * @copyright 2026 Recall Author
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['modulename'] = 'Recall Aktivität';
+$string['modulename'] = 'Recall';
 $string['modulename_help'] = 'Die Recall-Aktivität ermöglicht es Schülern, Karteikarten mit einem System der verteilten Wiederholung (Spaced Repetition) nach der Leitner-Methode zu üben. Die Benutzeroberfläche nutzt einen modernen Single-Page-Application-Ansatz.';
-$string['modulenameplural'] = 'Recall Aktivitäten';
+$string['modulenameplural'] = 'Recall';
 $string['pluginadministration'] = 'Recall Administration';
-$string['pluginname'] = 'Recall Aktivität';
-$string['recall:addinstance'] = 'Neue Recall-Aktivität hinzufügen';
-$string['recall:view'] = 'Recall-Aktivität ansehen';
+$string['pluginname'] = 'Recall';
+$string['recall:addinstance'] = 'Neues Recall hinzufügen';
+$string['recall:view'] = 'Recall ansehen';
 
 $string['recallname'] = 'Name der Aktivität';
 $string['settings'] = 'Recall Einstellungen';
