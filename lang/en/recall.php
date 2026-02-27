@@ -63,20 +63,20 @@ $string['privacy:metadata:recall_progress:count_wrong'] = 'The number of times t
 $string['privacy:metadata:recall_progress:last_reviewed'] = 'The timestamp when the card was last reviewed.';
 
 // Management Interface
-$string['demo_q1'] = 'Welcome to Recall! 🎉<br><br>What is the goal of this learning system?';
-$string['demo_a1'] = 'The goal is to move all cards to the final deck ("Expert"). <br><br>The system uses the method of <b>spaced repetition</b> to boost your long-term memory.';
+$string['demo_q1'] = 'Welcome to Recall.<br><br>What is the goal of this learning system?';
+$string['demo_a1'] = 'The goal is to move all flashcards to the final deck ("Expert") by answering them correctly.<br><br>The system uses the method of <b>spaced repetition</b> for this purpose.';
 $string['demo_h1'] = 'Think about how you remember things best long-term.';
-$string['demo_q2'] = 'How do I move this card to the next deck?';
-$string['demo_a2'] = 'By tapping the green button <b>Got it</b>. <br><br>If the card was easy, it moves one step further to the right. It will then be asked less frequently in the future.';
+$string['demo_q2'] = 'How do I move a card to the next deck?';
+$string['demo_a2'] = 'By clicking the <b>green</b> button <b>Got it</b>.<br><br>This indicates that the answer was known. The card advances one deck and will be queried less frequently in the future.';
 $string['demo_h2'] = 'It has to do with the green checkmark.';
-$string['demo_q3'] = 'What happens if I press the red button <b>Hard</b>?';
-$string['demo_a3'] = 'Then the card moves back <b>only one single step</b>!<br><br>Always do this if you completely forgot the answer. You will review it sooner without completely destroying your hard-earned progress.';
+$string['demo_q3'] = 'What happens when clicking the <b>red</b> button <b>Hard</b>?';
+$string['demo_a3'] = 'The card moves back exactly <b>one deck</b>.<br><br>Select this option if you did not know the answer. The card will be repeated more frequently without completely resetting your previous learning progress.';
 $string['demo_h3'] = 'Did not know it!';
-$string['demo_q4'] = 'What is the yellow button <b>Again</b> for?';
-$string['demo_a4'] = 'If you were unsure, but not completely wrong. <br><br>The card stays in the current deck without moving back. You do not lose progress, but you will see the card again just to be safe.';
+$string['demo_q4'] = 'What is the <b>yellow</b> button <b>Again</b> used for?';
+$string['demo_a4'] = 'This option is intended for cases where your answer was uncertain or incomplete.<br><br>The card remains in its current deck. It will be presented again within the same learning session, but your overall progress is maintained.';
 $string['demo_h4'] = 'The sweet spot between easy and hard.';
-$string['demo_q5'] = 'Tip: Can I delete these demo cards?';
-$string['demo_a5'] = 'Sure! Actually, as soon as you start importing your own cards, these demo cards will be automatically deleted for you. Magic!';
+$string['demo_q5'] = 'Usage note: Can these demo cards be deleted?';
+$string['demo_a5'] = 'Yes. As soon as you import or create your own flashcards, the system will remove these demo cards automatically.';
 $string['demo_h5'] = '';
 
 $string['managecards'] = 'Manage Cards';
