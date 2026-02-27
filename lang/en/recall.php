@@ -97,7 +97,7 @@ $string['didactic_limit_notice'] = '<strong>Learning Tip:</strong> To ensure opt
 $string['bulkimport'] = 'Bulk Import (AI / Text)';
 $string['bulkimportdesc'] = 'Paste a formatted text block to import multiple cards at once.';
 $string['exportcards'] = 'Export cards (.txt)';
-$string['prompt_instruction'] = 'Copy this prompt and use it with ChatGPT/Claude to generate cards from your material:';
+$string['prompt_instruction'] = 'Copy this prompt and use it with any AI to generate cards from your material:';
 $string['prompt_template'] = 'Create flashcards from the following text for studying. 
 Format each card EXACTLY like this, with no markdown (no asterisks, no hashes), and separate all cards with ===CARD===. 
 Do not write an introduction, only the pure text code.

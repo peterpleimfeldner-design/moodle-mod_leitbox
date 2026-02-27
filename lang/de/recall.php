@@ -97,7 +97,7 @@ $string['didactic_limit_notice'] = '<strong>Lerntipp:</strong> Für den besten L
 $string['bulkimport'] = 'Massen-Import (KI / Text)';
 $string['bulkimportdesc'] = 'Füge einen formatierten Textblock ein, um mehrere Karten auf einmal zu importieren.';
 $string['exportcards'] = 'Karten exportieren (.txt)';
-$string['prompt_instruction'] = 'Kopiere diesen Prompt und nutze ihn mit ChatGPT/Claude, um aus deinen Scripten Karten zu generieren:';
+$string['prompt_instruction'] = 'Kopiere diesen Prompt und nutze ihn mit einer beliebigen KI, um aus deinen Scripten Karten zu generieren:';
 $string['prompt_template'] = 'Erstelle aus folgendem Text Karteikarten zum Lernen. 
 Formatiere jede Karte EXAKT in diesem Format, ohne Abweichungen, ohne Markdown (keine Sternchen, keine Rauten) und trenne alle Karten mit ===CARD===. 
 Schreibe keine Einleitung, nur den reinen Text-Code.
