@@ -33,37 +33,37 @@ function recall_add_instance($recall) {
     $recall->timemodified = $recall->timecreated;
     $id = $DB->insert_record('recall', $recall);
 
-    // Insert tutorial demo cards
+    // Insert tutorial demo cards using localized strings
     $demo_cards = [
         [
             'recallid' => $id,
-            'question' => 'Willkommen bei Recall! 🎉<br><br>Was ist das Ziel dieses Lernsystems?',
-            'answer' => 'Das Ziel ist es, alle Karten in den letzten Stapel ("Gelernt") zu befördern. <br><br>Das System nutzt die Methode der <b>verteilten Wiederholung</b> (Spaced Repetition).',
-            'hint' => 'Denke daran, wie man sich Dinge langfristig am besten merkt.',
+            'question' => get_string('demo_q1', 'mod_recall'),
+            'answer' => get_string('demo_a1', 'mod_recall'),
+            'hint' => get_string('demo_h1', 'mod_recall'),
         ],
         [
             'recallid' => $id,
-            'question' => 'Wie bewege ich diese Karte in den nächsten Stapel?',
-            'answer' => 'Indem du auf den grünen Button <b>🟢 Gewusst</b> tippst. <br><br>Wenn du dir absolut sicher warst, rückt die Karte einen Schritt weiter. Sie wird dann in Zukunft seltener abgefragt.',
-            'hint' => 'Es hat mit dem grünen Button zu tun.',
+            'question' => get_string('demo_q2', 'mod_recall'),
+            'answer' => get_string('demo_a2', 'mod_recall'),
+            'hint' => get_string('demo_h2', 'mod_recall'),
         ],
         [
             'recallid' => $id,
-            'question' => 'Was passiert, wenn ich auf den roten Button <b>🔴 Schwer</b> drücke?',
-            'answer' => 'Dann wandert die Karte sofort wieder ganz an den Anfang in den Stapel "Schwer" (Box 1) zurück!<br><br>Mache das immer dann, wenn du die Antwort komplett vergessen hast. So stellst du sicher, dass du sie bald wieder lernst.',
-            'hint' => 'Rot bedeutet Gefahr bzw. völliger Gedächtnisverlust.',
+            'question' => get_string('demo_q3', 'mod_recall'),
+            'answer' => get_string('demo_a3', 'mod_recall'),
+            'hint' => get_string('demo_h3', 'mod_recall'),
         ],
         [
             'recallid' => $id,
-            'question' => 'Wofür ist der gelbe Button <b>🟡 Nochmal</b> gedacht?',
-            'answer' => 'Wenn du einen Fehler gemacht hast, aber eigentlich wusstest worum es geht, oder ziemlich unsicher warst. <br><br>Die Karte bleibt dann im aktuellen Stapel und wird dir bald wieder vorgelegt.',
-            'hint' => 'Zwischen Grün und Rot.',
+            'question' => get_string('demo_q4', 'mod_recall'),
+            'answer' => get_string('demo_a4', 'mod_recall'),
+            'hint' => get_string('demo_h4', 'mod_recall'),
         ],
         [
             'recallid' => $id,
-            'question' => 'Tipp: Kann ich diese Demo-Karten später löschen?',
-            'answer' => 'Klar! Sobald du erste eigene Karten importiert hast, kannst du diese Erklärungs-Karten in der Verwaltungsoberfläche einfach herauslöschen.',
-            'hint' => null,
+            'question' => get_string('demo_q5', 'mod_recall'),
+            'answer' => get_string('demo_a5', 'mod_recall'),
+            'hint' => get_string('demo_h5', 'mod_recall'),
         ]
     ];
 

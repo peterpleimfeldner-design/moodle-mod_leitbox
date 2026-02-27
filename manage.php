@@ -47,7 +47,7 @@ function mod_recall_auto_delete_demos($recallid) {
     $cards = $DB->get_records('recall_cards', ['recallid' => $recallid], 'id ASC');
     if (count($cards) === 5) {
         $first_card = reset($cards);
-        if (strpos($first_card->question, 'Willkommen bei Recall!') !== false) {
+        if (strpos($first_card->question, 'Recall! 🎉') !== false) {
             list($in, $params) = $DB->get_in_or_equal(array_keys($cards));
             if (!empty($params)) {
                  $DB->delete_records_select('recall_progress', "cardid $in", $params);
