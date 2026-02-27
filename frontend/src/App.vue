@@ -77,11 +77,41 @@ import Dashboard from './components/Dashboard.vue';
 import Card from './components/Card.vue';
 import { getCardsByBox, submitAnswer } from './api';
 
+const FALLBACKS = {
+    sessiondone: 'Alles erledigt!',
+    sessiondonedesc: 'Gute Arbeit. Gehe zurück zum Dashboard für den nächsten Stapel.',
+    feedback_perfect_title: 'Starkes Ergebnis',
+    feedback_perfect_desc: 'Du hast die meisten Inhalte korrekt ins Gedächtnis gerufen. Das Material sitzt.',
+    feedback_good_title: 'Solide Leistung',
+    feedback_good_desc: 'Du hast einen guten Überblick. Die verbleibenden Lücken schließen sich mit der Zeit.',
+    feedback_okay_title: 'Auf dem richtigen Weg',
+    feedback_okay_desc: 'Die Basis steht. Eine weitere Wiederholung wird dein Wissen festigen.',
+    feedback_learn_title: 'Wiederholung empfohlen',
+    feedback_learn_desc: 'Einige Antworten fielen dir schwer. Nutze die nächste Runde, um diese trainieren.',
+    completed: 'Abgeschlossen',
+    loadingcards: 'Karten werden geladen...',
+    cards: 'Karten',
+    known_btn: 'Gewusst',
+    again_btn: 'Nochmal',
+    hard_btn: 'Schwer',
+    backtodashboard: 'Zurück zum Dashboard',
+    cardxofy_x: 'Karte',
+    cardxofy_y: 'von',
+    box0: 'Neu',
+    box1: 'Einsteiger',
+    box2: 'Lernender',
+    box3: 'Fortgeschritten',
+    box4: 'Erfahren',
+    box5: 'Experte',
+};
+
 const getString = (key) => {
-    if (window.M && window.M.str && window.M.str.mod_recall && window.M.str.mod_recall[key]) {
-        return window.M.str.mod_recall[key];
-    }
-    return key;
+    // 1. Try Moodle's loaded strings
+    const moodleStr = window.M?.str?.mod_recall?.[key];
+    // 2. Only use Moodle string if it's valid (not a [[placeholder]])
+    if (moodleStr && !moodleStr.startsWith('[[')) return moodleStr;
+    // 3. Fall back to hardcoded defaults
+    return FALLBACKS[key] ?? key;
 };
 
 const sessionActive = ref(false);
