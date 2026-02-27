@@ -6,23 +6,22 @@
       <div class="rc-header-brand">
         <img :src="getLogoUrl()" alt="Recall" class="rc-logo" />
         <div class="rc-header-text">
-          <div class="rc-title-row">
-            <h1 class="rc-title">{{ getString('dashboardtitle') }}</h1>
-            <div class="rc-header-actions">
-              <button @click="showInfo = true" class="rc-btn rc-btn--ghost rc-btn--sm" :aria-label="getString('howitworks')">
-                <svg aria-hidden="true" class="rc-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                {{ getString('howitworks') }}
-              </button>
-              <button @click="showReset = true" class="rc-btn-reset" :aria-label="getString('reset_progress')" :title="getString('reset_progress')">
-                <span aria-hidden="true">🔄</span>
-              </button>
-            </div>
-          </div>
+          <h1 class="rc-title" style="margin-bottom: 4px;">{{ getString('dashboardtitle') }}</h1>
           <p class="rc-subtitle">{{ getString('dashboardsbtitle') }}</p>
         </div>
+      </div>
+      
+      <div class="rc-header-actions">
+        <button @click="showInfo = true" class="rc-btn rc-btn--ghost rc-btn--sm" :aria-label="getString('howitworks')">
+          <svg aria-hidden="true" class="rc-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          {{ getString('howitworks') }}
+        </button>
+        <button @click="showReset = true" class="rc-btn-reset" :aria-label="getString('reset_progress')" :title="getString('reset_progress')">
+          <span aria-hidden="true">🔄</span>
+        </button>
       </div>
     </header>
 
@@ -346,19 +345,19 @@ const doReset = async () => {
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  background: #fff5f5;
-  border: 1px dashed #fca5a5;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
   cursor: pointer;
   transition: all 0.2s;
   font-size: 1.1rem;
 }
 .rc-btn-reset:hover {
-  background: #fee2e2;
+  background: #f1f5f9;
   border-style: solid;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.15);
 }
-.rc-btn-reset:focus-visible { outline: 2px solid #ef4444; outline-offset: 2px; }
+.rc-btn-reset:focus-visible { outline: 2px solid #94a3b8; outline-offset: 2px; }
 
 .rc-btn--danger-ghost {
   background: #fff5f5;
