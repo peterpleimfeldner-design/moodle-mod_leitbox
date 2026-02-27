@@ -54,6 +54,7 @@ class external extends external_api {
         }
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
+        require_capability('mod/recall:view', $context);
 
         $box = $params['boxnumber'];
         $userid = $USER->id;
@@ -142,6 +143,7 @@ class external extends external_api {
         }
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
+        require_capability('mod/recall:view', $context);
 
         $userid = $USER->id;
         $progress = $DB->get_record('recall_progress', ['userid' => $userid, 'cardid' => $card->id]);
@@ -212,6 +214,7 @@ class external extends external_api {
         }
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
+        require_capability('mod/recall:view', $context);
 
         // Get all card IDs belonging to this instance.
         $cardids = $DB->get_fieldset_select('recall_cards', 'id', 'recallid = ?', [$params['instanceid']]);

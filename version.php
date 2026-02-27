@@ -21,7 +21,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026022707; // The current module version (Date: YYYYMMDDXX).
+$plugin->version   = 2026022708; // The current module version (Date: YYYYMMDDXX).
 $plugin->requires  = 2022112800; // Requires Moodle 4.1 (LTS).
 $plugin->component = 'mod_recall'; // Full name of the plugin (used for diagnostics).
 $plugin->maturity  = MATURITY_STABLE;

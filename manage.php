@@ -83,6 +83,11 @@ if ($action === 'add' && data_submitted() && confirm_sesskey()) {
 }
 
 if ($action === 'update' && data_submitted() && confirm_sesskey() && $cardid) {
+    // Security check: Ensure the card belongs to this recall instance
+    if (!$DB->record_exists('recall_cards', ['id' => $cardid, 'recallid' => $recall->id])) {
+        print_error('invalidrecord');
+    }
+
     $q = required_param('question', PARAM_RAW);
     $a = required_param('answer', PARAM_RAW);
     $h = optional_param('hint', '', PARAM_RAW);
