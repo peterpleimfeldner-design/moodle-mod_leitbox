@@ -232,7 +232,7 @@ const getBoxColorClass = (box) => [
 ][box] ?? 'rc-box--teal';
 
 const startSession = (boxnumber) => {
-    if ((counts.value[boxnumber] ?? 0) > 0) emit('start-session', boxnumber);
+    if ((counts.value[boxnumber] ?? 0) > 0) emit('start-session', boxnumber, totalCards.value);
 };
 
 const doReset = async () => {

@@ -80,6 +80,8 @@ import { getCardsByBox, submitAnswer } from './api';
 const FALLBACKS = {
     sessiondone: 'Alles erledigt!',
     sessiondonedesc: 'Gute Arbeit. Gehe zurück zum Dashboard für den nächsten Stapel.',
+    feedback_grand_title: 'Meisterwerk',
+    feedback_grand_desc: 'Herzlichen Glückwunsch! Du hast alle Karten im System bis in den Experten-Stapel gebracht und zudem völlig fehlerfrei wiedergegeben. Du hast dieses Thema absolut verstanden!',
     feedback_perfect_title: 'Starkes Ergebnis',
     feedback_perfect_desc: 'Du hast die meisten Inhalte korrekt ins Gedächtnis gerufen. Das Material sitzt.',
     feedback_good_title: 'Solide Leistung',
@@ -121,6 +123,7 @@ const loading = ref(false);
 const sessionCards = ref([]);
 const currentCardIndex = ref(0);
 const sessionStats = ref({ known: 0, again: 0, hard: 0 });
+const totalCardsInSystem = ref(0);
 
 const currentCard = computed(() => sessionCards.value[currentCardIndex.value]);
 
@@ -133,6 +136,11 @@ const getSessionFeedback = () => {
     const total = sessionCards.value.length;
     if (total === 0) return { emoji: '🎉', title: getString('sessiondone'), desc: getString('sessiondonedesc') };
     
+    // Grand Finale check: all cards in system are in Box 5 and answered perfectly
+    if (activeBox.value === 5 && total === totalCardsInSystem.value && sessionStats.value.known === total) {
+        return { emoji: '🎓', title: getString('feedback_grand_title'), desc: getString('feedback_grand_desc') };
+    }
+
     // Weight calculation to determine performance
     const score = (sessionStats.value.known + (sessionStats.value.again * 0.5)) / total;
     
@@ -168,8 +176,9 @@ const getBoxName = (box) => {
     return getString('box' + box);
 };
 
-const handleStartSession = async (boxnumber) => {
+const handleStartSession = async (boxnumber, totalSystemCards) => {
     activeBox.value = boxnumber;
+    totalCardsInSystem.value = totalSystemCards;
     sessionActive.value = true;
     sessionFinished.value = false;
     loading.value = true;
