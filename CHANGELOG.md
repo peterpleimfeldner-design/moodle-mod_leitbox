@@ -2,26 +2,28 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
-## [1.1.0] - 2026-02-27
-### Geändert
-- **Rebranding zu "Recall"**: Plugin-Name von "SmartCards" auf "Recall" geändert (`mod_recall`).
-- **Didaktik-Update**: Button-Beschriftungen auf Option A ("Nochmal lernen", "Bald wiederholen", "Später wiederholen") aktualisiert, um die Selbststeuerung erwachsener Lernender zu fördern.
-- **Visuelles Branding**: Neues Logo (Icon) hinzugefügt und Farbpalette auf Deep Indigo (#4F46E5) umgestellt.
-- **UI-Refinement**: Glassmorphismus-Effekte und verbesserte Schatten für die Karteikarten hinzugefügt.
+## [1.0.0] - 2026-02-27 (Stable Marketplace Release)
 
-## [1.0.0] - 2026-02-27
 ### Hinzugefügt
-- Deutsche Benutzeroberfläche und Moodle-Sprachpaket (`lang/de/recall.php`).
-- Möglichkeit, die Karteikarte durch Antippen der Rückseite wieder auf die Frage (Vorderseite) zurückzudrehen.
-- "Hinweis anzeigen"-Funktion auf der Kartenvorderseite versteckt, um selbstständiges Denken besser zu unterstützen.
+- **Reset-Funktion (API & UI):** Neues Moodle Web-Service-Backend und ein User-Interface Icon (`🔄`), um den eigenen Lernfortschritt sicher (inkl. Warnungs-Pop-up) vor Prüfungen auf "Neu" zurückzusetzen.
+- **Barrierefreiheit (WCAG 2.1 AA):** Komplette Überarbeitung des Vue-Frontends für volle Screenreader-Kompatibilität (`aria`-Attribute), Tastaturfokus und semantisches HTML.
+- **Branding-Assets:** Integration der finalen Logos (`Symbol.png` und `logo.png` im Header) mit angepasster Icon-Platzierung für Moodle-Aktivitäten.
+- **Umbrella Fallbacks:** Neues Fallback-String-System in Vue integriert, um Platzhalter `[[...]]` bei noch nicht geladenen Sprachpaketen zu verhindern.
 
 ### Geändert
-- Das Frontend wurde auf Version 1.0.0 mit Vite neu gebündelt (`npm run build`).
-- `version.php` auf Version `2026022700` (Release `1.0`, Maturity `MATURITY_BETA`) aktualisiert.
+- **Rebranding zu "Recall":** Kompletter Rename aller Dateien, Sprachpakete und Datenbanktabellen von `mod_smartcards` auf `mod_recall`.
+- **Didaktik-Update & Benennung:** Motivierende Box-Namen ("Einsteiger", "Lernender", "Fortgeschritten", "Erfahren", "Experte") statt nackter Zahlen integriert.
+- **Spaced Repetition Logik:** "Schwer/Nicht gewusst"-Karten fallen nun motivierend nur um 1 Box zurück, anstatt komplett auf Box 0 zurückzusetzen.
+- **Visuelles Branding & UI:** Komplettes Redesign des Dashboards mit entspannenden Teal/Navy Pastellfarben, schwebenden Boxen und dezenten Fortschrittsbalken.
+- **Maturity Level:** Moodle Plugin-Status offiziell auf `MATURITY_STABLE` gesetzt (`version.php` Bump auf `2026022707`).
+- Frontend Bundle neu kompiliert (`npm run build`), optimiert für Production.
 
-## [0.1.0] - initial implementation
+---
+
+## [0.1.0] - Initial Implementation (Beta)
 ### Hinzugefügt
 - Grundlegendes Moodle-Modul-Setup mit Datenbanktabellen.
-- Vue.js/Tailwind CSS Frontend-Setup.
-- Leitner-System-Logik für verteilte Wiederholung (Spaced Repetition).
-- Text-Import-Handler für Karteikarten.
+- Vue.js / Tailwind CSS Frontend-Basis.
+- Leitner-System-Logik (Standard).
+- Text-Import-Handler für KI-generierte Karteikarten.
+- Basis Moodle Backup/Restore & Privacy APIs implementiert.
