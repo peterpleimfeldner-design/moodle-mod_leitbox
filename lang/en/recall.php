@@ -64,19 +64,19 @@ $string['privacy:metadata:recall_progress:last_reviewed'] = 'The timestamp when 
 
 // Management Interface
 $string['demo_q1'] = 'Welcome to Recall! 🎉<br><br>What is the goal of this learning system?';
-$string['demo_a1'] = 'The goal is to move all cards to the final deck ("Graduated"). <br><br>The system uses the method of <b>spaced repetition</b>.';
+$string['demo_a1'] = 'The goal is to move all cards to the final deck ("Expert"). <br><br>The system uses the method of <b>spaced repetition</b> to boost your long-term memory.';
 $string['demo_h1'] = 'Think about how you remember things best long-term.';
 $string['demo_q2'] = 'How do I move this card to the next deck?';
-$string['demo_a2'] = 'By tapping the green button <b>🟢 Got it</b>. <br><br>If you were absolutely sure, the card moves one step further. It will then be asked less frequently in the future.';
-$string['demo_h2'] = 'It has to do with the green button.';
-$string['demo_q3'] = 'What happens if I press the red button <b>🔴 Hard</b>?';
-$string['demo_a3'] = 'Then the card moves back one step!<br><br>Always do this if you completely forgot the answer. This ensures you will review it soon.';
-$string['demo_h3'] = 'Red means danger or complete memory loss.';
-$string['demo_q4'] = 'What is the yellow button <b>🟡 Again</b> for?';
-$string['demo_a4'] = 'If you made a mistake but actually knew what it was about, or were quite unsure. <br><br>The card stays in the current deck and will be presented to you again soon.';
-$string['demo_h4'] = 'Between green and red.';
-$string['demo_q5'] = 'Tip: Can I delete these demo cards later?';
-$string['demo_a5'] = 'Sure! Once you have imported your first own cards, you can simply delete these explanation cards in the management interface.';
+$string['demo_a2'] = 'By tapping the green button <b>Got it</b>. <br><br>If the card was easy, it moves one step further to the right. It will then be asked less frequently in the future.';
+$string['demo_h2'] = 'It has to do with the green checkmark.';
+$string['demo_q3'] = 'What happens if I press the red button <b>Hard</b>?';
+$string['demo_a3'] = 'Then the card moves back <b>only one single step</b>!<br><br>Always do this if you completely forgot the answer. You will review it sooner without completely destroying your hard-earned progress.';
+$string['demo_h3'] = 'Did not know it!';
+$string['demo_q4'] = 'What is the yellow button <b>Again</b> for?';
+$string['demo_a4'] = 'If you were unsure, but not completely wrong. <br><br>The card stays in the current deck without moving back. You do not lose progress, but you will see the card again just to be safe.';
+$string['demo_h4'] = 'The sweet spot between easy and hard.';
+$string['demo_q5'] = 'Tip: Can I delete these demo cards?';
+$string['demo_a5'] = 'Sure! Actually, as soon as you start importing your own cards, these demo cards will be automatically deleted for you. Magic!';
 $string['demo_h5'] = '';
 
 $string['managecards'] = 'Manage Cards';

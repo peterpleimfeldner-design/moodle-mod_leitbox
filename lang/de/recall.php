@@ -64,19 +64,19 @@ $string['privacy:metadata:recall_progress:last_reviewed'] = 'Der Zeitstempel, wa
 
 // Management Interface
 $string['demo_q1'] = 'Willkommen bei Recall! 🎉<br><br>Was ist das Ziel dieses Lernsystems?';
-$string['demo_a1'] = 'Das Ziel ist es, alle Karten in den letzten Stapel ("Gelernt") zu befördern. <br><br>Das System nutzt die Methode der <b>verteilten Wiederholung</b> (Spaced Repetition).';
+$string['demo_a1'] = 'Das Ziel ist es, alle Karten durch das Beantworten in den letzten Stapel ("Experte") zu befördern. <br><br>Das System nutzt die Methode der <b>verteilten Wiederholung</b> (Spaced Repetition).';
 $string['demo_h1'] = 'Denke daran, wie man sich Dinge langfristig am besten merkt.';
 $string['demo_q2'] = 'Wie bewege ich diese Karte in den nächsten Stapel?';
-$string['demo_a2'] = 'Indem du auf den grünen Button <b>🟢 Gewusst</b> tippst. <br><br>Wenn du dir absolut sicher warst, rückt die Karte einen Schritt weiter. Sie wird dann in Zukunft seltener abgefragt.';
-$string['demo_h2'] = 'Es hat mit dem grünen Button zu tun.';
-$string['demo_q3'] = 'Was passiert, wenn ich auf den roten Button <b>🔴 Schwer</b> drücke?';
-$string['demo_a3'] = 'Dann wandert die Karte sofort wieder ganz an den Anfang in den Stapel "Schwer" (Box 1) zurück!<br><br>Mache das immer dann, wenn du die Antwort komplett vergessen hast. So stellst du sicher, dass du sie bald wieder lernst.';
-$string['demo_h3'] = 'Rot bedeutet Gefahr bzw. völliger Gedächtnisverlust.';
-$string['demo_q4'] = 'Wofür ist der gelbe Button <b>🟡 Nochmal</b> gedacht?';
-$string['demo_a4'] = 'Wenn du einen Fehler gemacht hast, aber eigentlich wusstest worum es geht, oder ziemlich unsicher warst. <br><br>Die Karte bleibt dann im aktuellen Stapel und wird dir bald wieder vorgelegt.';
-$string['demo_h4'] = 'Zwischen Grün und Rot.';
+$string['demo_a2'] = 'Indem du auf den grünen Button <b>Gewusst</b> tippst. <br><br>Die Karte war einfach für dich! Sie rückt sofort einen Stapel weiter nach rechts. Sie wird dir dann in Zukunft seltener abgefragt.';
+$string['demo_h2'] = 'Es hat mit dem grünen Häkchen zu tun.';
+$string['demo_q3'] = 'Was passiert, wenn ich auf den roten Button <b>Schwer</b> drücke?';
+$string['demo_a3'] = 'Dann wandert die Karte <b>nur einen Stapel zurück</b>!<br><br>Mache das, wenn du eine Antwort nicht wusstest. Du verlierst so nicht deinen komplett mühsam erarbeiteten Fortschritt, wiederholst die Karte aber deutlich öfter, bis sie sitzt.';
+$string['demo_h3'] = 'Nicht gewusst!';
+$string['demo_q4'] = 'Wofür ist der gelbe Button <b>Nochmal</b> gedacht?';
+$string['demo_a4'] = 'Wenn du dir absolut unsicher warst, aber nicht ganz daneben lagst.<br><br>Die Karte bleibt dann im aktuellen Stapel. Du verlierst keinen Fortschritt, aber siehst diese Karte nochmal in dieser Lernrunde.';
+$string['demo_h4'] = 'Die goldene Mitte zwischen Leicht und Schwer.';
 $string['demo_q5'] = 'Tipp: Kann ich diese Demo-Karten später löschen?';
-$string['demo_a5'] = 'Klar! Sobald du erste eigene Karten importiert hast, kannst du diese Erklärungs-Karten in der Verwaltungsoberfläche einfach herauslöschen.';
+$string['demo_a5'] = 'Klar! Sobald du erste eigene Karten ins System hinzufügst, werden diese Demo-Karten automatisch von selbst für dich gelöscht. Einfach so!';
 $string['demo_h5'] = '';
 
 $string['managecards'] = 'Karten verwalten';
