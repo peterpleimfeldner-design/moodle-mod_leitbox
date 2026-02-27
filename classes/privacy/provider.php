@@ -24,12 +24,15 @@ namespace mod_recall\privacy;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\userlist;
+use core_privacy\local\request\approved_userlist;
 use core_privacy\local\metadata\provider as metadata_provider;
 use core_privacy\local\request\plugin\provider as plugin_provider;
+use core_privacy\local\request\core_userlist_provider;
 
 defined('MOODLE_INTERNAL') || die();
 
-class provider implements metadata_provider, plugin_provider {
+class provider implements metadata_provider, plugin_provider, core_userlist_provider {
 
     public static function get_metadata(collection $collection) : collection {
         $collection->add_database_table(
@@ -53,10 +56,10 @@ class provider implements metadata_provider, plugin_provider {
                   FROM {context} c
                   JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
                   JOIN {modules} m ON m.name = :modname AND m.id = cm.module
-                  JOIN {recall} s ON s.id = cm.instance
-                  JOIN {recall_cards} sc ON sc.recallid = s.id
-                  JOIN {recall_progress} sp ON sp.cardid = sc.id
-                 WHERE sp.userid = :userid";
+                  JOIN {recall} r ON r.id = cm.instance
+                  JOIN {recall_cards} rc ON rc.recallid = r.id
+                  JOIN {recall_progress} rp ON rp.cardid = rc.id
+                 WHERE rp.userid = :userid";
         $params = [
             'modname' => 'recall',
             'contextlevel' => CONTEXT_MODULE,
@@ -66,8 +69,68 @@ class provider implements metadata_provider, plugin_provider {
         return $contextlist;
     }
 
+    public static function get_users_in_context(userlist $userlist) {
+        $context = $userlist->get_context();
+        if ($context->contextlevel != CONTEXT_MODULE) {
+            return;
+        }
+
+        $sql = "SELECT rp.userid
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.name = :modname AND m.id = cm.module
+                  JOIN {recall} r ON r.id = cm.instance
+                  JOIN {recall_cards} rc ON rc.recallid = r.id
+                  JOIN {recall_progress} rp ON rp.cardid = rc.id
+                 WHERE cm.id = :cmid";
+        
+        $params = [
+            'modname' => 'recall',
+            'cmid' => $context->instanceid
+        ];
+        
+        $userlist->add_from_sql('userid', $sql, $params);
+    }
+
     public static function export_user_data(approved_contextlist $contextlist) {
-        // Simple skeleton export. Data is exported using writer.
+        global $DB;
+        if (empty($contextlist->count())) {
+            return;
+        }
+
+        $userid = $contextlist->get_user()->id;
+        foreach ($contextlist->get_contexts() as $context) {
+            if ($context->contextlevel == CONTEXT_MODULE) {
+                $cm = get_coursemodule_from_id('recall', $context->instanceid);
+                if (!$cm) {
+                    continue;
+                }
+
+                $sql = "SELECT rp.*, rc.question, rc.answer
+                          FROM {recall_progress} rp
+                          JOIN {recall_cards} rc ON rc.id = rp.cardid
+                         WHERE rc.recallid = ? AND rp.userid = ?";
+                $progress_records = $DB->get_records_sql($sql, [$cm->instance, $userid]);
+
+                if (!empty($progress_records)) {
+                    $exportdata = [];
+                    foreach ($progress_records as $rec) {
+                        $exportdata[] = (object)[
+                            'question' => format_text($rec->question),
+                            'answer' => format_text($rec->answer),
+                            'box_number' => $rec->box_number,
+                            'count_correct' => $rec->count_correct,
+                            'count_wrong' => $rec->count_wrong,
+                            'last_reviewed' => \core_date::userdate($rec->last_reviewed)
+                        ];
+                    }
+                    
+                    \core_privacy\local\request\writer::with_context($context)->export_data(
+                        [get_string('pluginname', 'mod_recall'), get_string('cards', 'mod_recall')],
+                        (object)['progress' => $exportdata]
+                    );
+                }
+            }
+        }
     }
 
     public static function delete_data_for_all_users_in_context(\context $context) {
@@ -87,7 +150,6 @@ class provider implements metadata_provider, plugin_provider {
 
     public static function delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
-
         if (empty($contextlist->count())) {
             return;
         }
@@ -105,6 +167,30 @@ class provider implements metadata_provider, plugin_provider {
             }
         }
     }
+
+    public static function delete_data_for_users(approved_userlist $userlist) {
+        global $DB;
+        $context = $userlist->get_context();
+        if ($context->contextlevel != CONTEXT_MODULE) {
+            return;
+        }
+
+        $userids = $userlist->get_userids();
+        if (empty($userids)) {
+            return;
+        }
+
+        if ($cm = get_coursemodule_from_id('recall', $context->instanceid)) {
+            list($insql, $inparams) = $DB->get_in_or_equal($userids);
+            
+            $sql = "SELECT p.id 
+                      FROM {recall_progress} p
+                      JOIN {recall_cards} c ON c.id = p.cardid
+                     WHERE c.recallid = ? AND p.userid $insql";
+            
+            $params = array_merge([$cm->instance], $inparams);
+            
+            $DB->delete_records_select('recall_progress', "id IN ($sql)", $params);
+        }
+    }
 }
-
-
