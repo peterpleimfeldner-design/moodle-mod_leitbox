@@ -2,6 +2,13 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.3] - 2026-03-01 (Moodle Core Database Hotfix)
+
+### Behoben
+- **Server Error (`dml_read_exception`):** Der verbleibende HTTP 500 Fehler wurde behoben. Die Ursache lag in einer systemfremden SQL-Abfrage (`SELECT ... ohne FROM`) innerhalb der `lib.php`, an der die strenge Moodle 4.x Datenbank-API bei der Abschluss-Prüfung abstürzte. Die Abfrage wurde in native Moodle-Funktionen (`count_records`) umgeschrieben.
+
+---
+
 ## [1.4.2] - 2026-03-01 (HTTP 500 Hotfix)
 
 ### Behoben

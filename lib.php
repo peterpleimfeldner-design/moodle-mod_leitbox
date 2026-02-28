@@ -200,19 +200,22 @@ function leitbox_get_completion_state($course, $cm, $userid, $type) {
     }
 
     if (!empty($leitbox->completion_all_mastered)) {
-        $sql_all = "SELECT 
-                        (SELECT COUNT(*) FROM {leitbox_cards} c WHERE c.leitboxid = :instanceid) AS total_cards,
-                        (SELECT COUNT(*) FROM {leitbox_progress} p 
-                          JOIN {leitbox_cards} c ON p.cardid = c.id
-                         WHERE c.leitboxid = :instanceid2 AND p.userid = :userid AND p.box_number = 5) AS mastered_cards";
-        $stats = $DB->get_record_sql($sql_all, [
+        // Count total cards in this box
+        $total_cards = $DB->count_records('leitbox_cards', ['leitboxid' => $leitbox->id]);
+        
+        // Count how many of those cards this user has mastered (box 5)
+        $sql_mastered = "SELECT COUNT(p.id) 
+                           FROM {leitbox_progress} p 
+                           JOIN {leitbox_cards} c ON p.cardid = c.id 
+                          WHERE c.leitboxid = :instanceid 
+                            AND p.userid = :userid 
+                            AND p.box_number = 5";
+        $mastered_cards = $DB->count_records_sql($sql_mastered, [
             'instanceid' => $leitbox->id, 
-            'instanceid2' => $leitbox->id, 
             'userid' => $userid
         ]);
 
-        // Fail if no cards exist, or not all of them are mastered
-        if (!$stats || $stats->total_cards == 0 || $stats->total_cards != $stats->mastered_cards) {
+        if ($total_cards == 0 || $total_cards != $mastered_cards) {
             $completed = false;
         }
     }
