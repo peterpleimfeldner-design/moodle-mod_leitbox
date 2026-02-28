@@ -28,7 +28,7 @@ class backup_leitbox_activity_structure_step extends backup_activity_structure_s
         // Define each element separated.
         $leitbox = new backup_nested_element('leitbox', ['id'], [
             'course', 'name', 'intro', 'introformat', 'cardorder', 
-            'completion_min_cards', 'completion_min_mastered', 'timecreated', 'timemodified'
+            'completion_min_cards', 'completion_min_mastered', 'completion_all_mastered', 'timecreated', 'timemodified'
         ]);
 
         $cards = new backup_nested_element('cards');

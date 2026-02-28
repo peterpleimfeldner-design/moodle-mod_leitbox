@@ -37,6 +37,10 @@ $string['completion_min_mastered'] = 'Mastered cards (Box 5)';
 $string['completion_min_mastered_desc'] = 'Student must master at least this many flashcards (reach Box 5):';
 $string['completion_min_mastered_help'] = 'The number of cards a student must successfully move to the final box (Box 5) to complete the activity. This ensures true mastery rather than just interaction.';
 
+$string['completion_all_mastered'] = 'All cards mastered';
+$string['completion_all_mastered_desc'] = 'Student must master ALL flashcards perfectly (Move all cards to Expert/Box 5)';
+$string['completion_all_mastered_help'] = 'If enabled, the activity will only be marked as complete when the student successfully moves every single flashcard in the set into the final Expert box.';
+
 $string['box0'] = 'New';
 $string['box1'] = 'Beginner';
 $string['box2'] = 'Learner';

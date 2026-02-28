@@ -142,6 +142,10 @@ function leitbox_get_completion_active_rule_descriptions($course, $cm) {
     if (!empty($cm->customdata['customcompletionrules']['completion_min_mastered'])) {
         $rules[] = get_string('completion_min_mastered_desc', 'mod_leitbox') . ' ' . $cm->customdata['customcompletionrules']['completion_min_mastered'];
     }
+
+    if (!empty($cm->customdata['customcompletionrules']['completion_all_mastered'])) {
+        $rules[] = get_string('completion_all_mastered', 'mod_leitbox');
+    }
     return $rules;
 }
 
@@ -161,7 +165,7 @@ function leitbox_get_completion_state($course, $cm, $userid, $type) {
     $leitbox = $DB->get_record('leitbox', ['id' => $cm->instance], '*', MUST_EXIST);
     
     // Check if the conditions are set
-    if (!$leitbox->completion_min_cards && !$leitbox->completion_min_mastered) {
+    if (!$leitbox->completion_min_cards && !$leitbox->completion_min_mastered && empty($leitbox->completion_all_mastered)) {
         return $type; // Rules not enabled
     }
 
@@ -191,6 +195,24 @@ function leitbox_get_completion_state($course, $cm, $userid, $type) {
         $total_mastered = $DB->get_field_sql($sql_mastered, ['userid' => $userid, 'instanceid' => $leitbox->id]);
 
         if ($total_mastered < $leitbox->completion_min_mastered) {
+            $completed = false;
+        }
+    }
+
+    if (!empty($leitbox->completion_all_mastered)) {
+        $sql_all = "SELECT 
+                        (SELECT COUNT(*) FROM {leitbox_cards} c WHERE c.leitboxid = :instanceid) AS total_cards,
+                        (SELECT COUNT(*) FROM {leitbox_progress} p 
+                          JOIN {leitbox_cards} c ON p.cardid = c.id
+                         WHERE c.leitboxid = :instanceid2 AND p.userid = :userid AND p.box_number = 5) AS mastered_cards";
+        $stats = $DB->get_record_sql($sql_all, [
+            'instanceid' => $leitbox->id, 
+            'instanceid2' => $leitbox->id, 
+            'userid' => $userid
+        ]);
+
+        // Fail if no cards exist, or not all of them are mastered
+        if (!$stats || $stats->total_cards == 0 || $stats->total_cards != $stats->mastered_cards) {
             $completed = false;
         }
     }

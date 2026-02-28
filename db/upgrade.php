@@ -47,6 +47,17 @@ function xmldb_leitbox_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026022705, 'leitbox');
     }
 
+    if ($oldversion < 2026030100) {
+        $table = new xmldb_table('leitbox');
+        $field = new xmldb_field('completion_all_mastered', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'completion_min_mastered');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2026030100, 'leitbox');
+    }
+
     return true;
 }
 
