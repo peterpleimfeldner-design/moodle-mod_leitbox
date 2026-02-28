@@ -87,6 +87,7 @@ $string['addcard'] = 'Karte speichern';
 $string['updatecard'] = 'Änderungen speichern';
 $string['cardadded'] = 'Karte wurde erfolgreich hinzugefügt.';
 $string['cardupdated'] = 'Karte wurde erfolgreich aktualisiert.';
+$string['cancel'] = 'Abbrechen';
 $string['carddeleted'] = 'Karte gelöscht.';
 $string['cardsdeleted'] = '{$a} Karten erfolgreich gelöscht.';
 $string['deleteselected'] = 'Ausgewählte löschen';

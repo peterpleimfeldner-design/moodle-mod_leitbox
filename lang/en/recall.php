@@ -87,6 +87,7 @@ $string['addcard'] = 'Save Card';
 $string['updatecard'] = 'Save changes';
 $string['cardadded'] = 'Card added successfully.';
 $string['cardupdated'] = 'Card updated successfully.';
+$string['cancel'] = 'Cancel';
 $string['carddeleted'] = 'Card deleted.';
 $string['cardsdeleted'] = 'Successfully deleted {$a} cards.';
 $string['deleteselected'] = 'Delete selected';
