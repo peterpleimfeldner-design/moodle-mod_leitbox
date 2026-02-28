@@ -15,41 +15,41 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   mod_recall
+ * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
 $functions = array(
-    'mod_recall_get_box_counts' => array(
-        'classname' => 'mod_recall\external',
+    'mod_leitbox_get_box_counts' => array(
+        'classname' => 'mod_leitbox\external',
         'methodname' => 'get_box_counts',
-        'classpath' => 'mod/recall/classes/external.php',
+        'classpath' => 'mod/leitbox/classes/external.php',
         'description' => 'Get aggregated flashcard counts per Leitner box',
         'type' => 'read',
         'ajax' => true,
     ),
-    'mod_recall_get_cards_by_box' => array(
-        'classname' => 'mod_recall\external',
+    'mod_leitbox_get_cards_by_box' => array(
+        'classname' => 'mod_leitbox\external',
         'methodname' => 'get_cards_by_box',
-        'classpath' => 'mod/recall/classes/external.php',
+        'classpath' => 'mod/leitbox/classes/external.php',
         'description' => 'Get flashcards by Leitner box number',
         'type' => 'read',
         'ajax' => true,
     ),
-    'mod_recall_submit_answer' => array(
-        'classname' => 'mod_recall\external',
+    'mod_leitbox_submit_answer' => array(
+        'classname' => 'mod_leitbox\external',
         'methodname' => 'submit_answer',
-        'classpath' => 'mod/recall/classes/external.php',
+        'classpath' => 'mod/leitbox/classes/external.php',
         'description' => 'Submit a flashcard review rating',
         'type' => 'write',
         'ajax' => true,
     ),
-    'mod_recall_reset_progress' => array(
-        'classname' => 'mod_recall\external',
+    'mod_leitbox_reset_progress' => array(
+        'classname' => 'mod_leitbox\external',
         'methodname' => 'reset_progress',
-        'classpath' => 'mod/recall/classes/external.php',
+        'classpath' => 'mod/leitbox/classes/external.php',
         'description' => 'Reset all card progress for the current user',
         'type' => 'write',
         'ajax' => true,

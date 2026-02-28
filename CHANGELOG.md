@@ -5,11 +5,11 @@ Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokument
 ## [1.3.1] - 2026-02-28 (Performance & Reliability Update)
 
 ### Geändert
-- **Performance (Dashboard Load):** Die `getBoxCounts` Funktion triggert nicht länger 6 parallele API-Aufrufe mit dem gesamten Kartendatenstrom. Ein neuer dedizierter, aggregierter REST-Endpunkt `mod_recall_get_box_counts` summiert die Karten serverseitig in Millisekunden und überträgt nur noch die 6 Zahlenwerte. Dies reduziert den Netzwerk-Payload bei 200 Karten um ca. 98%.
+- **Performance (Dashboard Load):** Die `getBoxCounts` Funktion triggert nicht länger 6 parallele API-Aufrufe mit dem gesamten Kartendatenstrom. Ein neuer dedizierter, aggregierter REST-Endpunkt `mod_leitbox_get_box_counts` summiert die Karten serverseitig in Millisekunden und überträgt nur noch die 6 Zahlenwerte. Dies reduziert den Netzwerk-Payload bei 200 Karten um ca. 98%.
 
 ### Behoben
 - **Race-Condition bei Frontend-Übersetzungen:** Wenn Moodle beim Ladezyklus Strings blockierte oder nicht fand, zeigte die Ansicht leere Platzhalter wie `[[showhint]]`. Ein robustes Fallback-Dictionary (`FALLBACKS`) in `Card.vue` fängt dies nun verlässlich ab.
-- **Backup & Restore Link-Dekodierung:** Fehlende `RECALLINDEX` Decode-Rules in `restore_recall_activity_task.php` ergänzt, sodass in Kursen platzierte Links auf Flashcard-Decks bei der Wiederherstellung korrekt aufgelöst statt als `$@RECALLVIEWBYID*...` roh im Text stehengelassen werden. Abwärtskompatibilität für alte `SMARTCARDS`-Backups bleibt bestehen.
+- **Backup & Restore Link-Dekodierung:** Fehlende `LEITBOXINDEX` Decode-Rules in `restore_leitbox_activity_task.php` ergänzt, sodass in Kursen platzierte Links auf Flashcard-Decks bei der Wiederherstellung korrekt aufgelöst statt als `$@LEITBOXVIEWBYID*...` roh im Text stehengelassen werden. Abwärtskompatibilität für alte `SMARTCARDS`-Backups bleibt bestehen.
 
 ---
 
@@ -24,7 +24,7 @@ Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokument
 - **Fortschrittsbalken-Übersetzung:** Der Fortschrittstext und sein barrierefreies aria-label sind jetzt korrekt internationalisiert.
 
 ### Geändert
-- **Plugin-Name vereinfacht:** Von „Recall Aktivität" zu „Recall" – konsistent mit Moodle-Namenskonventionen (Forum, Glossar, etc.).
+- **Plugin-Name vereinfacht:** Von „LeitBox Aktivität" zu „LeitBox" – konsistent mit Moodle-Namenskonventionen (Forum, Glossar, etc.).
 - **Reset-Button:** Visuelle Umgestaltung von rot zu neutralem Grau für ein harmonischeres Dashboard-Layout.
 - **Header-Layout:** Logo/Titel links, Buttons rechts – bündige Ausrichtung mit dem Fortschrittsbalken darunter.
 - **KI-Prompt-Text:** Herstellerunabhängig formuliert („nutze ihn mit einer beliebigen KI" statt spezifischer Markennamen).
@@ -44,9 +44,9 @@ Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokument
 - **Visuelle Statistiken:** Zeigt nach dem Absolvieren einen Fortschrittsbalken und Couter für "Gewusst" (Grün), "Nochmal" (Gelb) und "Schwer" (Rot) in der jeweiligen Durchgangs-Zusammenfassung an.
 
 ### Geändert
-- **Gezielte Ersteindruck-Kontrolle:** Die "Willkommen bei Recall"-Demokarte wird nun serverseitig *immer* an die erste Stelle gezwungen, selbst wenn die "Karten mischen"-Option in Moodle aktiv ist.
+- **Gezielte Ersteindruck-Kontrolle:** Die "Willkommen bei LeitBox"-Demokarte wird nun serverseitig *immer* an die erste Stelle gezwungen, selbst wenn die "Karten mischen"-Option in Moodle aktiv ist.
 - **Texte & Sprachpakete:** Sämtliche Demotexte sowie die Feedback-Meldungen wurden sachlicher und erwachsener formuliert ("alle" statt "die meisten"). Vue-Fallbacks hinzugefügt, um Cache-Fehler zu vermeiden.
-- **Logo Update:** Das Recall-Logo in der Moodle-Aktivität verwendet nun die saubere, freigestellte PNG-Version.
+- **Logo Update:** Das LeitBox-Logo in der Moodle-Aktivität verwendet nun die saubere, freigestellte PNG-Version.
 
 ---
 
@@ -59,7 +59,7 @@ Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokument
 - **Umbrella Fallbacks:** Neues Fallback-String-System in Vue integriert, um Platzhalter `[[...]]` bei noch nicht geladenen Sprachpaketen zu verhindern.
 
 ### Geändert
-- **Rebranding zu "Recall":** Kompletter Rename aller Dateien, Sprachpakete und Datenbanktabellen von `mod_smartcards` auf `mod_recall`.
+- **Rebranding zu "LeitBox":** Kompletter Rename aller Dateien, Sprachpakete und Datenbanktabellen von `mod_smartcards` auf `mod_leitbox`.
 - **Didaktik-Update & Benennung:** Motivierende Box-Namen ("Einsteiger", "Lernender", "Fortgeschritten", "Erfahren", "Experte") statt nackter Zahlen integriert.
 - **Spaced Repetition Logik:** "Schwer/Nicht gewusst"-Karten fallen nun motivierend nur um 1 Box zurück, anstatt komplett auf Box 0 zurückzusetzen.
 - **Visuelles Branding & UI:** Komplettes Redesign des Dashboards mit entspannenden Teal/Navy Pastellfarben, schwebenden Boxen und dezenten Fortschrittsbalken.

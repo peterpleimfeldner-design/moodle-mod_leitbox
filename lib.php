@@ -15,98 +15,98 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   mod_recall
+ * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Adds a new recall instance
+ * Adds a new leitbox instance
  *
- * @param stdClass $recall
+ * @param stdClass $leitbox
  * @return int The instance ID
  */
-function recall_add_instance($recall) {
+function leitbox_add_instance($leitbox) {
     global $DB;
-    $recall->timecreated = time();
-    $recall->timemodified = $recall->timecreated;
-    $id = $DB->insert_record('recall', $recall);
+    $leitbox->timecreated = time();
+    $leitbox->timemodified = $leitbox->timecreated;
+    $id = $DB->insert_record('leitbox', $leitbox);
 
     // Insert tutorial demo cards using localized strings
     $demo_cards = [
         [
-            'recallid' => $id,
-            'question' => get_string('demo_q1', 'mod_recall'),
-            'answer' => get_string('demo_a1', 'mod_recall'),
-            'hint' => get_string('demo_h1', 'mod_recall'),
+            'leitboxid' => $id,
+            'question' => get_string('demo_q1', 'mod_leitbox'),
+            'answer' => get_string('demo_a1', 'mod_leitbox'),
+            'hint' => get_string('demo_h1', 'mod_leitbox'),
         ],
         [
-            'recallid' => $id,
-            'question' => get_string('demo_q2', 'mod_recall'),
-            'answer' => get_string('demo_a2', 'mod_recall'),
-            'hint' => get_string('demo_h2', 'mod_recall'),
+            'leitboxid' => $id,
+            'question' => get_string('demo_q2', 'mod_leitbox'),
+            'answer' => get_string('demo_a2', 'mod_leitbox'),
+            'hint' => get_string('demo_h2', 'mod_leitbox'),
         ],
         [
-            'recallid' => $id,
-            'question' => get_string('demo_q3', 'mod_recall'),
-            'answer' => get_string('demo_a3', 'mod_recall'),
-            'hint' => get_string('demo_h3', 'mod_recall'),
+            'leitboxid' => $id,
+            'question' => get_string('demo_q3', 'mod_leitbox'),
+            'answer' => get_string('demo_a3', 'mod_leitbox'),
+            'hint' => get_string('demo_h3', 'mod_leitbox'),
         ],
         [
-            'recallid' => $id,
-            'question' => get_string('demo_q4', 'mod_recall'),
-            'answer' => get_string('demo_a4', 'mod_recall'),
-            'hint' => get_string('demo_h4', 'mod_recall'),
+            'leitboxid' => $id,
+            'question' => get_string('demo_q4', 'mod_leitbox'),
+            'answer' => get_string('demo_a4', 'mod_leitbox'),
+            'hint' => get_string('demo_h4', 'mod_leitbox'),
         ],
         [
-            'recallid' => $id,
-            'question' => get_string('demo_q5', 'mod_recall'),
-            'answer' => get_string('demo_a5', 'mod_recall'),
-            'hint' => get_string('demo_h5', 'mod_recall'),
+            'leitboxid' => $id,
+            'question' => get_string('demo_q5', 'mod_leitbox'),
+            'answer' => get_string('demo_a5', 'mod_leitbox'),
+            'hint' => get_string('demo_h5', 'mod_leitbox'),
         ]
     ];
 
     foreach ($demo_cards as $card) {
-        $DB->insert_record('recall_cards', (object)$card);
+        $DB->insert_record('leitbox_cards', (object)$card);
     }
 
     return $id;
 }
 
 /**
- * Updates an existing recall instance
+ * Updates an existing leitbox instance
  *
- * @param stdClass $recall
+ * @param stdClass $leitbox
  * @return bool
  */
-function recall_update_instance($recall) {
+function leitbox_update_instance($leitbox) {
     global $DB;
-    $recall->timemodified = time();
-    $recall->id = $recall->instance;
-    return $DB->update_record('recall', $recall);
+    $leitbox->timemodified = time();
+    $leitbox->id = $leitbox->instance;
+    return $DB->update_record('leitbox', $leitbox);
 }
 
 /**
- * Deletes a recall instance
+ * Deletes a leitbox instance
  *
  * @param int $id The instance ID
  * @return bool
  */
-function recall_delete_instance($id) {
+function leitbox_delete_instance($id) {
     global $DB;
-    if (!$recall = $DB->get_record('recall', ['id' => $id])) {
+    if (!$leitbox = $DB->get_record('leitbox', ['id' => $id])) {
         return false;
     }
     
-    $sql = "SELECT id FROM {recall_cards} WHERE recallid = ?";
+    $sql = "SELECT id FROM {leitbox_cards} WHERE leitboxid = ?";
     if ($cards = $DB->get_records_sql($sql, [$id])) {
         list($in, $params) = $DB->get_in_or_equal(array_keys($cards));
-        $DB->delete_records_select('recall_progress', "cardid $in", $params);
+        $DB->delete_records_select('leitbox_progress', "cardid $in", $params);
     }
     
-    $DB->delete_records('recall_cards', ['recallid' => $id]);
-    $DB->delete_records('recall', ['id' => $id]);
+    $DB->delete_records('leitbox_cards', ['leitboxid' => $id]);
+    $DB->delete_records('leitbox', ['id' => $id]);
     return true;
 }
 
@@ -116,7 +116,7 @@ function recall_delete_instance($id) {
  * @param string $feature
  * @return mixed
  */
-function recall_supports($feature) {
+function leitbox_supports($feature) {
     switch($feature) {
         case FEATURE_MOD_INTRO: return true;
         case FEATURE_SHOW_DESCRIPTION: return true;
@@ -134,20 +134,20 @@ function recall_supports($feature) {
  * @param cm_info $cm
  * @return array
  */
-function recall_get_completion_active_rule_descriptions($course, $cm) {
+function leitbox_get_completion_active_rule_descriptions($course, $cm) {
     $rules = [];
     if (!empty($cm->customdata['customcompletionrules']['completion_min_cards'])) {
-        $rules[] = get_string('completion_min_cards_desc', 'mod_recall') . ' ' . $cm->customdata['customcompletionrules']['completion_min_cards'];
+        $rules[] = get_string('completion_min_cards_desc', 'mod_leitbox') . ' ' . $cm->customdata['customcompletionrules']['completion_min_cards'];
     }
     if (!empty($cm->customdata['customcompletionrules']['completion_min_mastered'])) {
-        $rules[] = get_string('completion_min_mastered_desc', 'mod_recall') . ' ' . $cm->customdata['customcompletionrules']['completion_min_mastered'];
+        $rules[] = get_string('completion_min_mastered_desc', 'mod_leitbox') . ' ' . $cm->customdata['customcompletionrules']['completion_min_mastered'];
     }
     return $rules;
 }
 
 /**
  * Obtains the automatic completion state for this module based on any custom
- * conditions in the mod_recall record.
+ * conditions in the mod_leitbox record.
  *
  * @param stdClass $course Course
  * @param cm_info $cm Course-module
@@ -155,42 +155,42 @@ function recall_get_completion_active_rule_descriptions($course, $cm) {
  * @param bool $type Type of comparison (or/and)
  * @return bool True if completed, false if not, $type if conditions not set.
  */
-function recall_get_completion_state($course, $cm, $userid, $type) {
+function leitbox_get_completion_state($course, $cm, $userid, $type) {
     global $DB;
 
-    $recall = $DB->get_record('recall', ['id' => $cm->instance], '*', MUST_EXIST);
+    $leitbox = $DB->get_record('leitbox', ['id' => $cm->instance], '*', MUST_EXIST);
     
     // Check if the conditions are set
-    if (!$recall->completion_min_cards && !$recall->completion_min_mastered) {
+    if (!$leitbox->completion_min_cards && !$leitbox->completion_min_mastered) {
         return $type; // Rules not enabled
     }
 
     $completed = true;
 
-    if ($recall->completion_min_cards) {
+    if ($leitbox->completion_min_cards) {
         $sql = "SELECT COALESCE(SUM(count_correct + count_wrong), 0) AS total_reviews
-                  FROM {recall_progress}
+                  FROM {leitbox_progress}
                  WHERE userid = :userid AND cardid IN (
-                     SELECT id FROM {recall_cards} WHERE recallid = :instanceid
+                     SELECT id FROM {leitbox_cards} WHERE leitboxid = :instanceid
                  )";
-        $total_reviews = $DB->get_field_sql($sql, ['userid' => $userid, 'instanceid' => $recall->id]);
+        $total_reviews = $DB->get_field_sql($sql, ['userid' => $userid, 'instanceid' => $leitbox->id]);
 
-        if ($total_reviews < $recall->completion_min_cards) {
+        if ($total_reviews < $leitbox->completion_min_cards) {
             $completed = false;
         }
     }
 
-    if ($recall->completion_min_mastered) {
+    if ($leitbox->completion_min_mastered) {
         $sql_mastered = "SELECT COUNT(*)
-                           FROM {recall_progress}
+                           FROM {leitbox_progress}
                           WHERE userid = :userid 
                             AND box_number = 5
                             AND cardid IN (
-                                SELECT id FROM {recall_cards} WHERE recallid = :instanceid
+                                SELECT id FROM {leitbox_cards} WHERE leitboxid = :instanceid
                             )";
-        $total_mastered = $DB->get_field_sql($sql_mastered, ['userid' => $userid, 'instanceid' => $recall->id]);
+        $total_mastered = $DB->get_field_sql($sql_mastered, ['userid' => $userid, 'instanceid' => $leitbox->id]);
 
-        if ($total_mastered < $recall->completion_min_mastered) {
+        if ($total_mastered < $leitbox->completion_min_mastered) {
             $completed = false;
         }
     }
@@ -199,18 +199,18 @@ function recall_get_completion_state($course, $cm, $userid, $type) {
 }
 
 /**
- * Extends the settings navigation for the recall module.
+ * Extends the settings navigation for the leitbox module.
  *
  * @param settings_navigation $settings
- * @param navigation_node $recallnode
+ * @param navigation_node $leitboxnode
  */
-function recall_extend_settings_navigation(settings_navigation $settings, navigation_node $recallnode) {
+function leitbox_extend_settings_navigation(settings_navigation $settings, navigation_node $leitboxnode) {
     global $PAGE;
 
     if (has_capability('moodle/course:manageactivities', $PAGE->cm->context)) {
-        $url = new moodle_url('/mod/recall/manage.php', ['id' => $PAGE->cm->id]);
-        $recallnode->add(
-            get_string('managecards', 'mod_recall'),
+        $url = new moodle_url('/mod/leitbox/manage.php', ['id' => $PAGE->cm->id]);
+        $leitboxnode->add(
+            get_string('managecards', 'mod_leitbox'),
             $url,
             navigation_node::TYPE_SETTING,
             null,

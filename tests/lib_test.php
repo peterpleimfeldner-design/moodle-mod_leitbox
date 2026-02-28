@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Library unit tests for mod_recall.
+ * Library unit tests for mod_leitbox.
  *
- * @package   mod_recall
+ * @package   mod_leitbox
  * @category  test
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,12 +26,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/recall/lib.php');
+require_once($CFG->dirroot . '/mod/leitbox/lib.php');
 
 /**
- * Library unit tests for mod_recall.
+ * Library unit tests for mod_leitbox.
  */
-class mod_recall_lib_testcase extends advanced_testcase {
+class mod_leitbox_lib_testcase extends advanced_testcase {
 
     public function setUp(): void {
         $this->resetAfterTest();
@@ -47,38 +47,38 @@ class mod_recall_lib_testcase extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         
         // 1. Test Add
-        $recall = new \stdClass();
-        $recall->course = $course->id;
-        $recall->name = 'Recall Test Activity';
-        $recall->intro = 'Intro text';
-        $recall->introformat = FORMAT_HTML;
-        $recall->cardorder = 0;
+        $leitbox = new \stdClass();
+        $leitbox->course = $course->id;
+        $leitbox->name = 'LeitBox Test Activity';
+        $leitbox->intro = 'Intro text';
+        $leitbox->introformat = FORMAT_HTML;
+        $leitbox->cardorder = 0;
         
-        $module = $this->getDataGenerator()->create_module('recall', (array)$recall);
+        $module = $this->getDataGenerator()->create_module('leitbox', (array)$leitbox);
         $this->assertNotEmpty($module->id);
 
         // Verify demo cards were created by our custom add_instance logic.
-        $cardcount = $DB->count_records('recall_cards', ['recallid' => $module->id]);
+        $cardcount = $DB->count_records('leitbox_cards', ['leitboxid' => $module->id]);
         $this->assertEquals(5, $cardcount); // add_instance inserts 5 demo cards
 
         // 2. Test Update
-        $module->name = 'Updated Recall Name';
+        $module->name = 'Updated LeitBox Name';
         $module->instance = $module->id;
-        $result = recall_update_instance($module);
+        $result = leitbox_update_instance($module);
         $this->assertTrue($result);
 
-        $updated = $DB->get_record('recall', ['id' => $module->id]);
-        $this->assertEquals('Updated Recall Name', $updated->name);
+        $updated = $DB->get_record('leitbox', ['id' => $module->id]);
+        $this->assertEquals('Updated LeitBox Name', $updated->name);
 
         // 3. Test Delete
-        $result = recall_delete_instance($module->id);
+        $result = leitbox_delete_instance($module->id);
         $this->assertTrue($result);
 
-        $deleted = $DB->get_record('recall', ['id' => $module->id]);
+        $deleted = $DB->get_record('leitbox', ['id' => $module->id]);
         $this->assertFalse($deleted);
         
         // Cards should also be deleted
-        $cardcount_after = $DB->count_records('recall_cards', ['recallid' => $module->id]);
+        $cardcount_after = $DB->count_records('leitbox_cards', ['leitboxid' => $module->id]);
         $this->assertEquals(0, $cardcount_after);
     }
 }

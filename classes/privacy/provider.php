@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   mod_recall
+ * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_recall\privacy;
+namespace mod_leitbox\privacy;
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\contextlist;
@@ -36,16 +36,16 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
 
     public static function get_metadata(collection $collection) : collection {
         $collection->add_database_table(
-            'recall_progress',
+            'leitbox_progress',
             [
-                'userid' => 'privacy:metadata:recall_progress:userid',
-                'cardid' => 'privacy:metadata:recall_progress:cardid',
-                'box_number' => 'privacy:metadata:recall_progress:box_number',
-                'count_correct' => 'privacy:metadata:recall_progress:count_correct',
-                'count_wrong' => 'privacy:metadata:recall_progress:count_wrong',
-                'last_reviewed' => 'privacy:metadata:recall_progress:last_reviewed',
+                'userid' => 'privacy:metadata:leitbox_progress:userid',
+                'cardid' => 'privacy:metadata:leitbox_progress:cardid',
+                'box_number' => 'privacy:metadata:leitbox_progress:box_number',
+                'count_correct' => 'privacy:metadata:leitbox_progress:count_correct',
+                'count_wrong' => 'privacy:metadata:leitbox_progress:count_wrong',
+                'last_reviewed' => 'privacy:metadata:leitbox_progress:last_reviewed',
             ],
-            'privacy:metadata:recall_progress'
+            'privacy:metadata:leitbox_progress'
         );
         return $collection;
     }
@@ -56,12 +56,12 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
                   FROM {context} c
                   JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
                   JOIN {modules} m ON m.name = :modname AND m.id = cm.module
-                  JOIN {recall} r ON r.id = cm.instance
-                  JOIN {recall_cards} rc ON rc.recallid = r.id
-                  JOIN {recall_progress} rp ON rp.cardid = rc.id
+                  JOIN {leitbox} r ON r.id = cm.instance
+                  JOIN {leitbox_cards} rc ON rc.leitboxid = r.id
+                  JOIN {leitbox_progress} rp ON rp.cardid = rc.id
                  WHERE rp.userid = :userid";
         $params = [
-            'modname' => 'recall',
+            'modname' => 'leitbox',
             'contextlevel' => CONTEXT_MODULE,
             'userid' => $userid,
         ];
@@ -78,13 +78,13 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
         $sql = "SELECT rp.userid
                   FROM {course_modules} cm
                   JOIN {modules} m ON m.name = :modname AND m.id = cm.module
-                  JOIN {recall} r ON r.id = cm.instance
-                  JOIN {recall_cards} rc ON rc.recallid = r.id
-                  JOIN {recall_progress} rp ON rp.cardid = rc.id
+                  JOIN {leitbox} r ON r.id = cm.instance
+                  JOIN {leitbox_cards} rc ON rc.leitboxid = r.id
+                  JOIN {leitbox_progress} rp ON rp.cardid = rc.id
                  WHERE cm.id = :cmid";
         
         $params = [
-            'modname' => 'recall',
+            'modname' => 'leitbox',
             'cmid' => $context->instanceid
         ];
         
@@ -100,15 +100,15 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
         $userid = $contextlist->get_user()->id;
         foreach ($contextlist->get_contexts() as $context) {
             if ($context->contextlevel == CONTEXT_MODULE) {
-                $cm = get_coursemodule_from_id('recall', $context->instanceid);
+                $cm = get_coursemodule_from_id('leitbox', $context->instanceid);
                 if (!$cm) {
                     continue;
                 }
 
                 $sql = "SELECT rp.*, rc.question, rc.answer
-                          FROM {recall_progress} rp
-                          JOIN {recall_cards} rc ON rc.id = rp.cardid
-                         WHERE rc.recallid = ? AND rp.userid = ?";
+                          FROM {leitbox_progress} rp
+                          JOIN {leitbox_cards} rc ON rc.id = rp.cardid
+                         WHERE rc.leitboxid = ? AND rp.userid = ?";
                 $progress_records = $DB->get_records_sql($sql, [$cm->instance, $userid]);
 
                 if (!empty($progress_records)) {
@@ -125,7 +125,7 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
                     }
                     
                     \core_privacy\local\request\writer::with_context($context)->export_data(
-                        [get_string('pluginname', 'mod_recall'), get_string('cards', 'mod_recall')],
+                        [get_string('pluginname', 'mod_leitbox'), get_string('cards', 'mod_leitbox')],
                         (object)['progress' => $exportdata]
                     );
                 }
@@ -139,12 +139,12 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
             return;
         }
 
-        if ($cm = get_coursemodule_from_id('recall', $context->instanceid)) {
+        if ($cm = get_coursemodule_from_id('leitbox', $context->instanceid)) {
             $sql = "SELECT p.id 
-                      FROM {recall_progress} p
-                      JOIN {recall_cards} c ON c.id = p.cardid
-                     WHERE c.recallid = ?";
-            $DB->delete_records_select('recall_progress', "id IN ($sql)", [$cm->instance]);
+                      FROM {leitbox_progress} p
+                      JOIN {leitbox_cards} c ON c.id = p.cardid
+                     WHERE c.leitboxid = ?";
+            $DB->delete_records_select('leitbox_progress', "id IN ($sql)", [$cm->instance]);
         }
     }
 
@@ -157,12 +157,12 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
         $userid = $contextlist->get_user()->id;
         foreach ($contextlist->get_contexts() as $context) {
             if ($context->contextlevel == CONTEXT_MODULE) {
-                if ($cm = get_coursemodule_from_id('recall', $context->instanceid)) {
+                if ($cm = get_coursemodule_from_id('leitbox', $context->instanceid)) {
                     $sql = "SELECT p.id 
-                              FROM {recall_progress} p
-                              JOIN {recall_cards} c ON c.id = p.cardid
-                             WHERE c.recallid = ? AND p.userid = ?";
-                    $DB->delete_records_select('recall_progress', "id IN ($sql)", [$cm->instance, $userid]);
+                              FROM {leitbox_progress} p
+                              JOIN {leitbox_cards} c ON c.id = p.cardid
+                             WHERE c.leitboxid = ? AND p.userid = ?";
+                    $DB->delete_records_select('leitbox_progress', "id IN ($sql)", [$cm->instance, $userid]);
                 }
             }
         }
@@ -180,17 +180,17 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
             return;
         }
 
-        if ($cm = get_coursemodule_from_id('recall', $context->instanceid)) {
+        if ($cm = get_coursemodule_from_id('leitbox', $context->instanceid)) {
             list($insql, $inparams) = $DB->get_in_or_equal($userids);
             
             $sql = "SELECT p.id 
-                      FROM {recall_progress} p
-                      JOIN {recall_cards} c ON c.id = p.cardid
-                     WHERE c.recallid = ? AND p.userid $insql";
+                      FROM {leitbox_progress} p
+                      JOIN {leitbox_cards} c ON c.id = p.cardid
+                     WHERE c.leitboxid = ? AND p.userid $insql";
             
             $params = array_merge([$cm->instance], $inparams);
             
-            $DB->delete_records_select('recall_progress', "id IN ($sql)", $params);
+            $DB->delete_records_select('leitbox_progress', "id IN ($sql)", $params);
         }
     }
 }

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   mod_recall
+ * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,41 +27,41 @@ $id = required_param('id', PARAM_INT); // Course Module ID
 $action = optional_param('action', '', PARAM_ALPHA);
 $cardid = optional_param('cardid', 0, PARAM_INT);
 
-list($course, $cm) = get_course_and_cm_from_cmid($id, 'recall');
-$recall = $DB->get_record('recall', ['id' => $cm->instance], '*', MUST_EXIST);
+list($course, $cm) = get_course_and_cm_from_cmid($id, 'leitbox');
+$leitbox = $DB->get_record('leitbox', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
 require_capability('moodle/course:manageactivities', $context);
 
-$PAGE->set_url('/mod/recall/manage.php', ['id' => $cm->id]);
-$PAGE->set_title(format_string($recall->name));
+$PAGE->set_url('/mod/leitbox/manage.php', ['id' => $cm->id]);
+$PAGE->set_title(format_string($leitbox->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 
 /**
  * Automatically cleans up the 5 tutorial demo cards when the teacher adds their first custom card.
  */
-function mod_recall_auto_delete_demos($recallid) {
+function mod_leitbox_auto_delete_demos($leitboxid) {
     global $DB;
-    $cards = $DB->get_records('recall_cards', ['recallid' => $recallid], 'id ASC');
+    $cards = $DB->get_records('leitbox_cards', ['leitboxid' => $leitboxid], 'id ASC');
     if (count($cards) === 5) {
         $first_card = reset($cards);
-        if (strpos($first_card->question, 'Willkommen bei Recall') !== false || strpos($first_card->question, 'Welcome to Recall') !== false) {
+        if (strpos($first_card->question, 'Willkommen bei LeitBox') !== false || strpos($first_card->question, 'Welcome to LeitBox') !== false) {
             list($in, $params) = $DB->get_in_or_equal(array_keys($cards));
             if (!empty($params)) {
-                 $DB->delete_records_select('recall_progress', "cardid $in", $params);
+                 $DB->delete_records_select('leitbox_progress', "cardid $in", $params);
             }
-            $DB->delete_records('recall_cards', ['recallid' => $recallid]);
+            $DB->delete_records('leitbox_cards', ['leitboxid' => $leitboxid]);
         }
     }
 }
 
 // Process actions
 if ($action === 'delete' && $cardid && confirm_sesskey()) {
-    $DB->delete_records('recall_progress', ['cardid' => $cardid]);
-    $DB->delete_records('recall_cards', ['id' => $cardid, 'recallid' => $recall->id]);
-    redirect(new moodle_url('/mod/recall/manage.php', ['id' => $cm->id]), get_string('carddeleted', 'mod_recall'));
+    $DB->delete_records('leitbox_progress', ['cardid' => $cardid]);
+    $DB->delete_records('leitbox_cards', ['id' => $cardid, 'leitboxid' => $leitbox->id]);
+    redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]), get_string('carddeleted', 'mod_leitbox'));
 }
 
 if ($action === 'bulkdelete' && data_submitted() && confirm_sesskey()) {
@@ -71,27 +71,27 @@ if ($action === 'bulkdelete' && data_submitted() && confirm_sesskey()) {
     if (!empty($cardids)) {
         list($in, $params) = $DB->get_in_or_equal($cardids);
         
-        // Double check they belong to this recall instance
-        $params[] = $recall->id;
-        $valid_cards = $DB->get_fieldset_sql("SELECT id FROM {recall_cards} WHERE id $in AND recallid = ?", $params);
+        // Double check they belong to this leitbox instance
+        $params[] = $leitbox->id;
+        $valid_cards = $DB->get_fieldset_sql("SELECT id FROM {leitbox_cards} WHERE id $in AND leitboxid = ?", $params);
         
         if (!empty($valid_cards)) {
             $deleted_count = count($valid_cards);
             list($in_valid, $params_valid) = $DB->get_in_or_equal($valid_cards);
-            $DB->delete_records_select('recall_progress', "cardid $in_valid", $params_valid);
-            $DB->delete_records_select('recall_cards', "id $in_valid", $params_valid);
+            $DB->delete_records_select('leitbox_progress', "cardid $in_valid", $params_valid);
+            $DB->delete_records_select('leitbox_cards', "id $in_valid", $params_valid);
         }
     }
     
     if ($deleted_count > 0) {
-        redirect(new moodle_url('/mod/recall/manage.php', ['id' => $cm->id]), get_string('cardsdeleted', 'mod_recall', $deleted_count));
+        redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]), get_string('cardsdeleted', 'mod_leitbox', $deleted_count));
     } else {
-        redirect(new moodle_url('/mod/recall/manage.php', ['id' => $cm->id]));
+        redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]));
     }
 }
 
 if ($action === 'export' && confirm_sesskey()) {
-    $cards = $DB->get_records('recall_cards', ['recallid' => $recall->id], 'id ASC');
+    $cards = $DB->get_records('leitbox_cards', ['leitboxid' => $leitbox->id], 'id ASC');
     $export_content = "";
     foreach ($cards as $c) {
         $export_content .= "===CARD===\n";
@@ -103,15 +103,15 @@ if ($action === 'export' && confirm_sesskey()) {
         $export_content .= "\n";
     }
     
-    $filename = clean_filename($recall->name) . '_export.txt';
+    $filename = clean_filename($leitbox->name) . '_export.txt';
     send_file($export_content, $filename, 0, 0, true, true, 'text/plain');
     die();
 }
 
 if ($action === 'add' && data_submitted() && confirm_sesskey()) {
-    $current_count = $DB->count_records('recall_cards', ['recallid' => $recall->id]);
+    $current_count = $DB->count_records('leitbox_cards', ['leitboxid' => $leitbox->id]);
     if ($current_count >= 200) {
-        redirect(new moodle_url('/mod/recall/manage.php', ['id' => $cm->id]), get_string('error_limit_reached', 'mod_recall'), null, \core\output\notification::NOTIFY_ERROR);
+        redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]), get_string('error_limit_reached', 'mod_leitbox'), null, \core\output\notification::NOTIFY_ERROR);
     }
 
     $q = required_param('question', PARAM_RAW);
@@ -119,21 +119,21 @@ if ($action === 'add' && data_submitted() && confirm_sesskey()) {
     $h = optional_param('hint', '', PARAM_RAW);
     
     if (!empty($q) && !empty($a)) {
-        mod_recall_auto_delete_demos($recall->id);
+        mod_leitbox_auto_delete_demos($leitbox->id);
         
         $newcard = new stdClass();
-        $newcard->recallid = $recall->id;
+        $newcard->leitboxid = $leitbox->id;
         $newcard->question = $q;
         $newcard->answer = $a;
         $newcard->hint = $h;
-        $DB->insert_record('recall_cards', $newcard);
-        redirect(new moodle_url('/mod/recall/manage.php', ['id' => $cm->id]), get_string('cardadded', 'mod_recall'));
+        $DB->insert_record('leitbox_cards', $newcard);
+        redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]), get_string('cardadded', 'mod_leitbox'));
     }
 }
 
 if ($action === 'update' && data_submitted() && confirm_sesskey() && $cardid) {
-    // Security check: Ensure the card belongs to this recall instance
-    if (!$DB->record_exists('recall_cards', ['id' => $cardid, 'recallid' => $recall->id])) {
+    // Security check: Ensure the card belongs to this leitbox instance
+    if (!$DB->record_exists('leitbox_cards', ['id' => $cardid, 'leitboxid' => $leitbox->id])) {
         print_error('invalidrecord');
     }
 
@@ -147,60 +147,60 @@ if ($action === 'update' && data_submitted() && confirm_sesskey() && $cardid) {
         $updatecard->question = $q;
         $updatecard->answer = $a;
         $updatecard->hint = $h;
-        $DB->update_record('recall_cards', $updatecard);
-        redirect(new moodle_url('/mod/recall/manage.php', ['id' => $cm->id]), get_string('cardupdated', 'mod_recall'));
+        $DB->update_record('leitbox_cards', $updatecard);
+        redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]), get_string('cardupdated', 'mod_leitbox'));
     }
 }
 
 if ($action === 'import' && data_submitted() && confirm_sesskey()) {
     $importtext = required_param('importdata', PARAM_RAW);
-    $parsed_cards = \mod_recall\import_handler::parse_text($importtext);
+    $parsed_cards = \mod_leitbox\import_handler::parse_text($importtext);
     
-    $current_count = $DB->count_records('recall_cards', ['recallid' => $recall->id]);
+    $current_count = $DB->count_records('leitbox_cards', ['leitboxid' => $leitbox->id]);
     $new_total = $current_count + count($parsed_cards);
     
     if ($new_total > 200) {
-        redirect(new moodle_url('/mod/recall/manage.php', ['id' => $cm->id]), get_string('error_limit_exceeded_import', 'mod_recall', max(0, 200 - $current_count)), null, \core\output\notification::NOTIFY_ERROR);
+        redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]), get_string('error_limit_exceeded_import', 'mod_leitbox', max(0, 200 - $current_count)), null, \core\output\notification::NOTIFY_ERROR);
     }
     
     if (!empty($parsed_cards)) {
-        mod_recall_auto_delete_demos($recall->id);
+        mod_leitbox_auto_delete_demos($leitbox->id);
     }
 
     $count = 0;
     foreach ($parsed_cards as $card) {
         $newcard = new stdClass();
-        $newcard->recallid = $recall->id;
+        $newcard->leitboxid = $leitbox->id;
         $newcard->question = $card['question'];
         $newcard->answer = $card['answer'];
         $newcard->hint = $card['hint'];
-        $DB->insert_record('recall_cards', $newcard);
+        $DB->insert_record('leitbox_cards', $newcard);
         $count++;
     }
-    redirect(new moodle_url('/mod/recall/manage.php', ['id' => $cm->id]), get_string('cardsimported', 'mod_recall', $count));
+    redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]), get_string('cardsimported', 'mod_leitbox', $count));
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('managecards', 'mod_recall'));
+echo $OUTPUT->heading(get_string('managecards', 'mod_leitbox'));
 
 // Display didactic limit notice
-echo $OUTPUT->notification(get_string('didactic_limit_notice', 'mod_recall'), \core\output\notification::NOTIFY_INFO);
+echo $OUTPUT->notification(get_string('didactic_limit_notice', 'mod_leitbox'), \core\output\notification::NOTIFY_INFO);
 
 // 1. Link back to activity
-echo html_writer::link(new moodle_url('/mod/recall/view.php', ['id' => $cm->id]), get_string('backtoactivity', 'mod_recall'), ['class' => 'btn btn-secondary mb-4']);
+echo html_writer::link(new moodle_url('/mod/leitbox/view.php', ['id' => $cm->id]), get_string('backtoactivity', 'mod_leitbox'), ['class' => 'btn btn-secondary mb-4']);
 
 
 // 2. Add or Edit Single Card Form
 $editcard = null;
 if ($action === 'edit' && $cardid) {
-    $editcard = $DB->get_record('recall_cards', ['id' => $cardid, 'recallid' => $recall->id]);
+    $editcard = $DB->get_record('leitbox_cards', ['id' => $cardid, 'leitboxid' => $leitbox->id]);
 }
 
 echo $OUTPUT->box_start('generalbox boxwidthwide boxaligncenter');
 if ($editcard) {
-    echo html_writer::tag('h3', get_string('editsinglecard', 'mod_recall'));
+    echo html_writer::tag('h3', get_string('editsinglecard', 'mod_leitbox'));
 } else {
-    echo html_writer::tag('h3', get_string('addsinglecard', 'mod_recall'));
+    echo html_writer::tag('h3', get_string('addsinglecard', 'mod_leitbox'));
 }
 
 echo html_writer::start_tag('form', ['action' => 'manage.php', 'method' => 'post', 'class' => 'mform']);
@@ -215,20 +215,20 @@ $qval = $editcard ? htmlspecialchars($editcard->question) : '';
 $aval = $editcard ? htmlspecialchars($editcard->answer) : '';
 $hval = $editcard ? htmlspecialchars($editcard->hint) : '';
 
-echo '<div class="mb-3"><label>' . get_string('question', 'mod_recall') . '</label><br>';
+echo '<div class="mb-3"><label>' . get_string('question', 'mod_leitbox') . '</label><br>';
 echo '<textarea name="question" rows="2" class="form-control w-100" required="required">' . $qval . '</textarea></div>';
 
-echo '<div class="mb-3"><label>' . get_string('answer', 'mod_recall') . '</label><br>';
+echo '<div class="mb-3"><label>' . get_string('answer', 'mod_leitbox') . '</label><br>';
 echo '<textarea name="answer" rows="2" class="form-control w-100" required="required">' . $aval . '</textarea></div>';
 
-echo '<div class="mb-3"><label>' . get_string('hint', 'mod_recall') . ' (' . get_string('optional', 'moodle') . ')</label><br>';
+echo '<div class="mb-3"><label>' . get_string('hint', 'mod_leitbox') . ' (' . get_string('optional', 'moodle') . ')</label><br>';
 echo '<textarea name="hint" rows="1" class="form-control w-100">' . $hval . '</textarea></div>';
 
 if ($editcard) {
-    echo html_writer::empty_tag('input', ['type' => 'submit', 'value' => get_string('updatecard', 'mod_recall'), 'class' => 'btn btn-primary']);
-    echo html_writer::link(new moodle_url('/mod/recall/manage.php', ['id' => $cm->id]), get_string('cancel', 'mod_recall'), ['class' => 'btn btn-secondary', 'style' => 'margin-left:10px;']);
+    echo html_writer::empty_tag('input', ['type' => 'submit', 'value' => get_string('updatecard', 'mod_leitbox'), 'class' => 'btn btn-primary']);
+    echo html_writer::link(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]), get_string('cancel', 'mod_leitbox'), ['class' => 'btn btn-secondary', 'style' => 'margin-left:10px;']);
 } else {
-    echo html_writer::empty_tag('input', ['type' => 'submit', 'value' => get_string('addcard', 'mod_recall'), 'class' => 'btn btn-primary']);
+    echo html_writer::empty_tag('input', ['type' => 'submit', 'value' => get_string('addcard', 'mod_leitbox'), 'class' => 'btn btn-primary']);
 }
 
 echo html_writer::end_tag('form');
@@ -237,33 +237,33 @@ echo $OUTPUT->box_end();
 
 // 3. AI Import Form
 echo $OUTPUT->box_start('generalbox boxwidthwide boxaligncenter mt-4');
-echo html_writer::tag('h3', get_string('bulkimport', 'mod_recall'));
-echo html_writer::tag('p', get_string('bulkimportdesc', 'mod_recall'));
+echo html_writer::tag('h3', get_string('bulkimport', 'mod_leitbox'));
+echo html_writer::tag('p', get_string('bulkimportdesc', 'mod_leitbox'));
 
 // Display AI Prompt template
-$prompt_standard = get_string('prompt_template_standard', 'mod_recall');
-$prompt_tf       = get_string('prompt_template_tf', 'mod_recall');
-$prompt_vocab    = get_string('prompt_template_vocab', 'mod_recall');
-$prompt_cloze    = get_string('prompt_template_cloze', 'mod_recall');
-$prompt_jeopardy = get_string('prompt_template_jeopardy', 'mod_recall');
-$prompt_transfer = get_string('prompt_template_transfer', 'mod_recall');
+$prompt_standard = get_string('prompt_template_standard', 'mod_leitbox');
+$prompt_tf       = get_string('prompt_template_tf', 'mod_leitbox');
+$prompt_vocab    = get_string('prompt_template_vocab', 'mod_leitbox');
+$prompt_cloze    = get_string('prompt_template_cloze', 'mod_leitbox');
+$prompt_jeopardy = get_string('prompt_template_jeopardy', 'mod_leitbox');
+$prompt_transfer = get_string('prompt_template_transfer', 'mod_leitbox');
 
 $prompt_options = [
-    'standard' => get_string('prompt_type_standard', 'mod_recall'),
-    'tf'       => get_string('prompt_type_tf', 'mod_recall'),
-    'vocab'    => get_string('prompt_type_vocab', 'mod_recall'),
-    'cloze'    => get_string('prompt_type_cloze', 'mod_recall'),
-    'jeopardy' => get_string('prompt_type_jeopardy', 'mod_recall'),
-    'transfer' => get_string('prompt_type_transfer', 'mod_recall'),
+    'standard' => get_string('prompt_type_standard', 'mod_leitbox'),
+    'tf'       => get_string('prompt_type_tf', 'mod_leitbox'),
+    'vocab'    => get_string('prompt_type_vocab', 'mod_leitbox'),
+    'cloze'    => get_string('prompt_type_cloze', 'mod_leitbox'),
+    'jeopardy' => get_string('prompt_type_jeopardy', 'mod_leitbox'),
+    'transfer' => get_string('prompt_type_transfer', 'mod_leitbox'),
 ];
 
 echo html_writer::tag('div', 
-    html_writer::tag('strong', get_string('prompt_type_selection', 'mod_recall')) . '<br>' .
+    html_writer::tag('strong', get_string('prompt_type_selection', 'mod_leitbox')) . '<br>' .
     html_writer::select($prompt_options, 'prompt_type_selector', 'standard', false, ['id' => 'prompt_selector', 'class' => 'custom-select form-control mb-3 mt-1 w-100'])
 , ['class' => 'mb-2']);
 
 echo html_writer::tag('div', 
-    html_writer::tag('strong', get_string('prompt_instruction', 'mod_recall')) . '<br>' .
+    html_writer::tag('strong', get_string('prompt_instruction', 'mod_leitbox')) . '<br>' .
     html_writer::tag('pre', s($prompt_standard), ['id' => 'prompt_display', 'class' => 'bg-light p-3 border rounded', 'style' => 'white-space: pre-wrap; font-size: 0.9em;'])
 , ['class' => 'mb-4']);
 
@@ -295,22 +295,22 @@ echo '<div class="mb-3">';
 echo '<textarea name="importdata" rows="10" class="form-control w-100" placeholder="===CARD==='."\n".'Q: Frage'."\n".'A: Antwort'."\n".'H: Optionaler Hinweis"></textarea>';
 echo '</div>';
 
-echo html_writer::empty_tag('input', ['type' => 'submit', 'value' => get_string('importcards', 'mod_recall'), 'class' => 'btn btn-success']);
+echo html_writer::empty_tag('input', ['type' => 'submit', 'value' => get_string('importcards', 'mod_leitbox'), 'class' => 'btn btn-success']);
 echo html_writer::end_tag('form');
 echo $OUTPUT->box_end();
 
 
 // 4. Existing Cards List
-echo html_writer::tag('h3', get_string('existingcards', 'mod_recall'), ['class' => 'mt-5']);
+echo html_writer::tag('h3', get_string('existingcards', 'mod_leitbox'), ['class' => 'mt-5']);
 
 $page = optional_param('page', 0, PARAM_INT);
 $perpage = 50;
 
-$totalcards = $DB->count_records('recall_cards', ['recallid' => $recall->id]);
-$cards = $DB->get_records('recall_cards', ['recallid' => $recall->id], 'id ASC', '*', $page * $perpage, $perpage);
+$totalcards = $DB->count_records('leitbox_cards', ['leitboxid' => $leitbox->id]);
+$cards = $DB->get_records('leitbox_cards', ['leitboxid' => $leitbox->id], 'id ASC', '*', $page * $perpage, $perpage);
 
 if ($cards) {
-    echo $OUTPUT->paging_bar($totalcards, $page, $perpage, new moodle_url('/mod/recall/manage.php', ['id' => $cm->id]));
+    echo $OUTPUT->paging_bar($totalcards, $page, $perpage, new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]));
     
     // Form for bulk deletion
     echo html_writer::start_tag('form', ['action' => 'manage.php', 'method' => 'post', 'id' => 'bulkdeleteform']);
@@ -321,18 +321,18 @@ if ($cards) {
     $table = new html_table();
     $table->head = [
         '<input type="checkbox" id="selectallcards" title="'.get_string('selectall', 'moodle').'">',
-        '#', get_string('question', 'mod_recall'), get_string('answer', 'mod_recall'), get_string('hint', 'mod_recall'), get_string('actions')
+        '#', get_string('question', 'mod_leitbox'), get_string('answer', 'mod_leitbox'), get_string('hint', 'mod_leitbox'), get_string('actions')
     ];
     $table->attributes['class'] = 'generaltable w-100';
 
     $rownum = ($page * $perpage) + 1;
     foreach ($cards as $c) {
         $checkbox = '<input type="checkbox" name="cardids[]" value="'.$c->id.'" class="cardcheckbox">';
-        $editurl = new moodle_url('/mod/recall/manage.php', ['id' => $cm->id, 'action' => 'edit', 'cardid' => $c->id]);
+        $editurl = new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id, 'action' => 'edit', 'cardid' => $c->id]);
         $editbtn = html_writer::link($editurl, $OUTPUT->pix_icon('t/edit', get_string('edit')), ['class' => 'mr-2', 'style' => 'margin-right:8px;']);
 
-        $delurl = new moodle_url('/mod/recall/manage.php', ['id' => $cm->id, 'action' => 'delete', 'cardid' => $c->id, 'sesskey' => sesskey()]);
-        $delbtn = html_writer::link($delurl, $OUTPUT->pix_icon('t/delete', get_string('delete')), ['onclick' => 'return confirm("'.get_string('confirmdeletecard', 'mod_recall').'")']);
+        $delurl = new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id, 'action' => 'delete', 'cardid' => $c->id, 'sesskey' => sesskey()]);
+        $delbtn = html_writer::link($delurl, $OUTPUT->pix_icon('t/delete', get_string('delete')), ['onclick' => 'return confirm("'.get_string('confirmdeletecard', 'mod_leitbox').'")']);
         
         $table->data[] = [
             $checkbox,
@@ -348,9 +348,9 @@ if ($cards) {
     echo '<div class="mt-3">';
     echo html_writer::empty_tag('input', [
         'type' => 'submit', 
-        'value' => get_string('deleteselected', 'mod_recall'), 
+        'value' => get_string('deleteselected', 'mod_leitbox'), 
         'class' => 'btn btn-danger',
-        'onclick' => 'return confirm("'.get_string('confirmbulkdelete', 'mod_recall').'")'
+        'onclick' => 'return confirm("'.get_string('confirmbulkdelete', 'mod_leitbox').'")'
     ]);
     echo '</div>';
     
@@ -367,15 +367,15 @@ if ($cards) {
     </script>';
     
     // Bottom paging bar for convenience
-    echo $OUTPUT->paging_bar($totalcards, $page, $perpage, new moodle_url('/mod/recall/manage.php', ['id' => $cm->id]));
+    echo $OUTPUT->paging_bar($totalcards, $page, $perpage, new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]));
     
     // Export Button
-    $exporturl = new moodle_url('/mod/recall/manage.php', ['id' => $cm->id, 'action' => 'export', 'sesskey' => sesskey()]);
+    $exporturl = new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id, 'action' => 'export', 'sesskey' => sesskey()]);
     echo '<div class="mt-5 text-right">';
-    echo html_writer::link($exporturl, get_string('exportcards', 'mod_recall'), ['class' => 'btn btn-outline-secondary']);
+    echo html_writer::link($exporturl, get_string('exportcards', 'mod_leitbox'), ['class' => 'btn btn-outline-secondary']);
     echo '</div>';
 } else {
-    echo html_writer::tag('p', get_string('nocards', 'mod_recall'));
+    echo html_writer::tag('p', get_string('nocards', 'mod_leitbox'));
 }
 
 echo $OUTPUT->footer();

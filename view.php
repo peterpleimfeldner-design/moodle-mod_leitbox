@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   mod_recall
+ * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -23,19 +23,19 @@ require_once('../../config.php');
 require_once(__DIR__ . '/lib.php');
 
 $id = required_param('id', PARAM_INT); // Course module ID
-$cm = get_coursemodule_from_id('recall', $id, 0, false, MUST_EXIST);
+$cm = get_coursemodule_from_id('leitbox', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
-$recall = $DB->get_record('recall', ['id' => $cm->instance], '*', MUST_EXIST);
+$leitbox = $DB->get_record('leitbox', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
 
 // Ensure the user has the required capability.
-require_capability('mod/recall:view', $context);
+require_capability('mod/leitbox:view', $context);
 
 // Generate modern page layout.
-$PAGE->set_url('/mod/recall/view.php', ['id' => $cm->id]);
-$PAGE->set_title(format_string($recall->name));
+$PAGE->set_url('/mod/leitbox/view.php', ['id' => $cm->id]);
+$PAGE->set_title(format_string($leitbox->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 
@@ -57,33 +57,33 @@ $vuestrings = [
     'feedback_good_title', 'feedback_good_desc', 'feedback_okay_title', 'feedback_okay_desc',
     'feedback_learn_title', 'feedback_learn_desc',
 ];
-$PAGE->requires->strings_for_js($vuestrings, 'mod_recall');
+$PAGE->requires->strings_for_js($vuestrings, 'mod_leitbox');
 
 echo $OUTPUT->header();
 
 // Display intro if present.
-if (!empty(trim($recall->intro))) {
-    echo $OUTPUT->box(format_module_intro('recall', $recall, $cm->id), 'generalbox mod_introbox', 'intro');
+if (!empty(trim($leitbox->intro))) {
+    echo $OUTPUT->box(format_module_intro('leitbox', $leitbox, $cm->id), 'generalbox mod_introbox', 'intro');
 }
 
 // Pass parameters to the Vue app via a data attribute.
 $appdata = [
     'wwwroot'    => $CFG->wwwroot,
     'sesskey'    => sesskey(),
-    'instanceid' => (int)$recall->id,
+    'instanceid' => (int)$leitbox->id,
     'cmid'       => (int)$cm->id,
 ];
 
 // Mount point for Vue
 echo \html_writer::tag('div', '', [
-    'id' => 'v-app-mod-recall',
+    'id' => 'v-app-mod-leitbox',
     'data-config' => json_encode($appdata)
 ]);
 
 // Include Vue build scripts manually with cache-busting
 if (file_exists(__DIR__ . '/dist/assets/index.js')) {
     $jsmtime = filemtime(__DIR__ . '/dist/assets/index.js');
-    $jsurl = new \moodle_url('/mod/recall/dist/assets/index.js', ['v' => $jsmtime]);
+    $jsurl = new \moodle_url('/mod/leitbox/dist/assets/index.js', ['v' => $jsmtime]);
     echo '<script type="module" crossorigin src="' . $jsurl->out() . '"></script>';
 } else {
     echo \html_writer::tag('p', 'Warning: Vue frontend bundle not found. Please run npm build.', ['class' => 'alert alert-warning mt-3']);
@@ -91,7 +91,7 @@ if (file_exists(__DIR__ . '/dist/assets/index.js')) {
 
 if (file_exists(__DIR__ . '/dist/assets/index.css')) {
     $cssmtime = filemtime(__DIR__ . '/dist/assets/index.css');
-    $cssurl = new \moodle_url('/mod/recall/dist/assets/index.css', ['v' => $cssmtime]);
+    $cssurl = new \moodle_url('/mod/leitbox/dist/assets/index.css', ['v' => $cssmtime]);
     echo '<link rel="stylesheet" href="' . $cssurl->out() . '">';
 }
 

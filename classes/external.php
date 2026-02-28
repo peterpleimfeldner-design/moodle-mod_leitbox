@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   mod_recall
+ * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_recall;
+namespace mod_leitbox;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -35,7 +35,7 @@ class external extends external_api {
 
     public static function get_box_counts_parameters() {
         return new external_function_parameters([
-            'instanceid' => new external_value(PARAM_INT, 'The recall instance id'),
+            'instanceid' => new external_value(PARAM_INT, 'The leitbox instance id'),
         ]);
     }
 
@@ -46,22 +46,22 @@ class external extends external_api {
             'instanceid' => $instanceid,
         ]);
         
-        $cm = get_coursemodule_from_instance('recall', $params['instanceid']);
+        $cm = get_coursemodule_from_instance('leitbox', $params['instanceid']);
         if (!$cm) {
             throw new \moodle_exception('invalidcoursemodule');
         }
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
-        require_capability('mod/recall:view', $context);
+        require_capability('mod/leitbox:view', $context);
 
         $userid = $USER->id;
         $results = [];
 
         // Box 0: Cards with NO progress entry OR box_number = 0
         $sql_new = "SELECT COUNT(*) AS cnt
-                      FROM {recall_cards} c
-                 LEFT JOIN {recall_progress} p ON c.id = p.cardid AND p.userid = :userid
-                     WHERE c.recallid = :instanceid
+                      FROM {leitbox_cards} c
+                 LEFT JOIN {leitbox_progress} p ON c.id = p.cardid AND p.userid = :userid
+                     WHERE c.leitboxid = :instanceid
                        AND (p.id IS NULL OR p.box_number = 0)";
         $count_new = $DB->count_records_sql($sql_new, ['instanceid' => $params['instanceid'], 'userid' => $userid]);
         if ($count_new > 0) {
@@ -70,9 +70,9 @@ class external extends external_api {
 
         // Boxes 1-5: Aggregate query
         $sql_boxes = "SELECT p.box_number, COUNT(*) AS cnt
-                        FROM {recall_cards} c
-                        JOIN {recall_progress} p ON c.id = p.cardid
-                       WHERE c.recallid = :instanceid
+                        FROM {leitbox_cards} c
+                        JOIN {leitbox_progress} p ON c.id = p.cardid
+                       WHERE c.leitboxid = :instanceid
                          AND p.userid   = :userid
                          AND p.box_number > 0
                     GROUP BY p.box_number";
@@ -96,7 +96,7 @@ class external extends external_api {
 
     public static function get_cards_by_box_parameters() {
         return new external_function_parameters([
-            'instanceid' => new external_value(PARAM_INT, 'The recall instance id'),
+            'instanceid' => new external_value(PARAM_INT, 'The leitbox instance id'),
             'boxnumber'  => new external_value(PARAM_INT, 'The Leitner box number (0-5)'),
         ]);
     }
@@ -109,37 +109,37 @@ class external extends external_api {
             'boxnumber' => $boxnumber
         ]);
         
-        $cm = get_coursemodule_from_instance('recall', $params['instanceid']);
+        $cm = get_coursemodule_from_instance('leitbox', $params['instanceid']);
         if (!$cm) {
             throw new \moodle_exception('invalidcoursemodule');
         }
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
-        require_capability('mod/recall:view', $context);
+        require_capability('mod/leitbox:view', $context);
 
         $box = $params['boxnumber'];
         $userid = $USER->id;
         $instanceid = $params['instanceid'];
         
         // Fetch instance to read cardorder setting
-        $recall = $DB->get_record('recall', ['id' => $instanceid], 'cardorder', MUST_EXIST);
-        $order_by = ($recall->cardorder == 1) ? "ORDER BY c.id ASC" : "";
+        $leitbox = $DB->get_record('leitbox', ['id' => $instanceid], 'cardorder', MUST_EXIST);
+        $order_by = ($leitbox->cardorder == 1) ? "ORDER BY c.id ASC" : "";
 
         if ($box == 0) {
             // New cards: box_number = 0 or no progress record yet
             $sql = "SELECT c.*
-                      FROM {recall_cards} c
-                 LEFT JOIN {recall_progress} p ON c.id = p.cardid AND p.userid = :userid
-                     WHERE c.recallid = :instanceid
+                      FROM {leitbox_cards} c
+                 LEFT JOIN {leitbox_progress} p ON c.id = p.cardid AND p.userid = :userid
+                     WHERE c.leitboxid = :instanceid
                        AND (p.id IS NULL OR p.box_number = 0)
                        $order_by";
             $cards = $DB->get_records_sql($sql, ['userid' => $userid, 'instanceid' => $instanceid]);
         } else {
             // Existing cards in a specific box
             $sql = "SELECT c.*
-                      FROM {recall_cards} c
-                      JOIN {recall_progress} p ON c.id = p.cardid
-                     WHERE c.recallid = :instanceid
+                      FROM {leitbox_cards} c
+                      JOIN {leitbox_progress} p ON c.id = p.cardid
+                     WHERE c.leitboxid = :instanceid
                        AND p.userid = :userid
                        AND p.box_number = :boxnumber
                        $order_by";
@@ -162,13 +162,13 @@ class external extends external_api {
         }
 
         // Apply random shuffle if cardorder is 0 (Random)
-        if ($recall->cardorder == 0) {
+        if ($leitbox->cardorder == 0) {
             shuffle($result);
         }
 
         // Always force the very first tutorial demo card to be strictly the first card if it's in this set
         foreach ($result as $index => $c) {
-            if (strpos($c['question'], 'Willkommen bei Recall') !== false || strpos($c['question'], 'Welcome to Recall') !== false) {
+            if (strpos($c['question'], 'Willkommen bei LeitBox') !== false || strpos($c['question'], 'Welcome to LeitBox') !== false) {
                 // Move it to the very front of the array
                 $demo_card = $result[$index];
                 unset($result[$index]);
@@ -208,17 +208,17 @@ class external extends external_api {
         ]);
 
         // Security check: get card and ensure it exists and user can access its module.
-        $card = $DB->get_record('recall_cards', ['id' => $params['cardid']], '*', MUST_EXIST);
-        $cm = get_coursemodule_from_instance('recall', $card->recallid);
+        $card = $DB->get_record('leitbox_cards', ['id' => $params['cardid']], '*', MUST_EXIST);
+        $cm = get_coursemodule_from_instance('leitbox', $card->leitboxid);
         if (!$cm) {
             throw new \moodle_exception('invalidcoursemodule');
         }
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
-        require_capability('mod/recall:view', $context);
+        require_capability('mod/leitbox:view', $context);
 
         $userid = $USER->id;
-        $progress = $DB->get_record('recall_progress', ['userid' => $userid, 'cardid' => $card->id]);
+        $progress = $DB->get_record('leitbox_progress', ['userid' => $userid, 'cardid' => $card->id]);
         
         $now = time();
 
@@ -231,7 +231,7 @@ class external extends external_api {
             $progress->count_correct = 0;
             $progress->count_wrong = 0;
             $progress->last_reviewed = $now;
-            $progress->id = $DB->insert_record('recall_progress', $progress);
+            $progress->id = $DB->insert_record('leitbox_progress', $progress);
         } else {
             $progress->last_reviewed = $now;
         }
@@ -252,7 +252,7 @@ class external extends external_api {
             }
         }
 
-        $DB->update_record('recall_progress', $progress);
+        $DB->update_record('leitbox_progress', $progress);
 
         return [
             'success' => true,
@@ -269,7 +269,7 @@ class external extends external_api {
 
     public static function reset_progress_parameters() {
         return new external_function_parameters([
-            'instanceid' => new external_value(PARAM_INT, 'The recall instance id'),
+            'instanceid' => new external_value(PARAM_INT, 'The leitbox instance id'),
         ]);
     }
 
@@ -280,21 +280,21 @@ class external extends external_api {
             'instanceid' => $instanceid,
         ]);
 
-        $cm = get_coursemodule_from_instance('recall', $params['instanceid']);
+        $cm = get_coursemodule_from_instance('leitbox', $params['instanceid']);
         if (!$cm) {
             throw new \moodle_exception('invalidcoursemodule');
         }
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
-        require_capability('mod/recall:view', $context);
+        require_capability('mod/leitbox:view', $context);
 
         // Get all card IDs belonging to this instance.
-        $cardids = $DB->get_fieldset_select('recall_cards', 'id', 'recallid = ?', [$params['instanceid']]);
+        $cardids = $DB->get_fieldset_select('leitbox_cards', 'id', 'leitboxid = ?', [$params['instanceid']]);
 
         if (!empty($cardids)) {
             list($insql, $inparams) = $DB->get_in_or_equal($cardids);
             $inparams[] = $USER->id;
-            $DB->delete_records_select('recall_progress', "cardid $insql AND userid = ?", $inparams);
+            $DB->delete_records_select('leitbox_progress', "cardid $insql AND userid = ?", $inparams);
         }
 
         return ['success' => true, 'reset_count' => count($cardids)];

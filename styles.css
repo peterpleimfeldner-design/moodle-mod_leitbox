@@ -1,10 +1,10 @@
 /**
- * Moodle Plugin: Recall
+ * Moodle Plugin: LeitBox
  * Standard Moodle CSS to fix UI issues.
  */
 
 /* Fix distortion of the activity icon in the header */
-.path-mod-recall .activity-header .activity-icon {
+.path-mod-leitbox .activity-header .activity-icon {
     width: 64px !important;
     height: 64px !important;
     object-fit: contain !important;
@@ -12,6 +12,6 @@
 }
 
 /* Ensure the icon in the breadcrumbs/activity selector is also crisp */
-.path-mod-recall .page-header-image img {
+.path-mod-leitbox .page-header-image img {
     object-fit: contain !important;
 }

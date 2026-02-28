@@ -15,28 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * External functions unit tests for mod_recall.
+ * External functions unit tests for mod_leitbox.
  *
- * @package   mod_recall
+ * @package   mod_leitbox
  * @category  test
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_recall\external;
+namespace mod_leitbox\external;
 
 use external_api;
 use externallib_advanced_testcase;
-use mod_recall\external;
+use mod_leitbox\external;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
-require_once($CFG->dirroot . '/mod/recall/classes/external.php');
+require_once($CFG->dirroot . '/mod/leitbox/classes/external.php');
 
 /**
- * External functions unit tests for mod_recall.
+ * External functions unit tests for mod_leitbox.
  */
 class external_test extends externallib_advanced_testcase {
 
@@ -49,9 +49,9 @@ class external_test extends externallib_advanced_testcase {
     }
 
     /**
-     * Helper to create a basic recall activity with some cards.
+     * Helper to create a basic leitbox activity with some cards.
      */
-    protected function create_recall_activity() {
+    protected function create_leitbox_activity() {
         global $DB;
 
         // Create course and user.
@@ -59,34 +59,34 @@ class external_test extends externallib_advanced_testcase {
         $student = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
 
-        // Create recall instance.
-        $recall = $this->getDataGenerator()->create_module('recall', ['course' => $course->id]);
+        // Create leitbox instance.
+        $leitbox = $this->getDataGenerator()->create_module('leitbox', ['course' => $course->id]);
 
         // Clear default demo cards inserted by the mod_form/lib.php to start fresh.
-        $DB->delete_records('recall_cards', ['recallid' => $recall->id]);
+        $DB->delete_records('leitbox_cards', ['leitboxid' => $leitbox->id]);
 
         // Insert a test card.
         $card = new \stdClass();
-        $card->recallid = $recall->id;
+        $card->leitboxid = $leitbox->id;
         $card->question = 'What is the capital of France?';
         $card->answer = 'Paris';
         $card->hint = 'City of light';
-        $card->id = $DB->insert_record('recall_cards', $card);
+        $card->id = $DB->insert_record('leitbox_cards', $card);
 
-        return [$course, $student, $recall, $card];
+        return [$course, $student, $leitbox, $card];
     }
 
     /**
      * Test getting cards by box.
      */
     public function test_get_cards_by_box() {
-        list($course, $student, $recall, $card) = $this->create_recall_activity();
+        list($course, $student, $leitbox, $card) = $this->create_leitbox_activity();
 
         // Must be logged in as the student.
         $this->setUser($student);
 
         // Call the external function for box 0 (New cards).
-        $result = external::get_cards_by_box($recall->id, 0);
+        $result = external::get_cards_by_box($leitbox->id, 0);
 
         // We need to execute the return values cleaning process to simulate the web service server.
         $result = external_api::clean_returnvalue(external::get_cards_by_box_returns(), $result);
@@ -101,7 +101,7 @@ class external_test extends externallib_advanced_testcase {
      */
     public function test_submit_answer() {
         global $DB;
-        list($course, $student, $recall, $card) = $this->create_recall_activity();
+        list($course, $student, $leitbox, $card) = $this->create_leitbox_activity();
 
         $this->setUser($student);
 
@@ -113,7 +113,7 @@ class external_test extends externallib_advanced_testcase {
         $this->assertEquals(1, $result['new_box']); // Should move from Box 0 to Box 1
 
         // Check DB
-        $progress = $DB->get_record('recall_progress', ['userid' => $student->id, 'cardid' => $card->id]);
+        $progress = $DB->get_record('leitbox_progress', ['userid' => $student->id, 'cardid' => $card->id]);
         $this->assertEquals(1, $progress->box_number);
         $this->assertEquals(1, $progress->count_correct);
 
@@ -121,7 +121,7 @@ class external_test extends externallib_advanced_testcase {
         $result = external::submit_answer($card->id, 0);
         $result = external_api::clean_returnvalue(external::submit_answer_returns(), $result);
         
-        $progress = $DB->get_record('recall_progress', ['userid' => $student->id, 'cardid' => $card->id]);
+        $progress = $DB->get_record('leitbox_progress', ['userid' => $student->id, 'cardid' => $card->id]);
         $this->assertEquals(1, $progress->box_number); // Cannot drop below 1
         $this->assertEquals(1, $progress->count_wrong);
     }
@@ -131,7 +131,7 @@ class external_test extends externallib_advanced_testcase {
      */
     public function test_reset_progress() {
         global $DB;
-        list($course, $student, $recall, $card) = $this->create_recall_activity();
+        list($course, $student, $leitbox, $card) = $this->create_leitbox_activity();
 
         $this->setUser($student);
 
@@ -139,16 +139,16 @@ class external_test extends externallib_advanced_testcase {
         external::submit_answer($card->id, 2);
         
         // Ensure progress exists.
-        $this->assertEquals(1, $DB->count_records('recall_progress', ['userid' => $student->id]));
+        $this->assertEquals(1, $DB->count_records('leitbox_progress', ['userid' => $student->id]));
 
         // Call reset.
-        $result = external::reset_progress($recall->id);
+        $result = external::reset_progress($leitbox->id);
         $result = external_api::clean_returnvalue(external::reset_progress_returns(), $result);
 
         $this->assertTrue($result['success']);
         $this->assertEquals(1, $result['reset_count']);
 
         // Progress should be completely gone for this user/instance.
-        $this->assertEquals(0, $DB->count_records('recall_progress', ['userid' => $student->id]));
+        $this->assertEquals(0, $DB->count_records('leitbox_progress', ['userid' => $student->id]));
     }
 }

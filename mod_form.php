@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   mod_recall
+ * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -23,7 +23,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
-class mod_recall_mod_form extends moodleform_mod {
+class mod_leitbox_mod_form extends moodleform_mod {
     public function definition() {
         global $CFG;
 
@@ -32,7 +32,7 @@ class mod_recall_mod_form extends moodleform_mod {
         // General section.
         $mform->addElement('header', 'general', get_string('general', 'form'));
         
-        $mform->addElement('text', 'name', get_string('recallname', 'mod_recall'), array('size'=>'64'));
+        $mform->addElement('text', 'name', get_string('leitboxname', 'mod_leitbox'), array('size'=>'64'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -44,14 +44,14 @@ class mod_recall_mod_form extends moodleform_mod {
         $this->standard_intro_elements();
 
         // Specific settings.
-        $mform->addElement('header', 'recallfieldset', get_string('settings', 'mod_recall'));
+        $mform->addElement('header', 'leitboxfieldset', get_string('settings', 'mod_leitbox'));
 
-        $mform->addElement('select', 'cardorder', get_string('cardorder', 'mod_recall'), array(
-            0 => get_string('cardorder_random', 'mod_recall'),
-            1 => get_string('cardorder_sequential', 'mod_recall')
+        $mform->addElement('select', 'cardorder', get_string('cardorder', 'mod_leitbox'), array(
+            0 => get_string('cardorder_random', 'mod_leitbox'),
+            1 => get_string('cardorder_sequential', 'mod_leitbox')
         ));
         $mform->setDefault('cardorder', 0);
-        $mform->addHelpButton('cardorder', 'cardorder', 'mod_recall');
+        $mform->addHelpButton('cardorder', 'cardorder', 'mod_leitbox');
 
         // Settings are now handled by add_completion_rules()
 
@@ -67,20 +67,20 @@ class mod_recall_mod_form extends moodleform_mod {
 
         $group = array();
         $group[] = $mform->createElement('checkbox', 'completion_min_cards_enabled', '',
-            get_string('completion_min_cards_desc', 'mod_recall'));
+            get_string('completion_min_cards_desc', 'mod_leitbox'));
         $group[] = $mform->createElement('text', 'completion_min_cards', '', array('size' => 3));
         
         $mform->setType('completion_min_cards', PARAM_INT);
-        $mform->addGroup($group, 'completion_min_cards_group', get_string('completion_min_cards', 'mod_recall'), array(' '), false);
+        $mform->addGroup($group, 'completion_min_cards_group', get_string('completion_min_cards', 'mod_leitbox'), array(' '), false);
         $mform->disabledIf('completion_min_cards', 'completion_min_cards_enabled', 'notchecked');
 
         $group2 = array();
         $group2[] = $mform->createElement('checkbox', 'completion_min_mastered_enabled', '',
-            get_string('completion_min_mastered_desc', 'mod_recall'));
+            get_string('completion_min_mastered_desc', 'mod_leitbox'));
         $group2[] = $mform->createElement('text', 'completion_min_mastered', '', array('size' => 3));
         
         $mform->setType('completion_min_mastered', PARAM_INT);
-        $mform->addGroup($group2, 'completion_min_mastered_group', get_string('completion_min_mastered', 'mod_recall'), array(' '), false);
+        $mform->addGroup($group2, 'completion_min_mastered_group', get_string('completion_min_mastered', 'mod_leitbox'), array(' '), false);
         $mform->disabledIf('completion_min_mastered', 'completion_min_mastered_enabled', 'notchecked');
 
         return array('completion_min_cards_group', 'completion_min_mastered_group');

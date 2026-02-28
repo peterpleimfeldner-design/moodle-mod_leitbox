@@ -15,36 +15,36 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   mod_recall
+ * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
-function xmldb_recall_upgrade($oldversion) {
+function xmldb_leitbox_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2024010103) {
-        $table = new xmldb_table('recall');
+        $table = new xmldb_table('leitbox');
         $field = new xmldb_field('completion_min_mastered', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'completion_min_cards');
 
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_mod_savepoint(true, 2024010103, 'recall');
+        upgrade_mod_savepoint(true, 2024010103, 'leitbox');
     }
 
     if ($oldversion < 2026022705) {
-        $table = new xmldb_table('recall');
+        $table = new xmldb_table('leitbox');
         $field = new xmldb_field('cardorder', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'introformat');
 
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_mod_savepoint(true, 2026022705, 'recall');
+        upgrade_mod_savepoint(true, 2026022705, 'leitbox');
     }
 
     return true;
