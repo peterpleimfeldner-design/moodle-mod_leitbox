@@ -56,8 +56,11 @@ $vuestrings = [
     'feedback_grand_title', 'feedback_grand_desc', 'feedback_perfect_title', 'feedback_perfect_desc',
     'feedback_good_title', 'feedback_good_desc', 'feedback_okay_title', 'feedback_okay_desc',
     'feedback_learn_title', 'feedback_learn_desc',
-];
 $PAGE->requires->strings_for_js($vuestrings, 'mod_leitbox');
+
+// Update completion state for 'view' condition.
+$completion = new completion_info($course);
+$completion->set_module_viewed($cm);
 
 echo $OUTPUT->header();
 
