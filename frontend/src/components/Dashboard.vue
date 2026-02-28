@@ -255,11 +255,13 @@ const doReset = async () => {
 
 <style scoped>
 /* ─── tokens ──────────────── */
-.rc-wrap {
+.rc-wrap, .rc-overlay {
   --teal: #00a693;
   --navy: #1d2757;
   --teal-pastel: #f0fdf9;
   --teal-mid: #ccf5ee;
+}
+.rc-wrap {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   max-width: 1080px;
   margin: 0 auto;
