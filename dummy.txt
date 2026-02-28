@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd" PATH="mod/recall/db" VERSION="20240101" COMMENT="XMLDB file for Moodle mod_recall">
-  <!-- This file is replaced later with proper XML tags by a sed script if I was using linux, but I will make sure the first call writes properly. Actually, wait. I will only call write_to_file once per file. -->
-$dbman = $DB->get_manager();
