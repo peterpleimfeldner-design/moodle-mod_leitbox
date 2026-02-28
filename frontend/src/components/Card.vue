@@ -61,11 +61,22 @@
 <script setup>
 import { ref, watch } from 'vue';
 
+const FALLBACKS = {
+    showhint:    'Hinweis anzeigen',
+    hint:        'Hinweis',
+    taptoflip:   'Antippen zum Umdrehen',
+    hard_btn:    'Schwer',
+    action_back: 'Zurück',
+    again_btn:   'Nochmal',
+    action_stay: 'Bleibt',
+    known_btn:   'Gewusst',
+    action_next: 'Nächste',
+};
+
 const getString = (key) => {
-    if (window.M && window.M.str && window.M.str.mod_recall && window.M.str.mod_recall[key]) {
-        return window.M.str.mod_recall[key];
-    }
-    return key;
+    const moodleStr = window.M?.str?.mod_recall?.[key];
+    if (moodleStr && !moodleStr.startsWith('[[')) return moodleStr;
+    return FALLBACKS[key] ?? key;
 };
 
 const props = defineProps({
