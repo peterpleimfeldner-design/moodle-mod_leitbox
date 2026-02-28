@@ -52,6 +52,10 @@ $vuestrings = [
     'completed', 'error_loading_cards', 'box0', 'box1', 'box2', 'box3', 'box4', 'box5',
     'reset_progress', 'reset_progress_confirm_title', 'reset_progress_confirm_msg',
     'reset_progress_btn', 'reset_progress_cancel', 'reset_progress_done',
+    'progress_label', 'progress_aria',
+    'feedback_grand_title', 'feedback_grand_desc', 'feedback_perfect_title', 'feedback_perfect_desc',
+    'feedback_good_title', 'feedback_good_desc', 'feedback_okay_title', 'feedback_okay_desc',
+    'feedback_learn_title', 'feedback_learn_desc',
 ];
 $PAGE->requires->strings_for_js($vuestrings, 'mod_recall');
 

@@ -26,11 +26,11 @@
     </header>
 
     <!-- ═══ PROGRESS BAR ═══ -->
-    <div class="rc-progress-bar" role="progressbar" :aria-valuemin="0" :aria-valuemax="totalCards" :aria-valuenow="masteredCards" :aria-label="'Fortschritt: ' + masteredCards + ' von ' + totalCards + ' Karten gelernt'">
+    <div class="rc-progress-bar" role="progressbar" :aria-valuemin="0" :aria-valuemax="totalCards" :aria-valuenow="masteredCards" :aria-label="getString('progress_aria').replace('{mastered}', masteredCards).replace('{total}', totalCards)">
       <div class="rc-progress-fill" :style="{ width: progressPercent + '%' }"></div>
     </div>
     <p class="rc-progress-label" aria-hidden="true">
-      <span v-if="totalCards > 0">{{ masteredCards }}/{{ totalCards }} Karten in Stufe Experte</span>
+      <span v-if="totalCards > 0">{{ masteredCards }}/{{ totalCards }} {{ getString('progress_label') }}</span>
     </p>
 
     <!-- ═══ BOX GRID ═══ -->
@@ -180,6 +180,8 @@ const FALLBACKS = {
     howitworks: 'Wie funktioniert das?',
     cards: 'Karten',
     loadingcards: 'Karten werden geladen...',
+    progress_label: 'Karten in Stufe Experte',
+    progress_aria: 'Fortschritt: {mastered} von {total} Karten gelernt',
     // Box levels
     box0: 'Neu',
     box1: 'Einsteiger',

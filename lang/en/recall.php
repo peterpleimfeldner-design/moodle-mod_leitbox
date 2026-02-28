@@ -53,6 +53,22 @@ $string['question'] = 'Question';
 $string['answer'] = 'Answer';
 $string['hint'] = 'Hint';
 
+// Progress bar
+$string['progress_label'] = 'cards at Expert level';
+$string['progress_aria'] = 'Progress: {mastered} of {total} cards mastered';
+
+// Session feedback
+$string['feedback_grand_title'] = 'Masterpiece';
+$string['feedback_grand_desc'] = 'Congratulations! You have moved all cards to the Expert deck and recalled them perfectly. You have truly mastered this topic!';
+$string['feedback_perfect_title'] = 'Strong result';
+$string['feedback_perfect_desc'] = 'You recalled all content correctly. The material is solid.';
+$string['feedback_good_title'] = 'Solid performance';
+$string['feedback_good_desc'] = 'You have a good overview. The remaining gaps will close over time.';
+$string['feedback_okay_title'] = 'On the right track';
+$string['feedback_okay_desc'] = 'The foundation is there. Another round of review will strengthen your knowledge.';
+$string['feedback_learn_title'] = 'Review recommended';
+$string['feedback_learn_desc'] = 'Some answers were difficult for you. Use the next round to practice these.';
+
 // Privacy metadata.
 $string['privacy:metadata:recall_progress'] = 'Information about user progress on Recall.';
 $string['privacy:metadata:recall_progress:userid'] = 'The user ID.';
