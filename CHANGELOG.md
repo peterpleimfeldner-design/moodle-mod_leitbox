@@ -2,6 +2,13 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.2] - 2026-03-01 (HTTP 500 Hotfix)
+
+### Behoben
+- **Server Error (`view.php`):** Behebt einen kritischen HTTP 500 Fehler, der auftrat, weil die Moodle `completionlib.php` Bibliothek vor dem Aufruf des Trackers nicht explizit in die Laufzeit geladen wurde.
+
+---
+
 ## [1.4.1] - 2026-03-01 (Completion Hotfix)
 
 ### Behoben

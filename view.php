@@ -59,7 +59,8 @@ $vuestrings = [
 $PAGE->requires->strings_for_js($vuestrings, 'mod_leitbox');
 
 // Update completion state for 'view' condition.
-$completion = new completion_info($course);
+require_once($CFG->libdir . '/completionlib.php');
+$completion = new \completion_info($course);
 $completion->set_module_viewed($cm);
 
 echo $OUTPUT->header();
