@@ -5,3 +5,4 @@ dist/
 .vscode/
 .idea/
 php_errors.log
+.claude/

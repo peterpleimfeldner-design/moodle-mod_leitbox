@@ -19,7 +19,7 @@
  *
  * @package   mod_recall
  * @category  test
- * @copyright 2026 Recall Author
+ * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
