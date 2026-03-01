@@ -2,6 +2,60 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.33] - 2026-03-01 (Sprachbereinigung & Completion-Audit)
+
+### Geändert
+- **Sprache (DE):** `modulename_help` – "Schülern" durch "Lernenden" ersetzt (konsistente, inklusive Sprache).
+- **Sprache (DE/EN):** Verwaiste `completion_min_correct` Strings aus beiden Sprachdateien entfernt. Die Regel `completion_min_cards` deckt diesen Use-Case bereits vollständig ab (SQL: `box_number >= 1`).
+
+### Überprüft (keine Änderung notwendig)
+- `completion_all_mastered_desc/help` (DE): "Schüler/in" → "Lernende" war bereits in 1.4.30 korrekt gesetzt.
+- `completion_min_mastered_help` (DE/EN): Kartenanzahl-Warnung war bereits in 1.4.30 korrekt gesetzt.
+
+---
+
+## [1.4.32] - 2026-03-01 (Completion-Formular: Hilfe-Icon-Position)
+
+### Behoben
+- **mod_form.php:** Die dritte Completion-Regel (`completion_all_mastered`) wurde von einem einzelnen `addElement('checkbox')` auf das `addGroup`-Pattern umgestellt (identisch zu den Regeln 1 und 2). Moodle platziert den Hilfe-Button (?) bei Gruppen standardmäßig links – beim einzelnen Checkbox-Element erschien er rechts, was das Layout inkonsistent machte.
+
+---
+
+## [1.4.31] - 2026-03-01 (Completion-Formular: Hilfe-Icons CSS)
+
+### Geändert
+- **styles.css:** CSS-Override für Completion-Hilfe-Icons erweitert. Selektoren für `[id*="fgroup_id_completion"]` und `[id*="fitem_id_completion"]` ergänzt, damit sowohl Gruppen- als auch Einzelelement-Hilfe-Icons linksbündig ausgerichtet werden.
+
+---
+
+## [1.4.30] - 2026-03-01 (Completion-Strings & Sprachqualität)
+
+### Geändert
+- **Sprache (DE):** `completion_all_mastered_desc/help` – "Schüler/in" durch "Lernende" ersetzt.
+- **Sprache (DE):** `completion_min_mastered_help` – Warnung ergänzt, dass der Schwellwert die Gesamtkartenanzahl nicht überschreiten darf (sonst unerreichbar).
+- **Sprache (EN):** Analoge Anpassungen in `completion_all_mastered_desc/help` und `completion_min_mastered_help`.
+- **styles.css:** CSS-Eintrag für linksbündige Ausrichtung der Completion-Hilfe-Icons hinzugefügt.
+- **Sprache (DE/EN):** `completion_min_correct` Strings ergänzt (wurden in 1.4.33 wieder entfernt, da redundant).
+
+---
+
+## [1.4.29] - 2026-03-01 (Completion-Logik: Korrekte Karten neu definiert)
+
+### Geändert
+- **Activity Completion (Logik):** SQL-Query in `classes/completion/custom_completion.php` für die Regel `completion_min_cards` überarbeitet. Zählt nun ausschließlich Karten mit `box_number >= 1` (mindestens einmal grün bewertet), anstatt alle Karten mit einem Progress-Eintrag. Karten die nur rot/gelb bewertet wurden zählen nicht mehr.
+- **Sprache (DE):** `completion_min_cards` Strings auf "Mindestanzahl richtig beantworteter Karten" aktualisiert.
+- **Sprache (EN):** `completion_min_cards` Strings auf "Minimum cards answered correctly" aktualisiert.
+
+---
+
+## [1.4.28] - 2026-03-01 (Completion-Strings: Englisch)
+
+### Geändert
+- **Sprache (EN):** `completion_min_cards` Strings auf "Minimum practice rounds" aktualisiert (Zwischenstand, in 1.4.29 weiter präzisiert).
+- **Sprache (EN):** `completion_all_mastered_desc/help` und `completion_min_mastered_desc/help` auf pluralinklusive Formulierungen ("Students must...") umgestellt.
+
+---
+
 ## [1.4.27] - 2026-03-01 (Moodle 4.x Completion String Fix)
 
 ### Geändert
