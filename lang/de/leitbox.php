@@ -29,9 +29,9 @@ $string['leitbox:view'] = 'LeitBox ansehen';
 
 $string['leitboxname'] = 'Name der Aktivität';
 $string['settings'] = 'LeitBox Einstellungen';
-$string['completion_min_cards'] = 'Mindestanzahl Lerndurchgänge';
-$string['completion_min_cards_desc'] = 'Lernende müssen mindestens so viele Lerndurchgänge absolvieren (gleiche Karte zählt mehrfach):';
-$string['completion_min_cards_help'] = 'Gesamtzahl der Kartenbewertungen (grün/gelb/rot), die ein Lernender durchführen muss, um diese Aktivität abzuschließen.';
+$string['completion_min_cards'] = 'Mindestanzahl richtig beantworteter Karten';
+$string['completion_min_cards_desc'] = 'Lernende müssen mindestens so viele Karten mindestens einmal richtig beantworten:';
+$string['completion_min_cards_help'] = 'Eine Karte gilt als "richtig beantwortet" sobald sie mindestens einmal grün bewertet wurde und sich in Box 1 oder höher befindet. Karten die nur rot oder gelb bewertet wurden zählen nicht.';
 
 $string['completion_min_mastered'] = 'Gelernte Karten (Box 5)';
 $string['completion_min_mastered_desc'] = 'Mindestanzahl an Karten, die die letzte Box (Gelernt) erreichen müssen:';
