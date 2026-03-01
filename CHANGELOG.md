@@ -2,6 +2,13 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.26] - 2026-03-01 (Moodle 4.x Completion State Reset)
+
+### Behoben
+- **Activity Completion (Fix):** Korrigiert den Completion-Trigger in `classes/external.php`. Es wird nun zwingend `COMPLETION_UNKNOWN` statt `COMPLETION_COMPLETE` an `update_state` gesendet. Dadurch wertet Moodle die Progress-Bedingungen nach jeder Antwort live vollständig neu aus, anstatt fälschlicherweise immer "Erledigt" zu erzwingen. Damit funktioniert auch der Downgrade der Completion (z.B. nach einem Reset) wieder fehlerfrei.
+
+---
+
 ## [1.4.25] - 2026-03-01 (Moodle 4.x Completion ID Fix)
 
 ### Behoben

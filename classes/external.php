@@ -265,7 +265,7 @@ class external extends external_api {
         // Trigger Moodle's completion API to re-evaluate conditions
         $completion = new \completion_info($course);
         if ($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
-            $completion->update_state($cm, COMPLETION_COMPLETE, $userid);
+            $completion->update_state($cm, COMPLETION_UNKNOWN, $userid);
         }
 
         return [
@@ -316,7 +316,7 @@ class external extends external_api {
         // Ensure completion triggers also run for progress resets
         $completion = new \completion_info($course);
         if ($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
-            $completion->update_state($cm, COMPLETION_COMPLETE, $USER->id);
+            $completion->update_state($cm, COMPLETION_UNKNOWN, $USER->id);
         }
 
         return ['success' => true, 'reset_count' => count($cardids)];
