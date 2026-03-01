@@ -112,14 +112,20 @@ class mod_leitbox_mod_form extends moodleform_mod {
 
         // ----------------------------------------------------------------
         // Rule 3: ALL cards must be mastered (Box 5)
+        // Use addGroup (like Rules 1 & 2) so the help icon renders on the left.
         // ----------------------------------------------------------------
-        $all_name = 'completion_all_mastered' . $suffix;
-        $mform->addElement('checkbox', $all_name,
-            get_string('completion_all_mastered', 'mod_leitbox'),
-            get_string('completion_all_mastered_desc', 'mod_leitbox'));
-        $mform->addHelpButton($all_name, 'completion_all_mastered', 'mod_leitbox');
+        $all_group_name = 'completion_all_mastered_group' . $suffix;
+        $all_name       = 'completion_all_mastered' . $suffix;
 
-        return [$group1_name, $group2_name, $all_name];
+        $group3 = [];
+        $group3[] = $mform->createElement('checkbox', $all_name, '',
+            get_string('completion_all_mastered_desc', 'mod_leitbox'));
+
+        $mform->addGroup($group3, $all_group_name,
+            get_string('completion_all_mastered', 'mod_leitbox'), [' '], false);
+        $mform->addHelpButton($all_group_name, 'completion_all_mastered', 'mod_leitbox');
+
+        return [$group1_name, $group2_name, $all_group_name];
     }
 
     /**
