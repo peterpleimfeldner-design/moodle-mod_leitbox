@@ -217,11 +217,7 @@ class external extends external_api {
         $course = $DB->get_record('course', ['id' => $leitbox->course], '*', MUST_EXIST);
         
         $modinfo = get_fast_modinfo($course);
-        $cms = $modinfo->get_instances_of('leitbox');
-        if (!isset($cms[$leitbox->id])) {
-            throw new \moodle_exception('invalidcoursemodule');
-        }
-        $cm = $cms[$leitbox->id];
+        $cm = $modinfo->get_cm($card->leitboxid); // cm_info Object with customdata
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
         require_capability('mod/leitbox:view', $context);
@@ -266,7 +262,7 @@ class external extends external_api {
         // Trigger Moodle's completion API to re-evaluate conditions
         $completion = new \completion_info($course);
         if ($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
-            $completion->update_state($cm, COMPLETION_UNKNOWN, $userid);
+            $completion->update_state($cm, COMPLETION_COMPLETE, $userid);
         }
 
         return [
@@ -299,11 +295,7 @@ class external extends external_api {
         $course = $DB->get_record('course', ['id' => $leitbox->course], '*', MUST_EXIST);
         
         $modinfo = get_fast_modinfo($course);
-        $cms = $modinfo->get_instances_of('leitbox');
-        if (!isset($cms[$leitbox->id])) {
-            throw new \moodle_exception('invalidcoursemodule');
-        }
-        $cm = $cms[$leitbox->id];
+        $cm = $modinfo->get_cm($params['instanceid']); // cm_info Object with customdata
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
         require_capability('mod/leitbox:view', $context);
@@ -315,6 +307,12 @@ class external extends external_api {
             list($insql, $inparams) = $DB->get_in_or_equal($cardids);
             $inparams[] = $USER->id;
             $DB->delete_records_select('leitbox_progress', "cardid $insql AND userid = ?", $inparams);
+        }
+
+        // Ensure completion triggers also run for progress resets
+        $completion = new \completion_info($course);
+        if ($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
+            $completion->update_state($cm, COMPLETION_COMPLETE, $USER->id);
         }
 
         return ['success' => true, 'reset_count' => count($cardids)];
