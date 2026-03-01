@@ -2,6 +2,13 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.8] - 2026-03-01 (SQL Semantic Refinement)
+
+### Geändert
+- **Abschlussbedingung "Minimale Anzahl zu übender Karten":** Die zugrunde liegende SQL-Abfrage verwendet nun explizit `COUNT(DISTINCT cardid)` anstelle von `COUNT(id)`. Dies erhöht die semantische Klarheit massiv und garantiert, dass immer streng nach einzigartigen gelernten Karten (und nicht nach der Anzahl der Klicks) abgerechnet wird, falls zukünftige Updates die Struktur der Progress-Tabelle erweitern sollten.
+
+---
+
 ## [1.4.7] - 2026-03-01 (Completion Default Logic Overhaul)
 
 ### Behoben
