@@ -133,9 +133,51 @@ function leitbox_supports($feature) {
 }
 
 /**
- * Obtains the custom completion rules for this module.
+ * THIS IS THE CRITICAL MISSING PIECE.
  *
- * @return array Array of strings
+ * Moodle calls leitbox_cm_info_static() to populate cm_info->customdata with
+ * this instance's active completion rules. The custom_completion class then
+ * reads $this->cm->customdata['customcompletionrules'] to know which rules are
+ * actually enabled for THIS instance.
+ *
+ * Without this callback, Moodle has no idea which rules are configured, and
+ * the completion system behaves unpredictably — typically treating every rule
+ * as either always-active or always-satisfied.
+ *
+ * @param cm_info $cm
+ */
+function leitbox_cm_info_static(cm_info $cm) {
+    global $DB;
+
+    $leitbox = $DB->get_record('leitbox', ['id' => $cm->instance], 
+        'id, completion_min_cards, completion_min_mastered, completion_all_mastered');
+
+    if (!$leitbox) {
+        return;
+    }
+
+    // Build the customcompletionrules array — only include rules that are
+    // actually configured (non-zero). Moodle uses this to know which rules
+    // are active for this specific module instance.
+    $rules = [];
+    if (!empty($leitbox->completion_min_cards)) {
+        $rules['completion_min_cards'] = (int)$leitbox->completion_min_cards;
+    }
+    if (!empty($leitbox->completion_min_mastered)) {
+        $rules['completion_min_mastered'] = (int)$leitbox->completion_min_mastered;
+    }
+    if (!empty($leitbox->completion_all_mastered)) {
+        $rules['completion_all_mastered'] = 1;
+    }
+
+    $cm->set_customdata(['customcompletionrules' => $rules]);
+}
+
+/**
+ * Obtains the custom completion rules for this module.
+ * Required by Moodle for FEATURE_COMPLETION_HAS_RULES.
+ *
+ * @return array Array of rule name strings
  */
 function leitbox_get_custom_completion_rules() {
     return ['completion_min_cards', 'completion_min_mastered', 'completion_all_mastered'];
