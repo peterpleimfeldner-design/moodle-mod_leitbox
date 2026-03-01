@@ -83,15 +83,22 @@ class custom_completion extends activity_custom_completion {
         $customrules = $cm->customdata['customcompletionrules'] ?? [];
 
         if ($rule === 'completion_min_cards') {
+            // Nicht in customdata = Regel deaktiviert = als erfüllt werten.
             if (empty($customrules['completion_min_cards'])) {
                 return COMPLETION_COMPLETE;
             }
-            
+
             $target = (int)$customrules['completion_min_cards'];
-            $sql = "SELECT COUNT(DISTINCT cardid)
-                      FROM {leitbox_progress}
-                     WHERE userid = :userid
-                       AND cardid IN (
+
+            // Zählt Karten die mindestens einmal richtig beantwortet wurden (box_number >= 1).
+            // Eine Karte landet nur in Box 1+ wenn sie mindestens einmal grün bewertet wurde.
+            // Das ist der erste echte Qualitätsnachweis im Leitner-System –
+            // im Gegensatz zu COUNT(DISTINCT cardid) das auch rote Karten zählt.
+            $sql = "SELECT COUNT(DISTINCT p.cardid)
+                      FROM {leitbox_progress} p
+                     WHERE p.userid      = :userid
+                       AND p.box_number >= 1
+                       AND p.cardid IN (
                            SELECT id FROM {leitbox_cards} WHERE leitboxid = :instanceid
                        )";
             $count = (int)($DB->get_field_sql($sql, [
