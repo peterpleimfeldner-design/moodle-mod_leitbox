@@ -84,7 +84,7 @@ class custom_completion extends activity_custom_completion {
 
         if ($rule === 'completion_min_cards') {
             if (empty($customrules['completion_min_cards'])) {
-                return COMPLETION_INCOMPLETE;
+                return COMPLETION_COMPLETE;
             }
             
             $target = (int)$customrules['completion_min_cards'];
@@ -103,7 +103,7 @@ class custom_completion extends activity_custom_completion {
 
         if ($rule === 'completion_min_mastered') {
             if (empty($customrules['completion_min_mastered'])) {
-                return COMPLETION_INCOMPLETE;
+                return COMPLETION_COMPLETE;
             }
             
             $target = (int)$customrules['completion_min_mastered'];
@@ -123,7 +123,7 @@ class custom_completion extends activity_custom_completion {
 
         if ($rule === 'completion_all_mastered') {
             if (empty($customrules['completion_all_mastered'])) {
-                return COMPLETION_INCOMPLETE;
+                return COMPLETION_COMPLETE;
             }
             
             $total = (int)$DB->count_records('leitbox_cards', ['leitboxid' => $instanceid]);
