@@ -2,6 +2,13 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.14] - 2026-03-01 (Wording Refinement)
+
+### Geändert
+- **Modal "Wie funktioniert das?":** Der Einleitungstext, welcher das Lernstapel-System erklärt, wurde umgeschrieben. Die Methodik wird nun historisch korrekt Sebastian Leitner (1972) zugeschrieben, anstatt rein den allgemeinen Begriff "Spaced Repetition System" zu verwenden. Dies betrifft sowohl die PHP-Sprachdateien als auch die Hardcoded-Fallbacks im Vue-Frontend.
+
+---
+
 ## [1.4.13] - 2026-03-01 (Language String Cleanup & UX Polish)
 
 ### Behoben

@@ -191,7 +191,7 @@ const FALLBACKS = {
     box5: 'Experte',
     // Info modal
     systemtitle: 'Das Lernstapel-System',
-    systemintro: 'Dieses Plugin verwendet das bewährte <strong>Spaced Repetition System</strong> (verteilte Wiederholung). Ziel ist es, Karten von links nach rechts in den letzten Stapel zu befördern.',
+    systemintro: 'Dieses Plugin basiert auf der Leitner-Methode – 1972 vom österreichischen Wissenschaftler Sebastian Leitner erfunden und heute weltweit in der Lernforschung anerkannt. Ziel ist es, Karten von links nach rechts in den letzten Stapel zu befördern.',
     known_btn: 'Gewusst',
     known_desc: 'Die Karte war einfach! Sie rückt einen Stapel weiter nach rechts.',
     again_btn: 'Nochmal',
