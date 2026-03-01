@@ -87,6 +87,11 @@ class mod_leitbox_mod_form extends moodleform_mod {
             get_string('completion_all_mastered', 'mod_leitbox'),
             get_string('completion_all_mastered_desc', 'mod_leitbox'));
 
+
+        $mform->addHelpButton('completion_min_cards_group', 'completion_min_cards', 'mod_leitbox');
+        $mform->addHelpButton('completion_min_mastered_group', 'completion_min_mastered', 'mod_leitbox');
+        $mform->addHelpButton('completion_all_mastered', 'completion_all_mastered', 'mod_leitbox');
+
         return array('completion_min_cards_group', 'completion_min_mastered_group', 'completion_all_mastered');
     }
 

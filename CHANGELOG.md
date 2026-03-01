@@ -2,6 +2,16 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.13] - 2026-03-01 (Language String Cleanup & UX Polish)
+
+### Behoben
+- **Sprachdateien (Deutsch & Englisch):** Es wurden identische (doppelte) veraltete Übersetzungs-Strings für das Session-Feedback und den "Karte gelöscht" Hinweistext im Kopf der jeweiligen Dateien `lang/de/leitbox.php` und `lang/en/leitbox.php` identifiziert und sicher entfernt. Der Quellcode ist nun sauber und verwendet ausschließlich die aktuellen Übersetzungen.
+
+### Hinzugefügt
+- **Admin-Interface:** In den Aktivitäts-Einstellungen (`mod_form.php`) für Moodle-Trainer wurden die drei offiziellen **Hilfe-Buttons** (Fragezeichen-Icons) neben den Abschlussbedingungen "Minimale Anzahl zu übender Karten", "Minimale Anzahl gelernter Karten" und "Alle Karten lückenlos bis Status Experte lernen" reaktiviert. Die erklärenden Tooltips waren in den Sprachdateien bereits vorhanden, aber in der Nutzeroberfläche zuvor nicht angebunden.
+
+---
+
 ## [1.4.12] - 2026-03-01 (Robust Demo Deletion & Unit Tests)
 
 ### Geändert

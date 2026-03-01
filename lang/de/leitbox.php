@@ -61,17 +61,7 @@ $string['hint'] = 'Hinweis';
 $string['progress_label'] = 'Karten in Stufe Experte';
 $string['progress_aria'] = 'Fortschritt: {mastered} von {total} Karten gelernt';
 
-// Session feedback
-$string['feedback_grand_title'] = 'Meisterwerk';
-$string['feedback_grand_desc'] = 'Herzlichen Glückwunsch! Du hast alle Karten bis in den Experten-Stapel gebracht und zudem fehlerfrei wiedergegeben. Du hast dieses Thema absolut verstanden!';
-$string['feedback_perfect_title'] = 'Starkes Ergebnis';
-$string['feedback_perfect_desc'] = 'Du hast alle Inhalte korrekt ins Gedächtnis gerufen. Das Material sitzt.';
-$string['feedback_good_title'] = 'Solide Leistung';
-$string['feedback_good_desc'] = 'Du hast einen guten Überblick. Die verbleibenden Lücken schließen sich mit der Zeit.';
-$string['feedback_okay_title'] = 'Auf dem richtigen Weg';
-$string['feedback_okay_desc'] = 'Die Basis steht. Eine weitere Wiederholung wird dein Wissen festigen.';
-$string['feedback_learn_title'] = 'Wiederholung empfohlen';
-$string['feedback_learn_desc'] = 'Einige Antworten fielen dir schwer. Nutze die nächste Runde, um diese zu trainieren.';
+
 
 // Privacy metadata.
 $string['privacy:metadata:leitbox_progress'] = 'Informationen über den Lernfortschritt bei LeitBox.';
@@ -108,7 +98,7 @@ $string['updatecard'] = 'Änderungen speichern';
 $string['cardadded'] = 'Karte wurde erfolgreich hinzugefügt.';
 $string['cardupdated'] = 'Karte wurde erfolgreich aktualisiert.';
 $string['cancel'] = 'Abbrechen';
-$string['carddeleted'] = 'Karte gelöscht.';
+
 $string['cardsdeleted'] = '{$a} Karten erfolgreich gelöscht.';
 $string['deleteselected'] = 'Ausgewählte löschen';
 $string['confirmbulkdelete'] = 'Möchtest du die ausgewählten Karten wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.';

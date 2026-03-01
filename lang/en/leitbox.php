@@ -61,17 +61,7 @@ $string['hint'] = 'Hint';
 $string['progress_label'] = 'cards at Expert level';
 $string['progress_aria'] = 'Progress: {mastered} of {total} cards mastered';
 
-// Session feedback
-$string['feedback_grand_title'] = 'Masterpiece';
-$string['feedback_grand_desc'] = 'Congratulations! You have moved all cards to the Expert deck and leitboxed them perfectly. You have truly mastered this topic!';
-$string['feedback_perfect_title'] = 'Strong result';
-$string['feedback_perfect_desc'] = 'You leitboxed all content correctly. The material is solid.';
-$string['feedback_good_title'] = 'Solid performance';
-$string['feedback_good_desc'] = 'You have a good overview. The remaining gaps will close over time.';
-$string['feedback_okay_title'] = 'On the right track';
-$string['feedback_okay_desc'] = 'The foundation is there. Another round of review will strengthen your knowledge.';
-$string['feedback_learn_title'] = 'Review recommended';
-$string['feedback_learn_desc'] = 'Some answers were difficult for you. Use the next round to practice these.';
+
 
 // Privacy metadata.
 $string['privacy:metadata:leitbox_progress'] = 'Information about user progress on LeitBox.';
@@ -108,7 +98,7 @@ $string['updatecard'] = 'Save changes';
 $string['cardadded'] = 'Card added successfully.';
 $string['cardupdated'] = 'Card updated successfully.';
 $string['cancel'] = 'Cancel';
-$string['carddeleted'] = 'Card deleted.';
+
 $string['cardsdeleted'] = 'Successfully deleted {$a} cards.';
 $string['deleteselected'] = 'Delete selected';
 $string['confirmbulkdelete'] = 'Are you sure you want to delete the selected cards? This action cannot be undone.';
