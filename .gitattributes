@@ -14,5 +14,15 @@
 *.png binary
 *.jpg binary
 *.gif binary
-*.svg binary
 *.zip binary
+
+# --- Export-Ignore: Diese Dateien/Ordner werden NICHT ins release-ZIP (git archive) eingebaut ---
+.gitattributes export-ignore
+.gitignore export-ignore
+.github export-ignore
+frontend export-ignore
+user-logo export-ignore
+test_completion.php export-ignore
+test_completion_db.php export-ignore
+LICENSE export-ignore
+tests export-ignore
