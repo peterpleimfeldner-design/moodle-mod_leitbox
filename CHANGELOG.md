@@ -2,6 +2,13 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.4] - 2026-03-01 (Moodle API Registration Fix)
+
+### Behoben
+- **Server Error (`coding_exception`):** Der verbleibende HTTP 500 Fehler trat bei der Neuanlage von LeitBox-Aktivitäten mit aktiven Abschlussbedingungen auf. Dies war eine sehr strikte Moodle-Regel: Ein Plugin, das Abschlussregeln definiert (`FEATURE_COMPLETION_HAS_RULES = true`), erfordert zwangsweise die Callback-Funktion `pluginname_get_custom_completion_rules()`. Diese fehlte im Moodle-Core des Plugins und wurde nun in `lib.php` nachgerüstet. Moodle stürzt beim Anlegen jetzt nicht mehr ab.
+
+---
+
 ## [1.4.3] - 2026-03-01 (Moodle Core Database Hotfix)
 
 ### Behoben

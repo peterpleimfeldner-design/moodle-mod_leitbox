@@ -128,6 +128,15 @@ function leitbox_supports($feature) {
 }
 
 /**
+ * Obtains the custom completion rules for this module.
+ *
+ * @return array Array of strings
+ */
+function leitbox_get_custom_completion_rules() {
+    return ['completion_min_cards', 'completion_min_mastered', 'completion_all_mastered'];
+}
+
+/**
  * Returns the custom completion rules for this module.
  *
  * @param stdClass $course
