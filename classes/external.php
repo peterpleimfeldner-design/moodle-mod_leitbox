@@ -258,7 +258,7 @@ class external extends external_api {
         $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
         $completion = new \completion_info($course);
         if ($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
-            $completion->update_state($cm, COMPLETION_COMPLETE, $userid);
+            $completion->update_state($cm, COMPLETION_UNKNOWN, $userid);
         }
 
         return [

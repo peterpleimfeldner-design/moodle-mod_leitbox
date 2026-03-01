@@ -181,7 +181,7 @@ function leitbox_get_completion_state($course, $cm, $userid, $type) {
     $completed = true;
 
     if ($leitbox->completion_min_cards) {
-        $sql = "SELECT COALESCE(SUM(count_correct + count_wrong), 0) AS total_reviews
+        $sql = "SELECT COUNT(id) AS total_reviews
                   FROM {leitbox_progress}
                  WHERE userid = :userid AND cardid IN (
                      SELECT id FROM {leitbox_cards} WHERE leitboxid = :instanceid

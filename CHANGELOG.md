@@ -2,6 +2,14 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.6] - 2026-03-01 (Completion Logic & Trigger Hotfix)
+
+### Behoben
+- **Vorzeitiger Abschluss (API Event):** Die in `1.4.1` eingeführte Live-Aktualisierung überschrieb Moodles Berechnungs-Logik ungeprüft mit `COMPLETION_COMPLETE`, weshalb bei der allerersten beantworteten Karte sofort alle Regeln als erfüllt galten. Das Skript ruft Moodles Evaluierungsnetzwerk nun formal mit dem Flag `COMPLETION_UNKNOWN` auf, wodurch die echten Backend-Regeln wieder das Zepter übernehmen.
+- **Logikfehler "Mindestkarten":** Die Bedingung "Mindestanzahl an Karten" zählte bisher versehentlich alle Karteikarten-Klicks (also auch, wenn man drei Mal dieselbe Karte gelernt hat). Der SQL-Query zählt nun korrekterweise strikt die Anzahl an einzigartigen (einzelnen) Karteikarten, mit denen der User interagiert hat.
+
+---
+
 ## [1.4.5] - 2026-03-01 (Syntax Error Hotfix)
 
 ### Behoben
