@@ -40,9 +40,9 @@ defined('MOODLE_INTERNAL') || die();
  * EVERY release must be officially block-documented in CHANGELOG.md!
  */
 
-$plugin->version   = 2026030109; // The current module version (Date: YYYYMMDDXX).
+$plugin->version   = 2026030110; // The current module version (Date: YYYYMMDDXX).
 $plugin->requires  = 2022112800; // Requires Moodle 4.1 (LTS).
 $plugin->component = 'mod_leitbox'; // Full name of the plugin (used for diagnostics).
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.4.8';
+$plugin->release   = '1.4.9';
 

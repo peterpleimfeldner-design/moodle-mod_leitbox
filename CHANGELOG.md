@@ -2,6 +2,13 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.9] - 2026-03-01 (Completion SQL DISTINCT Fix)
+
+### Geändert
+- **Abschlussbedingung SQL (Fix für alle Bedingungen):** Alle 3 Completion-SQL-Abfragen verwenden jetzt `DISTINCT` um Mehrfachzählungen bei wiederholten Karten-Interaktionen zu verhindern. Bei der Bedingung "Alle Karten gemeistert" (Bedingung 3) wurde zudem der Aufruf von `count_records_sql` durch `get_field_sql` ersetzt, um eine fehlerhafte SQL-Übersetzung der Moodle-Core Engine beim Einsatz von `DISTINCT` abzufangen.
+
+---
+
 ## [1.4.8] - 2026-03-01 (SQL Semantic Refinement)
 
 ### Geändert

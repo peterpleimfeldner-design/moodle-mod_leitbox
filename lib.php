@@ -205,7 +205,7 @@ function leitbox_get_completion_state($course, $cm, $userid, $type) {
     // 2. Min Mastered Condition
     if ($leitbox->completion_min_mastered) {
         $req_min_mastered = true;
-        $sql_mastered = "SELECT COUNT(*)
+        $sql_mastered = "SELECT COUNT(DISTINCT cardid)
                            FROM {leitbox_progress}
                           WHERE userid = :userid 
                             AND box_number = 5
@@ -222,13 +222,13 @@ function leitbox_get_completion_state($course, $cm, $userid, $type) {
     if (!empty($leitbox->completion_all_mastered)) {
         $req_all_mastered = true;
         $total_cards = $DB->count_records('leitbox_cards', ['leitboxid' => $leitbox->id]);
-        $sql_mastered = "SELECT COUNT(p.id) 
+        $sql_mastered = "SELECT COUNT(DISTINCT p.cardid)
                            FROM {leitbox_progress} p 
                            JOIN {leitbox_cards} c ON p.cardid = c.id 
                           WHERE c.leitboxid = :instanceid 
                             AND p.userid = :userid 
                             AND p.box_number = 5";
-        $mastered_cards = $DB->count_records_sql($sql_mastered, ['instanceid' => $leitbox->id, 'userid' => $userid]);
+        $mastered_cards = $DB->get_field_sql($sql_mastered, ['instanceid' => $leitbox->id, 'userid' => $userid]);
         if ($total_cards == 0 || $total_cards != $mastered_cards) {
             $met_all_mastered = false;
         }
