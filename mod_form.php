@@ -64,41 +64,94 @@ class mod_leitbox_mod_form extends moodleform_mod {
 
     public function add_completion_rules() {
         $mform = $this->_form;
+        $suffix = method_exists($this, 'get_suffix') ? $this->get_suffix() : '';
 
         // 1. Min Cards Rule
-        $mform->addElement('text', 'completion_min_cards', get_string('completion_min_cards', 'mod_leitbox'), array('size' => 3));
-        $mform->setType('completion_min_cards', PARAM_INT);
-        $mform->addHelpButton('completion_min_cards', 'completion_min_cards', 'mod_leitbox');
+        $group = array();
+        $completion_min_cards_enabled = 'completion_min_cards_enabled' . $suffix;
+        $completion_min_cards = 'completion_min_cards' . $suffix;
+        $completion_min_cards_group = 'completion_min_cards_group' . $suffix;
+
+        $group[] = $mform->createElement('checkbox', $completion_min_cards_enabled, '',
+            get_string('completion_min_cards_desc', 'mod_leitbox'));
+        $group[] = $mform->createElement('text', $completion_min_cards, '', array('size' => 3));
+        $mform->setType($completion_min_cards, PARAM_INT);
+        $mform->addGroup($group, $completion_min_cards_group, get_string('completion_min_cards', 'mod_leitbox'), array(' '), false);
+        $mform->hideIf($completion_min_cards, $completion_min_cards_enabled, 'notchecked');
 
         // 2. Min Mastered Rule
-        $mform->addElement('text', 'completion_min_mastered', get_string('completion_min_mastered', 'mod_leitbox'), array('size' => 3));
-        $mform->setType('completion_min_mastered', PARAM_INT);
-        $mform->addHelpButton('completion_min_mastered', 'completion_min_mastered', 'mod_leitbox');
+        $group2 = array();
+        $completion_min_mastered_enabled = 'completion_min_mastered_enabled' . $suffix;
+        $completion_min_mastered = 'completion_min_mastered' . $suffix;
+        $completion_min_mastered_group = 'completion_min_mastered_group' . $suffix;
+
+        $group2[] = $mform->createElement('checkbox', $completion_min_mastered_enabled, '',
+            get_string('completion_min_mastered_desc', 'mod_leitbox'));
+        $group2[] = $mform->createElement('text', $completion_min_mastered, '', array('size' => 3));
+        $mform->setType($completion_min_mastered, PARAM_INT);
+        $mform->addGroup($group2, $completion_min_mastered_group, get_string('completion_min_mastered', 'mod_leitbox'), array(' '), false);
+        $mform->hideIf($completion_min_mastered, $completion_min_mastered_enabled, 'notchecked');
 
         // 3. All Mastered Rule
-        $mform->addElement('checkbox', 'completion_all_mastered', 
+        $completion_all_mastered = 'completion_all_mastered' . $suffix;
+        $mform->addElement('checkbox', $completion_all_mastered, 
             get_string('completion_all_mastered', 'mod_leitbox'),
             get_string('completion_all_mastered_desc', 'mod_leitbox'));
-        $mform->addHelpButton('completion_all_mastered', 'completion_all_mastered', 'mod_leitbox');
 
-        return array('completion_min_cards', 'completion_min_mastered', 'completion_all_mastered');
+        return array($completion_min_cards_group, $completion_min_mastered_group, $completion_all_mastered);
     }
 
     public function completion_rule_enabled($data) {
-        return (!empty($data['completion_min_cards']) && $data['completion_min_cards'] > 0) ||
-               (!empty($data['completion_min_mastered']) && $data['completion_min_mastered'] > 0) ||
-               (!empty($data['completion_all_mastered']));
+        $suffix = method_exists($this, 'get_suffix') ? $this->get_suffix() : '';
+        return (!empty($data['completion_min_cards_enabled' . $suffix]) && $data['completion_min_cards' . $suffix] > 0) ||
+               (!empty($data['completion_min_mastered_enabled' . $suffix]) && $data['completion_min_mastered' . $suffix] > 0) ||
+               (!empty($data['completion_all_mastered' . $suffix]));
     }
 
     public function data_preprocessing(&$default_values) {
-        if (!isset($default_values['completion_min_cards'])) {
-            $default_values['completion_min_cards'] = 0;
+        $suffix = method_exists($this, 'get_suffix') ? $this->get_suffix() : '';
+        
+        $completion_min_cards = 'completion_min_cards' . $suffix;
+        $completion_min_cards_enabled = 'completion_min_cards_enabled' . $suffix;
+        if (empty($default_values[$completion_min_cards])) {
+            $default_values[$completion_min_cards] = 10;
+            $default_values[$completion_min_cards_enabled] = 0;
+        } else {
+            $default_values[$completion_min_cards_enabled] = $default_values[$completion_min_cards] > 0 ? 1 : 0;
         }
-        if (!isset($default_values['completion_min_mastered'])) {
-            $default_values['completion_min_mastered'] = 0;
+        
+        $completion_min_mastered = 'completion_min_mastered' . $suffix;
+        $completion_min_mastered_enabled = 'completion_min_mastered_enabled' . $suffix;
+        if (empty($default_values[$completion_min_mastered])) {
+            $default_values[$completion_min_mastered] = 0;
+            $default_values[$completion_min_mastered_enabled] = 0;
+        } else {
+            $default_values[$completion_min_mastered_enabled] = $default_values[$completion_min_mastered] > 0 ? 1 : 0;
         }
-        if (!isset($default_values['completion_all_mastered'])) {
-            $default_values['completion_all_mastered'] = 0;
+        
+        $completion_all_mastered = 'completion_all_mastered' . $suffix;
+        if (!isset($default_values[$completion_all_mastered])) {
+            $default_values[$completion_all_mastered] = 0;
+        }
+    }
+
+    public function data_postprocessing($data) {
+        parent::data_postprocessing($data);
+        $suffix = method_exists($this, 'get_suffix') ? $this->get_suffix() : '';
+        
+        if (!empty($data->completionunlocked)) {
+            $completion = $data->{'completion' . $suffix} ?? 0;
+            $autocompletion = !empty($completion) && $completion == COMPLETION_TRACKING_AUTOMATIC;
+            
+            if (empty($data->{'completion_min_cards_enabled' . $suffix}) || !$autocompletion) {
+                $data->{'completion_min_cards' . $suffix} = 0;
+            }
+            if (empty($data->{'completion_min_mastered_enabled' . $suffix}) || !$autocompletion) {
+                $data->{'completion_min_mastered' . $suffix} = 0;
+            }
+            if (!$autocompletion) {
+                $data->{'completion_all_mastered' . $suffix} = 0;
+            }
         }
     }
 }

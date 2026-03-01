@@ -2,6 +2,13 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.20] - 2026-03-01 (Moodle 4.3+ Checkbox State Fix)
+
+### Behoben
+- **Activity Completion (Bugfix):** Es wurde nun eine exakte Replikation der nativen `mod_quiz`-Logik für Moodle 4.3+ Abschlussbedingungen eingebaut. Moodle vergibt bei Sammelbearbeitungen (Bulk Edit) im Hintergrund Suffixe an Formularfelder, was dazu führte, dass die Checkboxen der Abschlussbedingungen ihre Werte beim Speichern und Laden (data_preprocessing / data_postprocessing) verloren haben. Die Checkboxen setzen jetzt den vorausgehenden Zahlenwert (z.B. 10 Karten) korrekt zurück, wenn sie deaktiviert werden, und ihr Haken bleibt verlässlich gespeichert!
+
+---
+
 ## [1.4.19] - 2026-03-01 (Moodle 4 Form UI Completion Fix)
 
 ### Behoben
