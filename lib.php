@@ -138,35 +138,30 @@ function leitbox_supports($feature) {
  * into the cm_info cache's customdata array.
  *
  * @param stdClass $coursemodule
- * @return cached_cm_info
+ * @return cached_cm_info|false
  */
 function leitbox_get_coursemodule_info($coursemodule) {
     global $DB;
 
-    $result = new cached_cm_info();
-
-    // Only inject rules if automatic completion is configured in the form
-    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
-        $leitbox = $DB->get_record('leitbox', ['id' => $coursemodule->instance], 
-            'id, completion_min_cards, completion_min_mastered, completion_all_mastered');
-
-        if ($leitbox) {
-            $rules = [];
-            if (!empty($leitbox->completion_min_cards)) {
-                $rules['completion_min_cards'] = (int)$leitbox->completion_min_cards;
-            }
-            if (!empty($leitbox->completion_min_mastered)) {
-                $rules['completion_min_mastered'] = (int)$leitbox->completion_min_mastered;
-            }
-            if (!empty($leitbox->completion_all_mastered)) {
-                $rules['completion_all_mastered'] = 1;
-            }
-            
-            // Critical: Custom completion system expects rules to live precisely here:
-            $result->customdata['customcompletionrules'] = $rules;
-        }
+    $leitbox = $DB->get_record('leitbox', ['id' => $coursemodule->instance],
+        'id, name, completion_min_cards, completion_min_mastered, completion_all_mastered');
+    if (!$leitbox) {
+        return false;
     }
-    
+
+    $result = new cached_cm_info();
+    $result->name = $leitbox->name;
+
+    // NUR bei automatic completion in customdata schreiben
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $result->customdata['customcompletionrules']['completion_min_cards'] =
+            (int)$leitbox->completion_min_cards;
+        $result->customdata['customcompletionrules']['completion_min_mastered'] =
+            (int)$leitbox->completion_min_mastered;
+        $result->customdata['customcompletionrules']['completion_all_mastered'] =
+            (int)$leitbox->completion_all_mastered;
+    }
+
     return $result;
 }
 
