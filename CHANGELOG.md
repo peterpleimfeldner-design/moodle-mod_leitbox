@@ -2,6 +2,13 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.10] - 2026-03-01 (Moodle Forms API Checkbox Fix)
+
+### Behoben
+- **Abschlussbedingung Formular (Speicher-Bug):** Ein kritischer Fehler in `mod_form.php` wurde behoben. Die Checkbox für "Alle Karten gemeistert" war fälschlicherweise in einer Moodle Formular-Gruppe (`addGroup()`) gekapselt. Dies verursachte beim Speichern ein verschachteltes Array (`$data['completion_all_mastered_group']['completion_all_mastered']`), weshalb Moodle den Wert auf der obersten Ebene nicht fand und immer `0` (deaktiviert) in die Datenbank speicherte. Die Checkbox ist nun ein vollwertiges `addElement` auf Hauptebene. Das Feld wird nun korrekt aus den Einstellungen im Backend gespeichert.
+
+---
+
 ## [1.4.9] - 2026-03-01 (Completion SQL DISTINCT Fix)
 
 ### Geändert

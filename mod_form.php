@@ -83,13 +83,11 @@ class mod_leitbox_mod_form extends moodleform_mod {
         $mform->addGroup($group2, 'completion_min_mastered_group', get_string('completion_min_mastered', 'mod_leitbox'), array(' '), false);
         $mform->disabledIf('completion_min_mastered', 'completion_min_mastered_enabled', 'notchecked');
 
-        $group3 = array();
-        $group3[] = $mform->createElement('checkbox', 'completion_all_mastered', '',
+        $mform->addElement('checkbox', 'completion_all_mastered', 
+            get_string('completion_all_mastered', 'mod_leitbox'),
             get_string('completion_all_mastered_desc', 'mod_leitbox'));
-        
-        $mform->addGroup($group3, 'completion_all_mastered_group', get_string('completion_all_mastered', 'mod_leitbox'), array(' '), false);
 
-        return array('completion_min_cards_group', 'completion_min_mastered_group', 'completion_all_mastered_group');
+        return array('completion_min_cards_group', 'completion_min_mastered_group', 'completion_all_mastered');
     }
 
     public function completion_rule_enabled($data) {
