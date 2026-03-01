@@ -47,7 +47,7 @@ function mod_leitbox_auto_delete_demos($leitboxid) {
     $cards = $DB->get_records('leitbox_cards', ['leitboxid' => $leitboxid], 'id ASC');
     if (count($cards) === 5) {
         $first_card = reset($cards);
-        if (strpos($first_card->question, 'Willkommen bei LeitBox') !== false || strpos($first_card->question, 'Welcome to LeitBox') !== false) {
+        if ($first_card->category === 'demo') {
             list($in, $params) = $DB->get_in_or_equal(array_keys($cards));
             if (!empty($params)) {
                  $DB->delete_records_select('leitbox_progress', "cardid $in", $params);
@@ -134,7 +134,7 @@ if ($action === 'add' && data_submitted() && confirm_sesskey()) {
 if ($action === 'update' && data_submitted() && confirm_sesskey() && $cardid) {
     // Security check: Ensure the card belongs to this leitbox instance
     if (!$DB->record_exists('leitbox_cards', ['id' => $cardid, 'leitboxid' => $leitbox->id])) {
-        print_error('invalidrecord');
+        throw new \moodle_exception('invalidrecord');
     }
 
     $q = required_param('question', PARAM_RAW);

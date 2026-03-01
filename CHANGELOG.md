@@ -2,6 +2,17 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.11] - 2026-03-01 (Code Review & Cleanup)
+
+### Behoben
+- **Backup API:** Ein ungültiger (`annotate_ids`) Aufruf mit totem Code in `backup_leitbox_stepslib.php` wurde entfernt, da das Plugin keine direkten User-IDs in der Haupt-Tabelle speichert.
+- **Exception Handling:** Die veraltete Moodle 3.x Funktion `print_error()` in `manage.php` wurde durch die korrekte `throw new \moodle_exception()` ersetzt.
+- **Demo-Karten Erkennung:** Das Erkennen von automatisch generierten Demo-Karten basierte auf fragilen String-Vergleichen (Text-basiert), die bei Übersetzungen gebrochen wären. Die Demo-Karten erhalten nun bei Installation intern den Datenbank-Category-Flag `demo` und werden darüber manipulationssicher identifiziert und gelöscht.
+- **API Validierung:** In `external.php` wurde bei `get_cards_by_box` eine strenge Validierung für die Box-Nummer eingeführt (`$box < 0 || $box > 5`), die nun mit einem fatalen Fehler abbricht, wenn manipulierte REST-Anfragen gesendet werden.
+- **Upgrade Pfade:** Anachronistische Versionsnummern (2024...) in der `db/upgrade.php` wurden bereinigt und an das Release-Jahr 2026 angepasst.
+
+---
+
 ## [1.4.10] - 2026-03-01 (Moodle Forms API Checkbox Fix)
 
 ### Behoben

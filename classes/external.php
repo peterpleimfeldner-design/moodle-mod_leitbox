@@ -118,6 +118,10 @@ class external extends external_api {
         require_capability('mod/leitbox:view', $context);
 
         $box = $params['boxnumber'];
+        if ($box < 0 || $box > 5) {
+            throw new \moodle_exception('invalidparameter');
+        }
+
         $userid = $USER->id;
         $instanceid = $params['instanceid'];
         
@@ -168,7 +172,7 @@ class external extends external_api {
 
         // Always force the very first tutorial demo card to be strictly the first card if it's in this set
         foreach ($result as $index => $c) {
-            if (strpos($c['question'], 'Willkommen bei LeitBox') !== false || strpos($c['question'], 'Welcome to LeitBox') !== false) {
+            if ($c['category'] === 'demo') {
                 // Move it to the very front of the array
                 $demo_card = $result[$index];
                 unset($result[$index]);

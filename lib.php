@@ -37,30 +37,35 @@ function leitbox_add_instance($leitbox) {
     $demo_cards = [
         [
             'leitboxid' => $id,
+            'category' => 'demo',
             'question' => get_string('demo_q1', 'mod_leitbox'),
             'answer' => get_string('demo_a1', 'mod_leitbox'),
             'hint' => get_string('demo_h1', 'mod_leitbox'),
         ],
         [
             'leitboxid' => $id,
+            'category' => 'demo',
             'question' => get_string('demo_q2', 'mod_leitbox'),
             'answer' => get_string('demo_a2', 'mod_leitbox'),
             'hint' => get_string('demo_h2', 'mod_leitbox'),
         ],
         [
             'leitboxid' => $id,
+            'category' => 'demo',
             'question' => get_string('demo_q3', 'mod_leitbox'),
             'answer' => get_string('demo_a3', 'mod_leitbox'),
             'hint' => get_string('demo_h3', 'mod_leitbox'),
         ],
         [
             'leitboxid' => $id,
+            'category' => 'demo',
             'question' => get_string('demo_q4', 'mod_leitbox'),
             'answer' => get_string('demo_a4', 'mod_leitbox'),
             'hint' => get_string('demo_h4', 'mod_leitbox'),
         ],
         [
             'leitboxid' => $id,
+            'category' => 'demo',
             'question' => get_string('demo_q5', 'mod_leitbox'),
             'answer' => get_string('demo_a5', 'mod_leitbox'),
             'hint' => get_string('demo_h5', 'mod_leitbox'),

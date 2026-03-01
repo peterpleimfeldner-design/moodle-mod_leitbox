@@ -58,7 +58,6 @@ class backup_leitbox_activity_structure_step extends backup_activity_structure_s
         }
 
         // Define id annotations to ensure accurate restoration of users and contexts.
-        $leitbox->annotate_ids('user', 'userid'); // Though leitbox table doesn't have userid, keeping it consistent conceptually if added later
         $progress->annotate_ids('user', 'userid');
 
         // Annotate file areas (intro text files).

@@ -25,7 +25,7 @@ function xmldb_leitbox_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2024010103) {
+    if ($oldversion < 2026010103) {
         $table = new xmldb_table('leitbox');
         $field = new xmldb_field('completion_min_mastered', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'completion_min_cards');
 
@@ -33,7 +33,7 @@ function xmldb_leitbox_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_mod_savepoint(true, 2024010103, 'leitbox');
+        upgrade_mod_savepoint(true, 2026010103, 'leitbox');
     }
 
     if ($oldversion < 2026022705) {
