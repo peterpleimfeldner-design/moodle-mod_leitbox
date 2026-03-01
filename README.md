@@ -1,65 +1,134 @@
-# Moodle Activity Module: LeitBox
+#### LeitBox – Spaced Repetition for Moodle
 
-LeitBox is a modern, single-page application (SPA) flashcard activity plugin for Moodle that utilizes the proven Leitner system of spaced repetition.
+> **Named after Sebastian Leitner** – the Austrian scientist who invented the flashcard learning system in 1972. LeitBox brings his method natively into Moodle.
 
-## Description
+LeitBox is a native Moodle activity plugin that turns passive course content into long-term knowledge. Built on the proven **Leitner spaced repetition method**, it provides a fast, modern learning experience directly inside Moodle – no extra login, no external tools, no privacy concerns.
 
-The LeitBox activity allows students to practice flashcards using a smart spaced repetition system. It provides a modern, fast, and responsive user interface built as a Vue.js 3 single-page application integrated directly into Moodle.
+---
 
-Teachers can easily manage flashcards manually or import them in bulk using AI-generated text. The plugin tracks student progress, supports custom activity completion rules based on cards mastered, and helps students retain knowledge efficiently.
+## Screenshots
 
-## Core Features & Benefits
+*Coming soon*
 
-- **Smart Leitner System:** Cards are organized into 6 learning boxes (New, Beginner, Learner, Advanced, Experienced, Expert). The system dynamically adjusts review intervals based on user feedback.
-- **Pedagogically Optimized:** When a card is forgotten (marked as "Hard"), it does not frustratingly reset to the beginning but shifts back by just one box, maintaining student motivation. A didactic limit of 200 cards per set ensures focused, effective learning.
-- **Premium UI/UX:** Built with Vue.js 3 and Tailwind CSS. Features psychologically aligned pastel colors, micro-animations, and a completely seamless, reload-free experience.
-- **AI Prompt Templates:** 6 built-in prompt templates (Standard Q&A, True/False, Vocabulary, Fill-in-the-blank, Jeopardy, Transfer & Everyday Context) for generating flashcard decks with any AI. Select, copy, and paste.
-- **Bulk Card Management:** Checkbox-powered multi-select for bulk deletion, plus a one-click export of all cards as a re-importable `.txt` file.
-- **WCAG 2.1 AA Compliant:** Fully accessible interface with comprehensive screen reader support, keyboard navigation, and high-contrast fallbacks.
-- **Full Internationalization:** Complete German and English language packs with no hardcoded strings. All UI elements, prompts, feedback messages, and explanations adapt to the user's Moodle language.
-- **Learning Progress Reset:** A built-in user-facing reset feature allows students to safely restart their learning journey before exams.
-- **Session Feedback:** Dynamic performance feedback after completing a deck, with 5 graduated levels from "Review recommended" to "Masterpiece".
+---
+
+## Features
+
+### 🧠 Motivation-Optimised Learning Algorithm
+Cards are organised into **6 learning boxes** (New → Beginner → Learner → Advanced → Experienced → Expert). Three answer options give learners full control:
+
+| Answer | Effect |
+|--------|--------|
+| **Knew it** | Card advances one box |
+| **Again** | Card stays, repeated in this session – no penalty |
+| **Hard** | Card falls back exactly **one box** (never to zero) |
+
+A single mistake never erases all progress. This design decision directly reduces frustration and improves long-term motivation.
+
+### 🤖 AI-Ready Card Creation
+Built-in prompt templates let teachers generate entire card decks from any existing material in under 2 minutes. Six didactic categories are available from a dropdown:
+
+- Standard Q&A (factual knowledge)
+- True or False (with explanation)
+- Vocabulary & Terms (translations, definitions)
+- Fill in the Blank (cloze-style)
+- Jeopardy (answer first, guess the question)
+- Transfer & Real-World Application (highest didactic level)
+
+The output can be pasted directly into the bulk import field – no file upload, no encoding errors, no CSV headaches.
+
+### 📊 Moodle-Native Completion Tracking
+Three granular, combinable completion conditions:
+- User interacted with X unique cards
+- User promoted X cards to Expert level (box 5)
+- User promoted **all** cards to Expert level
+
+Full integration with Moodle's Activity Completion system.
+
+### ♿ WCAG 2.1 AA Accessible
+- Full screen reader support (semantic HTML, ARIA attributes)
+- Complete keyboard navigation
+- Colour-independent recognition (icons + text)
+
+### 🔒 GDPR / Privacy by Design
+Full Moodle Privacy API integration. All student data stays on the institution's own server and can be exported or deleted via standard Moodle Data Privacy tools.
+
+### 🛡️ Moodle-Native & Admin-Friendly
+- Full Backup & Restore API support
+- No CSS bleeding, no external dependencies
+- Uses only Moodle's built-in role, permission and session management
+- Compatible with all standard Moodle themes
+
+---
 
 ## Requirements
 
-- Moodle 4.1 or later (LTS compliant).
-- No additional PHP extensions required.
+- **Moodle:** 4.1 LTS or later (tested up to 4.5)
+- **PHP:** 8.x
+- **Database:** MySQL, MariaDB, or PostgreSQL
+- No additional PHP extensions or server dependencies required
+
+---
 
 ## Installation
 
-1. Log in to your Moodle site as an administrator.
-2. Go to **Site administration** > **Plugins** > **Install plugins**.
-3. Upload the latest `mod_leitbox_vX.Y.Z.zip` file and follow the onscreen instructions.
-4. Alternatively, extract the zip file directly into the `mod/leitbox` directory of your Moodle installation and trigger the upgrade via the browser (`/admin/index.php`) or CLI.
+1. Download the latest release ZIP: `mod_leitbox_vX.Y.Z.zip`
+2. In Moodle: **Site administration → Plugins → Install plugins**
+3. Upload the ZIP and follow the on-screen instructions
+
+**Manual installation:**
+Extract the ZIP into your Moodle `/mod/leitbox/` directory, then visit `/admin/index.php` to trigger the database upgrade.
+
+> **Important:** The ZIP root must contain exactly one directory named `leitbox`. Do not rename or restructure it.
+
+---
+
+## Tech Stack
+
+| Component | Technology |
+|-----------|------------|
+| Backend | PHP 8.x, Moodle Core API |
+| Frontend | Vue.js 3, Tailwind CSS, Vite |
+| Database | Moodle XMLDB (MySQL / MariaDB / PostgreSQL) |
+| Security | CSRF/XSS protection via Moodle Core Services |
+| Maturity | `MATURITY_STABLE` |
+| License | GNU GPL v3 |
+
+---
+
+## Versioning
+
+This plugin follows [Semantic Versioning](https://semver.org/):
+
+- **MAJOR** – Architectural rewrites or dropping Moodle LTS support
+- **MINOR** – New features or database schema changes
+- **PATCH** – Bug fixes, translation corrections, CSS tweaks
+
+All changes are documented in [CHANGELOG.md](CHANGELOG.md).
+
+---
 
 ## Privacy & GDPR
 
-LeitBox supports Moodle's native Privacy API. All student interaction data (progress, flashcard states) is strictly linked to their Moodle ID and can be exported or purged via the standard Data Privacy tools in Moodle.
+LeitBox supports Moodle's native Privacy API. All student interaction data is strictly linked to their Moodle user ID and can be fully exported or purged via **Site administration → Privacy and policies → Data requests**.
+
+---
 
 ## Backup & Restore
 
-Full support for Moodle's native Backup and Restore API is included. Course backups will seamlessly include all flashcard decks and, optionally, student progress data.
+Full support for Moodle's native Backup and Restore API. Course backups include all flashcard decks and, optionally, individual student progress data.
 
-## Packaging Standard (Developers / AI Context)
+---
 
-**CRITICAL RULE:** For Moodle plugin compliance, all source ZIPs submitted to the Moodle Plugins directory or distributed to clients MUST follow the exact format: `mod_leitbox_vX.Y.Z.zip` (e.g., `mod_leitbox_v1.4.0.zip`).
-- The ZIP root must contain EXACTLY ONE directory named `leitbox`.
-- Do not use names like `leitbox_v1.zip` or `plugin.zip`.
+## Support & Contact
 
-## Versioning Standard (Semantic Versioning)
+- **Bug reports & feature requests:** [GitHub Issues](https://github.com/peterpleimfeldner-design/leitbox/issues)
+- **Email:** leitbox.moodle@gmail.com
 
-This plugin strictly adheres to standard Semantic Versioning (`MAJOR.MINOR.PATCH`). Future AI tools or developers MUST follow this:
-- **MAJOR** increment (e.g., `1.x.x` to `2.0.0`): Fundamental architectural changes, framework rewrites, dropping legacy Moodle LTS support.
-- **MINOR** increment (e.g., `1.4.x` to `1.5.0`): New features (e.g., new completion rules, UI upgrades) or database schema upgrades (`install.xml`).
-- **PATCH** increment (e.g., `1.4.0` to `1.4.1`): Strict bugfixes, translation string corrections, or risk-free CSS tweaks.
-- Every release must be thoroughly documented in the `CHANGELOG.md` file!
-
-## Links
-
-- **Documentation:** [GitHub Repository](https://github.com/peterpleimfeldner-design/leitbox)
-- **Bug tracker:** [GitHub Issues](https://github.com/peterpleimfeldner-design/leitbox/issues)
-- **Support & Contact:** leitbox.moodle@gmail.com
+---
 
 ## License
 
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under the terms of the **GNU General Public License** as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+See [LICENSE](LICENSE) for full details.
