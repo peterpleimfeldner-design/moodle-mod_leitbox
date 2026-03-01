@@ -2,6 +2,13 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.18] - 2026-03-01 (Moodle 4+ Completion Tracking Fix)
+
+### Behoben
+- **Activity Completion (Bugfix):** Es wurde ein kritischer Fehler in der Kommunikation mit der Moodle 4+ Completion API behoben. Da die neuen `custom_completion` Standard-Klassen für Moodle 4 fehlten, interpretierte der Moodle-Core die Zwischenstände von LeitBox als "Ohne Regeln abgeschlossen" und markierte die Aktivität oft fälschlicherweise nach der ersten gelernten Karte als "Erledigt". Die Architektur wurde nun nativ an Moodle 4 (Klasse `mod_leitbox\completion\custom_completion`) angepasst und die Fallback-Berechnungen strikt abgedichtet.
+
+---
+
 ## [1.4.17] - 2026-03-01 (Completion Data Preprocessing Fix)
 
 ### Behoben
