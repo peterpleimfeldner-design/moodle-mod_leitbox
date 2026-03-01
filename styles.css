@@ -15,3 +15,11 @@
 .path-mod-leitbox .page-header-image img {
     object-fit: contain !important;
 }
+
+/* Completion form: help icons linksbündig / left-aligned */
+#page-course-modedit .completion-rule .form-group .helptooltip,
+.completion-rule .helptooltip {
+    float: left;
+    margin-right: 8px;
+    margin-left: 0;
+}
