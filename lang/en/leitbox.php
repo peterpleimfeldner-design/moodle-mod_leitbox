@@ -29,9 +29,9 @@ $string['leitbox:view'] = 'View LeitBox';
 
 $string['leitboxname'] = 'Activity Name';
 $string['settings'] = 'LeitBox Settings';
-$string['completion_min_cards'] = 'Minimum cards to practice';
-$string['completion_min_cards_desc'] = 'Student must practice at least this many flashcards:';
-$string['completion_min_cards_help'] = 'The minimum number of cards a student must interact with to complete this activity.';
+$string['completion_min_cards'] = 'Minimum practice rounds';
+$string['completion_min_cards_desc'] = 'Student must complete at least this many practice rounds (same card can count multiple times):';
+$string['completion_min_cards_help'] = 'Total number of card ratings (green/yellow/red) required. A student with 5 cards who goes through them 3 times has 15 practice rounds.';
 
 $string['completion_min_mastered'] = 'Mastered cards (Box 5)';
 $string['completion_min_mastered_desc'] = 'Student must master at least this many flashcards (reach Box 5):';
