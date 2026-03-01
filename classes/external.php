@@ -156,11 +156,20 @@ class external extends external_api {
 
         $result = [];
         foreach ($cards as $card) {
+            // Resolve language-neutral demo card markers (e.g. ##demo_q1##) to
+            // the user's current Moodle language. This allows demo cards to be
+            // multilingual even though they are stored as plain keys in the DB.
+            $resolve = function($text) {
+                if (preg_match('/^##(demo_[a-z0-9]+)##$/', $text, $m)) {
+                    return get_string($m[1], 'mod_leitbox');
+                }
+                return $text;
+            };
             $result[] = [
-                'id' => $card->id,
-                'question' => $card->question,
-                'answer' => $card->answer,
-                'hint' => $card->hint ? $card->hint : '',
+                'id'       => $card->id,
+                'question' => $resolve($card->question),
+                'answer'   => $resolve($card->answer),
+                'hint'     => $resolve($card->hint ? $card->hint : ''),
                 'category' => $card->category ? $card->category : '',
             ];
         }

@@ -33,43 +33,15 @@ function leitbox_add_instance($leitbox) {
     $leitbox->timemodified = $leitbox->timecreated;
     $id = $DB->insert_record('leitbox', $leitbox);
 
-    // Insert tutorial demo cards using localized strings
+    // Insert tutorial demo cards using language-neutral marker keys.
+    // The markers (e.g. ##demo_q1##) are resolved to the user's language
+    // at display time in external.php, so the correct language is always shown.
     $demo_cards = [
-        [
-            'leitboxid' => $id,
-            'category' => 'demo',
-            'question' => get_string('demo_q1', 'mod_leitbox'),
-            'answer' => get_string('demo_a1', 'mod_leitbox'),
-            'hint' => get_string('demo_h1', 'mod_leitbox'),
-        ],
-        [
-            'leitboxid' => $id,
-            'category' => 'demo',
-            'question' => get_string('demo_q2', 'mod_leitbox'),
-            'answer' => get_string('demo_a2', 'mod_leitbox'),
-            'hint' => get_string('demo_h2', 'mod_leitbox'),
-        ],
-        [
-            'leitboxid' => $id,
-            'category' => 'demo',
-            'question' => get_string('demo_q3', 'mod_leitbox'),
-            'answer' => get_string('demo_a3', 'mod_leitbox'),
-            'hint' => get_string('demo_h3', 'mod_leitbox'),
-        ],
-        [
-            'leitboxid' => $id,
-            'category' => 'demo',
-            'question' => get_string('demo_q4', 'mod_leitbox'),
-            'answer' => get_string('demo_a4', 'mod_leitbox'),
-            'hint' => get_string('demo_h4', 'mod_leitbox'),
-        ],
-        [
-            'leitboxid' => $id,
-            'category' => 'demo',
-            'question' => get_string('demo_q5', 'mod_leitbox'),
-            'answer' => get_string('demo_a5', 'mod_leitbox'),
-            'hint' => get_string('demo_h5', 'mod_leitbox'),
-        ]
+        ['leitboxid' => $id, 'category' => 'demo', 'question' => '##demo_q1##', 'answer' => '##demo_a1##', 'hint' => '##demo_h1##'],
+        ['leitboxid' => $id, 'category' => 'demo', 'question' => '##demo_q2##', 'answer' => '##demo_a2##', 'hint' => '##demo_h2##'],
+        ['leitboxid' => $id, 'category' => 'demo', 'question' => '##demo_q3##', 'answer' => '##demo_a3##', 'hint' => '##demo_h3##'],
+        ['leitboxid' => $id, 'category' => 'demo', 'question' => '##demo_q4##', 'answer' => '##demo_a4##', 'hint' => '##demo_h4##'],
+        ['leitboxid' => $id, 'category' => 'demo', 'question' => '##demo_q5##', 'answer' => '##demo_a5##', 'hint' => '##demo_h5##'],
     ];
 
     foreach ($demo_cards as $card) {

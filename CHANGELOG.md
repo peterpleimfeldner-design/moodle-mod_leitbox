@@ -2,6 +2,23 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.5.5] - 2026-03-01 (Mehrsprachige Demo-Karten)
+
+### Behoben
+- **Demo-Karten Sprache:** Demo-Karten werden nun immer in der aktiven Moodle-Sprache des Nutzers angezeigt, unabhängig davon in welcher Sprache die Aktivität erstellt wurde.
+  - `lib.php`: Demo-Karten werden mit sprach-neutralen Marker-Keys gespeichert (`##demo_q1##` statt übersetztem Text).
+  - `classes/external.php`: Beim Abruf der Karten werden Marker-Keys automatisch in die aktuelle Nutzersprache aufgelöst (`get_string()`).
+
+---
+
+## [1.5.4] - 2026-03-01 (dist-Ordner in git aufgenommen)
+
+### Hinzugefügt
+- **`.gitattributes`:** Eintrag für `dist/` hinzugefügt, um sicherzustellen, dass der Ordner im Repository verfolgt wird.
+- **`dist/`:** Der `dist`-Ordner, der die kompilierten Frontend-Assets enthält, wurde dem Git-Repository hinzugefügt. Dies vereinfacht die Installation und das Deployment, da die Assets nicht mehr manuell kompiliert werden müssen.
+
+---
+
 ## [1.5.3] - 2026-03-01 (Branding: Custom SVG Icon)
 
 ### Geändert
