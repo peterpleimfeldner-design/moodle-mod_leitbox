@@ -29,9 +29,9 @@ $string['leitbox:view'] = 'View LeitBox';
 
 $string['leitboxname'] = 'Activity Name';
 $string['settings'] = 'LeitBox Settings';
-$string['completion_min_cards'] = 'Minimum practice rounds';
-$string['completion_min_cards_desc'] = 'Student must complete at least this many practice rounds (same card can count multiple times):';
-$string['completion_min_cards_help'] = 'Total number of card ratings (green/yellow/red) required. A student with 5 cards who goes through them 3 times has 15 practice rounds.';
+$string['completion_min_cards'] = 'Minimum cards answered correctly';
+$string['completion_min_cards_desc'] = 'Student must answer at least this many cards correctly at least once:';
+$string['completion_min_cards_help'] = 'A card counts as "correctly answered" once it has been rated green at least once and is in Box 1 or higher. Cards that were only rated red or yellow do not count.';
 
 $string['completion_min_mastered'] = 'Mastered cards (Box 5)';
 $string['completion_min_mastered_desc'] = 'Student must master at least this many flashcards (reach Box 5):';
