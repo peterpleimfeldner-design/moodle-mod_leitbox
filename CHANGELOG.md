@@ -2,6 +2,13 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.5.3] - 2026-03-01 (Branding: Custom SVG Icon)
+
+### Geändert
+- **`pix/icon.svg`:** Platzhalter-Icon ("L") durch das offizielle LeitBox-Markenicon ersetzt.
+
+---
+
 ## [1.5.2] - 2026-03-01 (Moodle Marketplace: Zeilenenden & Icon)
 
 ### Behoben
