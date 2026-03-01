@@ -2,6 +2,13 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.4.25] - 2026-03-01 (Moodle 4.x Completion ID Fix)
+
+### Behoben
+- **Activity Completion (Bugfix):** Behebt eine Exception in `classes/external.php`, die den Fortschritts-Speichervorgang abgebrochen hat. Der Methoden-Aufruf `$modinfo->get_cm()` erwartet die *Course Module ID*, es wurde jedoch fälschlicherweise die Leitbox *Instance ID* übergeben. Der Code bezieht die korrekte CM-ID nun vorab über `get_coursemodule_from_instance`. 
+
+---
+
 ## [1.4.24] - 2026-03-01 (Moodle 4.x Completion Logic Cleanup)
 
 ### Optimiert
