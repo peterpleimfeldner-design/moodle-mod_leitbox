@@ -2,6 +2,18 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.5.10] - 2026-03-18 (Backup-Dateinamen: Moodle Discovery Fix)
+
+### Behoben
+- **Backup-Dateinamen:** Backup/Restore-Task-Dateien wurden von `.php` zu `.class.php` umbenannt, um Moodles automatische Klassen-Erkennung zu aktivieren.
+  - `backup/moodle2/backup_leitbox_activity_task.php` → `backup_leitbox_activity_task.class.php`
+  - `backup/moodle2/restore_leitbox_activity_task.php` → `restore_leitbox_activity_task.class.php`
+- **Fehler behoben:** Kurse konnten nicht gesichert werden (Fehler: "Class 'backup_leitbox_activity_task' not found").
+  - Moodles Backup-Discovery-Mechanismus sucht nach `.class.php` Dateien für Activity Task Klassen.
+  - Diese Konvention ist Teil des Moodle Backup-API Standards.
+
+---
+
 ## [1.5.5] - 2026-03-01 (Mehrsprachige Demo-Karten)
 
 ### Behoben
