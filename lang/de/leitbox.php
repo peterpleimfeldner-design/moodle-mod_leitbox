@@ -265,3 +265,5 @@ $string['reset_progress_confirm_msg'] = 'Wirklich zurücksetzen? Dadurch geht de
 $string['reset_progress_btn'] = 'Ja, zurücksetzen';
 $string['reset_progress_cancel'] = 'Abbrechen';
 $string['reset_progress_done'] = 'Lernfortschritt wurde zurückgesetzt!';
+
+$string['event_course_module_viewed'] = 'LeitBox-Aktivität aufgerufen';

@@ -265,3 +265,5 @@ $string['reset_progress_confirm_msg'] = 'Warning: This will reset all your learn
 $string['reset_progress_btn'] = 'Yes, Reset';
 $string['reset_progress_cancel'] = 'Cancel';
 $string['reset_progress_done'] = 'Learning progress has been reset!';
+
+$string['event_course_module_viewed'] = 'LeitBox activity viewed';
