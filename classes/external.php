@@ -197,10 +197,10 @@ class external extends external_api {
         return new external_multiple_structure(
             new external_single_structure([
                 'id' => new external_value(PARAM_INT, 'Card ID'),
-                'question' => new external_value(PARAM_RAW, 'Question text'),
-                'answer' => new external_value(PARAM_RAW, 'Answer text'),
-                'hint' => new external_value(PARAM_RAW, 'Optional hint', VALUE_OPTIONAL),
-                'category' => new external_value(PARAM_RAW, 'Optional category', VALUE_OPTIONAL),
+                'question' => new external_value(PARAM_CLEANHTML, 'Question text'),
+                'answer' => new external_value(PARAM_CLEANHTML, 'Answer text'),
+                'hint' => new external_value(PARAM_CLEANHTML, 'Optional hint', VALUE_OPTIONAL),
+                'category' => new external_value(PARAM_TEXT, 'Optional category', VALUE_OPTIONAL),
             ])
         );
     }
@@ -225,11 +225,11 @@ class external extends external_api {
         $leitbox = $DB->get_record('leitbox', ['id' => $card->leitboxid], '*', MUST_EXIST);
         $course = $DB->get_record('course', ['id' => $leitbox->course], '*', MUST_EXIST);
         
-        // get_coursemodule_from_instance() liefert die CM-ID.
-        // get_fast_modinfo()->get_cm() braucht CM-ID (nicht Instance-ID!).
+        // get_coursemodule_from_instance() returns the CM-ID.
+        // get_fast_modinfo()->get_cm() requires CM-ID (not Instance-ID!).
         $cm_raw = get_coursemodule_from_instance('leitbox', $leitbox->id, $course->id, false, MUST_EXIST);
         $modinfo = get_fast_modinfo($course);
-        $cm = $modinfo->get_cm($cm_raw->id); // cm_info Objekt mit customdata
+        $cm = $modinfo->get_cm($cm_raw->id); // cm_info object with customdata
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
         require_capability('mod/leitbox:view', $context);
@@ -308,7 +308,7 @@ class external extends external_api {
         
         $cm_raw = get_coursemodule_from_instance('leitbox', $params['instanceid'], $course->id, false, MUST_EXIST);
         $modinfo = get_fast_modinfo($course);
-        $cm = $modinfo->get_cm($cm_raw->id); // cm_info Objekt mit customdata
+        $cm = $modinfo->get_cm($cm_raw->id); // cm_info object with customdata
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
         require_capability('mod/leitbox:view', $context);

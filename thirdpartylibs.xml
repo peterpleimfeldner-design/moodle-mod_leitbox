@@ -17,4 +17,15 @@
             <url>https://github.com/vuejs/core</url>
         </urls>
     </library>
+    <library>
+        <location>dist/assets</location>
+        <name>Axios</name>
+        <version>1.6.x</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+        <urls>
+            <url>https://axios-http.com/</url>
+            <url>https://github.com/axios/axios</url>
+        </urls>
+    </library>
 </libraries>
