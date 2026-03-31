@@ -22,6 +22,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/mod/leitbox/backup/moodle2/restore_leitbox_stepslib.php');
 
 class restore_leitbox_activity_task extends restore_activity_task {
