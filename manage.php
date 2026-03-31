@@ -328,13 +328,14 @@ $templatedata = [
         ['id' => $cm->id, 'action' => 'export', 'sesskey' => sesskey()]))->out(false),
 ];
 
-// Pass prompt templates and confirmation strings to the AMD module.
+// Pass prompt templates and confirmation strings to the AMD module via the template
+// (avoids Moodle's 1024-character limit on js_call_amd arguments).
 $amdparams = [
     'prompts'            => $prompts,
     'confirmDelete'      => get_string('confirmdeletecard',  'mod_leitbox'),
     'confirmBulkDelete'  => get_string('confirmbulkdelete',  'mod_leitbox'),
 ];
-$PAGE->requires->js_call_amd('mod_leitbox/manage', 'init', [$amdparams]);
+$templatedata['jsconfig'] = json_encode($amdparams);
 
 // =========================================================
 // Output

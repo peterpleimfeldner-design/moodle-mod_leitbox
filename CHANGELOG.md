@@ -2,6 +2,14 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.5.12] - 2026-03-31 (Fix: js_call_amd 1024-Zeichen-Limit)
+
+### Behoben
+- **Moodle-Warnung "Too much data passed as arguments to js_call_amd":** Der AMD-Aufruf für `mod_leitbox/manage` wurde von `$PAGE->requires->js_call_amd()` in einen `{{#js}}`-Block im Mustache-Template verschoben. Die Prompt-Templates überschritten Moodles eingebautes 1024-Zeichen-Limit für direkte AMD-Argumente. Im Mustache-Template gilt dieses Limit nicht. Die Daten werden via `json_encode()` in `$templatedata['jsconfig']` bereitgestellt und mit `{{{jsconfig}}}` (triple-stash, kein HTML-Escaping) in den `require()`-Aufruf injiziert.
+- Betroffene Dateien: `manage.php`, `templates/manage.mustache`
+
+---
+
 ## [1.5.11] - 2026-03-31 (Finale Review-Compliance: PARAM_RAW, Kommentare, CI/CD)
 
 ### Behoben

@@ -197,3 +197,8 @@
     {{/hascards}}
 
 </div>
+{{#js}}
+require(['mod_leitbox/manage'], function(Manage) {
+    Manage.init({{{jsconfig}}});
+});
+{{/js}}
