@@ -122,7 +122,7 @@ Full support for Moodle's native Backup and Restore API. Course backups include 
 
 ## Support & Contact
 
-- **Bug reports & feature requests:** [GitHub Issues](https://github.com/peterpleimfeldner-design/leitbox/issues)
+- **Bug reports & feature requests:** [GitHub Issues](https://github.com/peterpleimfeldner-design/moodle-mod_leitbox/issues)
 - **Email:** leitbox.moodle@gmail.com
 
 ---

@@ -2,6 +2,18 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.5.11] - 2026-03-31 (Finale Review-Compliance: PARAM_RAW, Kommentare, CI/CD)
+
+### Behoben
+- **Issue #4 – PARAM_RAW (Nachfix external.php):** In `classes/external.php` wurden `question`, `answer` und `hint` von `PARAM_RAW` auf `PARAM_CLEANHTML` umgestellt, `category` auf `PARAM_TEXT`. Der vorherige Fix in v1.5.6 hatte nur `manage.php` erfasst; die externe Web-Service-Schnittstelle wurde nachgezogen.
+- **Issue #7 – Non-English Comments (Nachfix):** Verbleibende deutsche Kommentare in `classes/external.php` (3 Stellen) und `classes/completion/custom_completion.php` (5 Stellen) wurden ins Englische übersetzt. Der vorherige Fix in v1.5.6 hatte nur `lib.php` erfasst.
+- **Issue #8 – thirdpartylibs.xml (Nachfix):** Axios 1.6.x (MIT) in `thirdpartylibs.xml` eingetragen. Axios wird als Runtime-Dependency in `dist/assets/index.js` gebündelt und war daher dokumentationspflichtig.
+
+### Hinzugefügt
+- **Issue #1 – GitHub Actions CI/CD:** `.github/workflows/ci.yml` mit `moodlehq/moodle-plugin-ci` erstellt. Testet automatisch auf Moodle 4.1, 4.4 und 4.5 mit PHP 8.1, 8.2 und 8.3 (PostgreSQL). Prüfschritte: PHPLint, CodeChecker, PHPDoc, Validate, Mustache Lint, JS Lint, PHPUnit, Behat.
+
+---
+
 ## [1.5.10] - 2026-03-18 (Backup-Dateinamen: Moodle Discovery Fix)
 
 ### Behoben
