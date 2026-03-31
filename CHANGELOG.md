@@ -41,11 +41,10 @@ Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokument
 
 ---
 
-## [1.5.8] - 2026-03-11 (Delete-Dialog & Leafr-Backup Fixes)
+## [1.5.8] - 2026-03-11 (Delete-Dialog Fix)
 
 ### Behoben
 - **Lösch-Bestätigungsdialog flackerte:** `Notification.confirm` (Moodle asynchrones Modal) wurde durch `window.confirm()` ersetzt. Das native Browser-Dialogfenster ist synchron und blockierend — es bleibt geöffnet bis der Nutzer explizit bestätigt oder abbricht, unabhängig vom Moodle-Modal-Stack. Die Abhängigkeit auf `core/notification` im AMD-Modul wurde entfernt.
-- **Leafr Backup Fatal Error (Folgefix):** Das Leafr-ZIP wurde mit der bereits in v1.0.8 korrigierten `backup_leafr_activity_task.class.php` (Typ-Hint-Entfernung) und einer erhöhten Versionsnummer (1.0.9) neu gepackt, sodass Moodle das Update korrekt erkennt und installiert.
 
 ---
 
