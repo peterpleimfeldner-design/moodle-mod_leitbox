@@ -22,20 +22,10 @@ jobs:
         with:
           node-version: 20
           
-      - name: Build Vue Frontend
-        working-directory: ./frontend
+      - name: Create ZIP Archive via git archive
         run: |
-          npm install
-          npm run build
-          
-      - name: Prepare Plugin Directory
-        run: |
-          mkdir leitbox
-          rsync -av --progress . ./leitbox --exclude leitbox --exclude frontend --exclude .git --exclude .github --exclude .gitignore --exclude .gitattributes --exclude test_completion.php --exclude '.claude'
-          
-      - name: Create ZIP Archive
-        run: |
-          zip -r mod_leitbox_${{ github.ref_name }}.zip leitbox/
+          git archive --format=zip --prefix=leitbox/ HEAD \
+            -o mod_leitbox_${{ github.ref_name }}.zip
           
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
