@@ -2,6 +2,90 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.5.13] - 2026-09-18 (Vollständiger Review-Fix: Issues #10-#12, #16 + Sicherheitsaudit)
+
+Alle vier seit der zweiten Moodle-Plugin-Directory-Einreichung offenen GitHub-Issues wurden
+behoben und live gegen eine echte Moodle-4.x-Testinstanz (PHP-CLI, reale Datenbank) verifiziert,
+nicht nur statisch geprüft. Zusätzlich wurde ein vollständiger Review-Durchlauf gegen die
+Moodle-Plugin-Directory-Richtlinien durchgeführt (Struktur, Sicherheit, Code-Qualität, APIs,
+Frontend/Third-Party), der mehrere weitere, bisher ungemeldete Probleme aufgedeckt hat.
+
+### Behoben (offene GitHub-Issues)
+- **Issue #16 – Missing language string definitions:** `import_placeholder` und
+  `frontendnotfound` waren trotz gegenteiliger Behauptung im CHANGELOG-Eintrag zu v1.5.6 nie
+  tatsächlich in `lang/en/leitbox.php`/`lang/de/leitbox.php` definiert worden. Beide Strings
+  jetzt ergänzt und per Live-`get_string()`-Aufruf gegen eine echte Moodle-Instanz verifiziert.
+- **Issue #11 – PARAM_RAW Security Risk:** Der eigentliche Fehler war nicht der `PARAM_RAW` auf
+  dem rohen Bulk-Import-Textblock (der ist als Rohtext für den eigenen Q:/A:/H:-Parser
+  gerechtfertigt), sondern dass `classes/import_handler.php::parse_text()` (vormals
+  `classes/import.php`) keinerlei Sanitisierung durchführt und die geparsten Felder in
+  `manage.php` bis dato ungefiltert per `insert_record()` gespeichert wurden – anders als beim
+  Einzel-Hinzufügen/Bearbeiten, das bereits `PARAM_CLEANHTML` nutzte. Jedes importierte Feld
+  (`question`/`answer`/`hint`) wird jetzt vor dem Speichern mit `clean_param(..., PARAM_CLEANHTML)`
+  bereinigt. Mit einem echten `<script>`-Payload gegen eine Live-Moodle-Instanz getestet:
+  wird zuverlässig entfernt.
+- **Issue #12 – Missing File Boilerplate Headers:** Der volle "This file is part of Moodle"-
+  GPL-Header fehlte in `styles.css`, `frontend/src/style.css`, `templates/manage.mustache`
+  (hatte nur einen `@copyright`-Docblock ohne Lizenztext) sowie in allen Frontend-Build-Configs
+  (`frontend/src/api.js`, `frontend/src/main.js`, `frontend/postcss.config.js`,
+  `frontend/tailwind.config.js`, `frontend/vite.config.js`) – jetzt ergänzt. Die zwei
+  Debug-/Pen-Test-Skripte `test_completion.php` und `test_completion_db.php` im Plugin-Root
+  (Letzteres mit hartkodierten lokalen Windows-Pfaden eines Entwicklerrechners, u.a. Verweis
+  auf ein fremdes Projekt) wurden vollständig aus dem Repository entfernt statt nur per
+  `.gitattributes export-ignore` versteckt zu werden.
+- **Issue #10 – Invalid or Stale AMD Build Artifact:** `amd/build/manage.min.js` war eine
+  byte-identische 1:1-Kopie von `amd/src/manage.js` (nie durch einen Minifier gelaufen). Jetzt
+  über Terser echt minifiziert (4170 → 2039 Bytes) inkl. Sourcemap
+  (`amd/build/manage.min.js.map`). CI-Pipeline um einen `moodle-plugin-ci grunt --tasks=amd`-
+  Schritt ergänzt, damit ein zukünftig veraltetes Build-Artefakt automatisch auffällt.
+
+### Behoben (zusätzliche Funde aus dem Vollreview)
+- **`classes/import.php` → `classes/import_handler.php` umbenannt (neu entdeckter Bug):** Die
+  Datei enthielt die Klasse `\mod_leitbox\import_handler`, was gegen Moodles
+  Autoloader-Konvention (Dateiname muss Klassenname entsprechen) verstößt. Funktionierte bisher
+  nur, weil `manage.php` die Datei manuell per `require_once` einband. Live gegen eine
+  Moodle-Instanz verifiziert: `class_exists('\mod_leitbox\import_handler')` schlug vor dem Fix
+  fehl, danach nicht mehr. Der manuelle `require_once` in `manage.php` wurde entfernt (nicht
+  mehr nötig, Moodle autoloaded die Klasse jetzt korrekt).
+- **`view.php`:** Die Vue-Frontend-Assets wurden per `echo '<script>'`/`echo '<link>'` roh
+  ausgegeben (Issue #6/#15 nicht vollständig erledigt). Jetzt über die offiziellen APIs
+  `$PAGE->requires->js()`/`css()` geladen (Moodle-Caching/-Aggregation).
+- **`thirdpartylibs.xml`:** Axios-Version von `1.6.x` auf die tatsächlich gebündelte, exakte
+  Version `1.13.5` korrigiert (verifiziert gegen `frontend/package-lock.json` und den
+  Versions-String im gebauten `dist/assets/index.js`-Bundle).
+- **`frontend/src/components/Dashboard.vue`:** Zwei hartkodierte deutsche Strings
+  (`'Schließen'`, `'Abbrechen'`) durch `getString('close')`/`getString('cancel')` ersetzt; neue
+  Strings `close`/`cancel` in beiden Sprachdateien ergänzt. Das komplette deutsche
+  JS-Fallback-Objekt (greift nur, falls Moodles `strings_for_js()` je fehlschlägt) auf Englisch
+  umgestellt, damit kein anderssprachiger Nutzer im Fehlerfall deutschen Text sieht.
+- **`styles.css`:** Deutsches Wort "linksbündig" aus einem Kommentar entfernt.
+- **`classes/external.php`:** `submit_answer()` validiert jetzt den `rating`-Parameter
+  (0–2), analog zur bereits vorhandenen Validierung in `get_cards_by_box()`.
+- **`db/services.php`:** Optionales `capabilities`-Feld für alle vier External Functions
+  ergänzt (Dokumentations-/Tooling-Zweck, Laufzeitprüfung war bereits korrekt).
+- **`templates/manage.mustache`:** Toten, nie gerenderten Kontextwert `strdidacticnotice`
+  entfernt (der Hinweistext wird separat über `$OUTPUT->notification()` ausgegeben); fehlende
+  `jsconfig`-Variable im "Example context (json)"-Dokumentationsblock ergänzt.
+- **`.gitattributes`:** `LICENSE` nicht mehr von `git archive` ausgeschlossen – das
+  veröffentlichte Release-ZIP enthielt bisher keine Lizenzdatei. `user-logo/` und die
+  gelöschten Test-Dateien aus der `export-ignore`-Liste entfernt (nicht mehr vorhanden).
+- **`user-logo/`-Verzeichnis entfernt:** Verwaiste, byteidentische Duplikate der `pix/`-Assets
+  (~6 MB toter Ballast, nirgends referenziert).
+- **CI:** Neuer Schritt `.github/scripts/check-lang-strings.sh`, der jeden
+  `get_string('key', 'mod_leitbox')`-Aufruf gegen `lang/en/leitbox.php` abgleicht und den Build
+  bricht, falls ein Key fehlt – genau die Fehlerklasse, die zu Issue #16 führte, wird damit
+  künftig automatisch vor der Einreichung erkannt statt erst vom Moodle-Reviewer.
+
+### Verifikation
+Alle Fixes wurden gegen eine reale lokale Moodle-4.x-Testinstanz (PHP 8.2, MariaDB) per CLI
+verifiziert: Plugin-Erkennung, alle 140 Sprachstring-Keys, Klassen-Autoloading, Mustache-
+Template-Rendering (inkl. korrekter `{{#js}}`-Queuing über `$PAGE->requires`), Backup/Restore-
+Dateistruktur, DB-Schema-Abgleich, External-Function-Registrierung sowie ein funktionaler
+XSS-Payload-Test gegen die neue Import-Sanitisierung. `php -l` über alle geänderten Dateien und
+ein frischer `npm run build` des Vue-Frontends liefen fehlerfrei.
+
+---
+
 ## [1.5.12] - 2026-03-31 (Fix: js_call_amd 1024-Zeichen-Limit)
 
 ### Behoben

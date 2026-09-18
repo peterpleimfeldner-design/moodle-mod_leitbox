@@ -220,6 +220,9 @@ $string['existingcards'] = 'Vorhandene Karten';
 $string['nocards'] = 'Keine Karten in dieser Aktivität gefunden.';
 $string['carddeleted'] = 'Karte wurde gelöscht.';
 $string['confirmdeletecard'] = 'Bist du sicher, dass du diese Karte löschen möchtest?';
+$string['import_placeholder'] = 'Füge hier deinen formatierten Kartentext ein (siehe Prompt oben)...';
+$string['frontendnotfound'] = 'Die LeitBox-Frontend-Anwendung wurde nicht gefunden. Bitte kontaktiere deine Administration.';
+$string['close'] = 'Schließen';
 
 // Vue Frontend App Strings
 $string['dashboardtitle'] = 'Deine LeitBox Karten';

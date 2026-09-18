@@ -220,6 +220,9 @@ $string['existingcards'] = 'Existing cards';
 $string['nocards'] = 'No cards found in this activity.';
 $string['carddeleted'] = 'Card deleted.';
 $string['confirmdeletecard'] = 'Are you sure you want to delete this card?';
+$string['import_placeholder'] = 'Paste your formatted card text here (see prompt above)...';
+$string['frontendnotfound'] = 'The LeitBox frontend application could not be found. Please contact your site administrator.';
+$string['close'] = 'Close';
 
 // Vue Frontend App Strings
 $string['dashboardtitle'] = 'Your LeitBox Cards';

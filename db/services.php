@@ -29,6 +29,7 @@ $functions = array(
         'description' => 'Get aggregated flashcard counts per Leitner box',
         'type' => 'read',
         'ajax' => true,
+        'capabilities' => 'mod/leitbox:view',
     ),
     'mod_leitbox_get_cards_by_box' => array(
         'classname' => 'mod_leitbox\external',
@@ -37,6 +38,7 @@ $functions = array(
         'description' => 'Get flashcards by Leitner box number',
         'type' => 'read',
         'ajax' => true,
+        'capabilities' => 'mod/leitbox:view',
     ),
     'mod_leitbox_submit_answer' => array(
         'classname' => 'mod_leitbox\external',
@@ -45,6 +47,7 @@ $functions = array(
         'description' => 'Submit a flashcard review rating',
         'type' => 'write',
         'ajax' => true,
+        'capabilities' => 'mod/leitbox:view',
     ),
     'mod_leitbox_reset_progress' => array(
         'classname' => 'mod_leitbox\external',
@@ -53,5 +56,6 @@ $functions = array(
         'description' => 'Reset all card progress for the current user',
         'type' => 'write',
         'ajax' => true,
+        'capabilities' => 'mod/leitbox:view',
     ),
 );

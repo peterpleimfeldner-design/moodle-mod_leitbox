@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "docs": "echo 'CRITICAL: The required Moodle deployment ZIP format MUST ALWAYS be mod_leitbox_vX.Y.Z.zip'"
+    "build": "vite build"
   },
   "dependencies": {
     "vue": "^3.4.0",

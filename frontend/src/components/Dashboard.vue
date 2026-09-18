@@ -83,7 +83,7 @@
       <Transition name="rc-fade">
         <div v-if="showInfo" class="rc-overlay" @click.self="showInfo = false" role="dialog" aria-modal="true" :aria-label="getString('systemtitle')">
           <div class="rc-modal rc-modal-flex">
-            <button @click="showInfo = false" class="rc-modal-close" :aria-label="'Schließen'">×</button>
+            <button @click="showInfo = false" class="rc-modal-close" :aria-label="getString('close')">×</button>
             <div class="rc-modal-head rc-modal-px rc-modal-pt" style="margin-bottom: 14px;">
               <span aria-hidden="true">🎓</span>
               <h2 style="margin: 0;">{{ getString('systemtitle') }}</h2>
@@ -121,7 +121,7 @@
       <Transition name="rc-fade">
         <div v-if="showReset" class="rc-overlay" @click.self="showReset = false" role="alertdialog" aria-modal="true" :aria-label="getString('reset_progress_confirm_title')">
           <div class="rc-modal rc-modal-flex rc-modal--warning">
-            <button @click="showReset = false" class="rc-modal-close" :aria-label="'Abbrechen'">×</button>
+            <button @click="showReset = false" class="rc-modal-close" :aria-label="getString('cancel')">×</button>
             <div class="rc-modal-scroll rc-modal-px rc-modal-pt rc-modal-pb">
               <div class="rc-modal-head" style="margin-bottom: 14px;">
                 <span aria-hidden="true">⚠️</span>
@@ -173,40 +173,44 @@ const loadCounts = async () => {
     catch (e) { console.error('Failed to load counts', e); }
 };
 
+// Fallback strings, used only if window.M.str.mod_leitbox failed to load
+// (Moodle's strings_for_js() normally always provides these - see view.php).
 const FALLBACKS = {
     // Header
-    dashboardtitle: 'Deine LeitBox Karten',
-    dashboardsbtitle: 'Wähle einen Lernstapel zum Üben aus',
-    howitworks: 'Wie funktioniert das?',
-    cards: 'Karten',
-    loadingcards: 'Karten werden geladen...',
-    progress_label: 'Karten in Stufe Experte',
-    progress_aria: 'Fortschritt: {mastered} von {total} Karten gelernt',
+    dashboardtitle: 'Your LeitBox Cards',
+    dashboardsbtitle: 'Select a learning deck to practice',
+    howitworks: 'How does this work?',
+    cards: 'Cards',
+    loadingcards: 'Shuffling cards...',
+    progress_label: 'cards at Expert level',
+    progress_aria: 'Progress: {mastered} of {total} cards mastered',
     // Box levels
-    box0: 'Neu',
-    box1: 'Einsteiger',
-    box2: 'Lernender',
-    box3: 'Fortgeschritten',
-    box4: 'Erfahren',
-    box5: 'Experte',
+    box0: 'New',
+    box1: 'Beginner',
+    box2: 'Learner',
+    box3: 'Advanced',
+    box4: 'Experienced',
+    box5: 'Expert',
     // Info modal
-    systemtitle: 'Das Lernstapel-System',
-    systemintro: 'Dieses Plugin basiert auf der Leitner-Methode – 1972 vom österreichischen Wissenschaftler Sebastian Leitner erfunden und heute weltweit in der Lernforschung anerkannt. Ziel ist es, Karten von links nach rechts in den letzten Stapel zu befördern.',
-    known_btn: 'Gewusst',
-    known_desc: 'Die Karte war einfach! Sie rückt einen Stapel weiter nach rechts.',
-    again_btn: 'Nochmal',
-    again_desc: 'Du warst dir unsicher. Die Karte bleibt im aktuellen Stapel.',
-    hard_btn: 'Schwer',
-    hard_desc: 'Nicht gewusst! Die Karte rückt einen Stapel zurück.',
-    systemtip: '<strong>Tipp:</strong> Beschäftige dich mit den Themen hinter den Karten, die du nicht wusstest – bevor du einen neuen Versuch startest.',
-    gotit: 'Verstanden, los geht\'s!',
+    systemtitle: 'The Spaced Repetition System',
+    systemintro: 'This plugin is based on the Leitner System - invented in 1972 by the Austrian scientist Sebastian Leitner and globally recognized in learning research today. The goal is to move cards from left to right into the final deck.',
+    known_btn: 'Got it',
+    known_desc: 'Easy! The card moves one stack to the right.',
+    again_btn: 'Again',
+    again_desc: 'Not sure. The card stays in the current stack.',
+    hard_btn: 'Hard',
+    hard_desc: 'Did not know it! The card moves back one stack.',
+    systemtip: '<strong>Tip:</strong> Review the topics behind the cards you did not know - before you start a new attempt.',
+    gotit: 'Got it, let\'s go!',
+    close: 'Close',
+    cancel: 'Cancel',
     // Reset
-    reset_progress: 'Fortschritt zurücksetzen',
-    reset_progress_confirm_title: 'Lernfortschritt zurücksetzen?',
-    reset_progress_confirm_msg: 'Wirklich zurücksetzen? Dein bisheriger Fortschritt geht dadurch verloren.',
-    reset_progress_btn: 'Ja, zurücksetzen',
-    reset_progress_cancel: 'Abbrechen',
-    reset_progress_done: '✅ Lernfortschritt wurde erfolgreich zurückgesetzt!',
+    reset_progress: 'Reset Learning Progress',
+    reset_progress_confirm_title: 'Reset Learning Progress?',
+    reset_progress_confirm_msg: 'Warning: This will reset all your learning progress. All cards will be moved back to "New". This cannot be undone!',
+    reset_progress_btn: 'Yes, Reset',
+    reset_progress_cancel: 'Cancel',
+    reset_progress_done: 'Learning progress has been reset!',
 };
 
 const getString = (key) => {

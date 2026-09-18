@@ -56,8 +56,29 @@ $vuestrings = [
     'feedback_grand_title', 'feedback_grand_desc', 'feedback_perfect_title', 'feedback_perfect_desc',
     'feedback_good_title', 'feedback_good_desc', 'feedback_okay_title', 'feedback_okay_desc',
     'feedback_learn_title', 'feedback_learn_desc',
+    'close', 'cancel',
 ];
 $PAGE->requires->strings_for_js($vuestrings, 'mod_leitbox');
+
+// Queue the built Vue frontend assets via Moodle's Output/JS APIs (instead of
+// echoing raw <script>/<link> tags) so they go through Moodle's normal
+// caching/aggregation. The bundle is a single, self-contained classic script
+// (Vite build without code-splitting or top-level ESM syntax), so it can be
+// safely loaded via $PAGE->requires->js() like any other plugin script.
+$frontendfound = file_exists(__DIR__ . '/dist/assets/index.js');
+if ($frontendfound) {
+    $jsmtime = filemtime(__DIR__ . '/dist/assets/index.js');
+    $jsurl = new \moodle_url('/mod/leitbox/dist/assets/index.js', ['v' => $jsmtime]);
+    // Load in the footer (inhead=false), not the head: the bundle looks for
+    // #v-app-mod-leitbox on execution, and that mount point is only echoed
+    // into the body below - it must not run before the DOM node exists.
+    $PAGE->requires->js($jsurl, false);
+}
+if (file_exists(__DIR__ . '/dist/assets/index.css')) {
+    $cssmtime = filemtime(__DIR__ . '/dist/assets/index.css');
+    $cssurl = new \moodle_url('/mod/leitbox/dist/assets/index.css', ['v' => $cssmtime]);
+    $PAGE->requires->css($cssurl);
+}
 
 // Fire the course_module_viewed event (required for Moodle activity logging).
 $event = \mod_leitbox\event\course_module_viewed::create([
@@ -96,19 +117,8 @@ echo \html_writer::tag('div', '', [
     'data-config' => json_encode($appdata)
 ]);
 
-// Include Vue build scripts manually with cache-busting
-if (file_exists(__DIR__ . '/dist/assets/index.js')) {
-    $jsmtime = filemtime(__DIR__ . '/dist/assets/index.js');
-    $jsurl = new \moodle_url('/mod/leitbox/dist/assets/index.js', ['v' => $jsmtime]);
-    echo '<script type="module" crossorigin src="' . $jsurl->out() . '"></script>';
-} else {
+if (!$frontendfound) {
     echo \html_writer::tag('p', get_string('frontendnotfound', 'mod_leitbox'), ['class' => 'alert alert-warning mt-3']);
-}
-
-if (file_exists(__DIR__ . '/dist/assets/index.css')) {
-    $cssmtime = filemtime(__DIR__ . '/dist/assets/index.css');
-    $cssurl = new \moodle_url('/mod/leitbox/dist/assets/index.css', ['v' => $cssmtime]);
-    echo '<link rel="stylesheet" href="' . $cssurl->out() . '">';
 }
 
 echo $OUTPUT->footer();

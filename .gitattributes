@@ -21,9 +21,5 @@
 .gitignore export-ignore
 .github export-ignore
 frontend export-ignore
-user-logo export-ignore
-test_completion.php export-ignore
-test_completion_db.php export-ignore
-LICENSE export-ignore
 tests export-ignore
 .claude export-ignore

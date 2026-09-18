@@ -20,7 +20,7 @@
     <library>
         <location>dist/assets</location>
         <name>Axios</name>
-        <version>1.6.x</version>
+        <version>1.13.5</version>
         <license>MIT</license>
         <licenseversion></licenseversion>
         <urls>

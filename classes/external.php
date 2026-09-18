@@ -234,6 +234,10 @@ class external extends external_api {
         self::validate_context($context);
         require_capability('mod/leitbox:view', $context);
 
+        if ($params['rating'] < 0 || $params['rating'] > 2) {
+            throw new \moodle_exception('invalidparameter');
+        }
+
         $userid = $USER->id;
         $progress = $DB->get_record('leitbox_progress', ['userid' => $userid, 'cardid' => $card->id]);
         

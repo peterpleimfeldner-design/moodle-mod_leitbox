@@ -111,6 +111,15 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci jslint
 
+      - name: Grunt (verify AMD build is up to date)
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci grunt --tasks=amd
+
+      - name: Check for missing language strings
+        if: ${{ !cancelled() }}
+        working-directory: plugin
+        run: bash .github/scripts/check-lang-strings.sh
+
       - name: PHPUnit tests
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpunit --coverage-clover

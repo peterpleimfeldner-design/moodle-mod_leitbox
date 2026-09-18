@@ -26,7 +26,6 @@
  */
 require_once('../../config.php');
 require_once(__DIR__ . '/lib.php');
-require_once(__DIR__ . '/classes/import.php');
 
 $id     = required_param('id', PARAM_INT);
 $action = optional_param('action', '', PARAM_ALPHA);
@@ -175,6 +174,12 @@ if ($action === 'update' && data_submitted() && confirm_sesskey() && $cardid) {
 }
 
 if ($action === 'import' && data_submitted() && confirm_sesskey()) {
+    // PARAM_RAW is required here because the bulk-import block uses a custom
+    // Q:/A:/H:/===CARD=== text syntax that must keep its exact line breaks to
+    // be parsed correctly. The syntax itself carries no HTML. Every field
+    // extracted from it is sanitised with PARAM_CLEANHTML below, before it is
+    // ever written to the database - the same rule that already applies to
+    // the single add/edit card forms above.
     $importtext   = required_param('importdata', PARAM_RAW);
     $parsed_cards = \mod_leitbox\import_handler::parse_text($importtext);
 
@@ -196,9 +201,9 @@ if ($action === 'import' && data_submitted() && confirm_sesskey()) {
     foreach ($parsed_cards as $card) {
         $newcard            = new stdClass();
         $newcard->leitboxid = $leitbox->id;
-        $newcard->question  = $card['question'];
-        $newcard->answer    = $card['answer'];
-        $newcard->hint      = $card['hint'];
+        $newcard->question  = clean_param($card['question'], PARAM_CLEANHTML);
+        $newcard->answer    = clean_param($card['answer'], PARAM_CLEANHTML);
+        $newcard->hint      = clean_param($card['hint'], PARAM_CLEANHTML);
         $DB->insert_record('leitbox_cards', $newcard);
         $count++;
     }
@@ -247,9 +252,9 @@ foreach ($cards as $c) {
     $cardrows[] = [
         'id'            => $c->id,
         'rownum'        => $rownum++,
-        'question'      => format_text($c->question),
-        'answer'        => format_text($c->answer),
-        'hint'          => format_text($c->hint),
+        'question'      => format_text($c->question, FORMAT_HTML, ['context' => $context, 'para' => false]),
+        'answer'        => format_text($c->answer, FORMAT_HTML, ['context' => $context, 'para' => false]),
+        'hint'          => format_text($c->hint, FORMAT_HTML, ['context' => $context, 'para' => false]),
         'editurl'       => $editurl,
         'delurl'        => $delurl,
         'editiconhtml'  => $OUTPUT->pix_icon('t/edit',   get_string('edit')),
@@ -274,7 +279,6 @@ $templatedata = [
     'sesskey'      => sesskey(),
 
     // Localised strings.
-    'strdidacticnotice'  => get_string('didactic_limit_notice', 'mod_leitbox'),
     'strbacktoactivity'  => get_string('backtoactivity',        'mod_leitbox'),
     'straddsinglecard'   => get_string('addsinglecard',         'mod_leitbox'),
     'streditsinglecard'  => get_string('editsinglecard',        'mod_leitbox'),
