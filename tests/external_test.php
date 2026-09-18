@@ -37,6 +37,8 @@ require_once($CFG->dirroot . '/mod/leitbox/classes/external.php');
 
 /**
  * External functions unit tests for mod_leitbox.
+ *
+ * @runTestsInSeparateProcesses
  */
 class external_test extends externallib_advanced_testcase {
     /**
