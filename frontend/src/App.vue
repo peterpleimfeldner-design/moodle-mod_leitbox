@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-[600px] w-full bg-slate-50 font-sans text-slate-900 py-10 px-4 rounded-3xl" style="font-family: 'Inter', system-ui, sans-serif;">
-    <Dashboard v-if="!sessionActive" @start-session="handleStartSession" />
+    <Dashboard v-if="!sessionActive" :activity-name="activityName" @start-session="handleStartSession" />
     
     <div v-else class="max-w-2xl mx-auto">
       <div class="flex flex-col sm:flex-row justify-between items-center mb-10 gap-4">
@@ -75,7 +75,9 @@
 import { ref, computed } from 'vue';
 import Dashboard from './components/Dashboard.vue';
 import Card from './components/Card.vue';
-import { getCardsByBox, submitAnswer } from './api';
+import { getCardsByBox, submitAnswer, getConfig } from './api';
+
+const activityName = getConfig().activityname || '';
 
 const FALLBACKS = {
     sessiondone: 'Alles erledigt!',
@@ -105,6 +107,7 @@ const FALLBACKS = {
     box3: 'Fortgeschritten',
     box4: 'Erfahren',
     box5: 'Experte',
+    box_empty_now: 'Dieser Stapel enthält gerade keine Karten mehr.',
 };
 
 const getString = (key) => {
@@ -186,6 +189,10 @@ const handleStartSession = async (boxnumber, totalSystemCards) => {
     sessionStats.value = { known: 0, again: 0, hard: 0 };
     try {
         sessionCards.value = await getCardsByBox(boxnumber);
+        if (sessionCards.value.length === 0) {
+            alert(getString('box_empty_now'));
+            sessionActive.value = false;
+        }
     } catch (e) {
         console.error("Error loading session:", e);
         alert(getString('error_loading_cards'));

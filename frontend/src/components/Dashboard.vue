@@ -3,34 +3,34 @@
 
     <!-- ═══ HEADER ═══ -->
     <header class="rc-header" role="banner">
-      <div class="rc-header-brand">
-        <img :src="getLogoUrl()" alt="LeitBox" class="rc-logo" />
-        <div class="rc-header-text">
-          <h1 class="rc-title" style="margin-bottom: 4px;">{{ getString('dashboardtitle') }}</h1>
-          <p class="rc-subtitle">{{ getString('dashboardsbtitle') }}</p>
+      <div class="rc-header-top">
+        <div class="rc-header-brand">
+          <img :src="getLogoUrl()" alt="LeitBox" class="rc-logo" />
+          <h1 class="rc-title" :title="activityName || getString('dashboardtitle')">{{ activityName || getString('dashboardtitle') }}</h1>
+        </div>
+
+        <div class="rc-header-actions">
+          <button @click="showInfo = true" class="rc-btn rc-btn--ghost rc-btn--sm" :aria-label="getString('howitworks')">
+            <svg aria-hidden="true" class="rc-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            {{ getString('howitworks') }}
+          </button>
+          <button @click="showReset = true" class="rc-btn-reset" :aria-label="getString('reset_progress')" :title="getString('reset_progress')">
+            <span aria-hidden="true">🔄</span>
+          </button>
         </div>
       </div>
-      
-      <div class="rc-header-actions">
-        <button @click="showInfo = true" class="rc-btn rc-btn--ghost rc-btn--sm" :aria-label="getString('howitworks')">
-          <svg aria-hidden="true" class="rc-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          {{ getString('howitworks') }}
-        </button>
-        <button @click="showReset = true" class="rc-btn-reset" :aria-label="getString('reset_progress')" :title="getString('reset_progress')">
-          <span aria-hidden="true">🔄</span>
-        </button>
-      </div>
+      <p class="rc-subtitle">{{ getString('dashboardsbtitle') }}</p>
     </header>
 
     <!-- ═══ PROGRESS BAR ═══ -->
-    <div class="rc-progress-bar" role="progressbar" :aria-valuemin="0" :aria-valuemax="totalCards" :aria-valuenow="masteredCards" :aria-label="getString('progress_aria').replace('{mastered}', masteredCards).replace('{total}', totalCards)">
+    <div class="rc-progress-bar" role="progressbar" :aria-valuemin="0" :aria-valuemax="100" :aria-valuenow="progressPercent" :aria-label="progressLabelText()">
       <div class="rc-progress-fill" :style="{ width: progressPercent + '%' }"></div>
     </div>
     <p class="rc-progress-label" aria-hidden="true">
-      <span v-if="totalCards > 0">{{ masteredCards }}/{{ totalCards }} {{ getString('progress_label') }}</span>
+      <span v-if="progressLabelText()">{{ progressLabelText() }}</span>
     </p>
 
     <!-- ═══ BOX GRID ═══ -->
@@ -45,7 +45,7 @@
           :class="[getBoxColorClass(box - 1), (counts[box-1] || 0) === 0 ? 'rc-box--empty' : 'rc-box--active']"
           :role="(counts[box-1] || 0) > 0 ? 'button' : 'listitem'"
           :tabindex="(counts[box-1] || 0) > 0 ? 0 : -1"
-          :aria-label="getBoxName(box - 1) + ': ' + (counts[box-1] || 0) + ' ' + getString('cards')"
+          :aria-label="getBoxName(box - 1) + ': ' + (counts[box-1] || 0) + ' ' + getCardsLabel(counts[box-1] || 0)"
           :aria-disabled="(counts[box-1] || 0) === 0"
         >
           <!-- colour stripe -->
@@ -60,7 +60,7 @@
           <!-- badge -->
           <div v-if="counts[box-1] > 0" class="rc-badge rc-badge--active" aria-live="polite">
             <span class="rc-badge-dot" aria-hidden="true"></span>
-            {{ counts[box-1] }} {{ getString('cards') }}
+            {{ counts[box-1] }} {{ getCardsLabel(counts[box-1]) }}
           </div>
           <div v-else-if="counts[box-1] === 0" class="rc-badge rc-badge--empty">
             0 {{ getString('cards') }}
@@ -156,6 +156,9 @@
 import { onMounted, ref, computed } from 'vue';
 import { getBoxCounts, getLogoUrl, resetProgress } from '../api';
 
+const props = defineProps({
+    activityName: { type: String, default: '' },
+});
 const emit = defineEmits(['start-session']);
 const counts = ref({});
 const showInfo = ref(false);
@@ -166,7 +169,25 @@ const resetError = ref('');
 
 const totalCards = computed(() => Object.values(counts.value).reduce((s, v) => s + (v || 0), 0));
 const masteredCards = computed(() => counts.value[5] || 0);
-const progressPercent = computed(() => totalCards.value > 0 ? Math.round((masteredCards.value / totalCards.value) * 100) : 0);
+
+// Overall learning progress across all six Leitner boxes, independent of
+// whatever completion conditions (if any) are configured. A card in "Neu"
+// (box 0) contributes nothing yet; a card in "Experte" (box 5) counts as
+// fully done. Cards sitting in between contribute proportionally, so the
+// bar visibly moves well before any card reaches the final box - going
+// from box 0 to box 1 ("Einsteiger") is the first bit of visible progress.
+const progressPercent = computed(() => {
+    if (totalCards.value === 0) return 0;
+    let weightedSum = 0;
+    for (let box = 1; box <= 5; box++) weightedSum += (counts.value[box] || 0) * box;
+    return Math.round((weightedSum / (5 * totalCards.value)) * 100);
+});
+
+const progressLabelText = () => {
+    if (totalCards.value === 0) return '';
+    const overall = getString('progress_overall').replace('{percent}', progressPercent.value);
+    return `${overall} · ${masteredCards.value}/${totalCards.value} ${getString('progress_label')}`;
+};
 
 const loadCounts = async () => {
     try { counts.value = await getBoxCounts(); }
@@ -181,8 +202,10 @@ const FALLBACKS = {
     dashboardsbtitle: 'Select a learning deck to practice',
     howitworks: 'How does this work?',
     cards: 'Cards',
+    card_singular: 'Card',
     loadingcards: 'Shuffling cards...',
     progress_label: 'cards at Expert level',
+    progress_overall: '{percent}% overall progress',
     progress_aria: 'Progress: {mastered} of {total} cards mastered',
     // Box levels
     box0: 'New',
@@ -226,6 +249,7 @@ onMounted(loadCounts);
 
 const getBoxEmoji = (box) => ['🆕','🔁','📖','🔥','💡','🏆'][box] ?? '📦';
 const getBoxName = (box) => getString('box' + box);
+const getCardsLabel = (count) => (count === 1 ? getString('card_singular') : getString('cards'));
 
 const getBoxColorClass = (box) => [
     'rc-box--teal',
@@ -275,49 +299,50 @@ const doReset = async () => {
 
 /* ─── header ──────────────── */
 .rc-header {
+  padding: 28px 0 20px;
+}
+.rc-header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 16px;
-  padding: 28px 0 20px;
+  gap: 12px 16px;
 }
 .rc-header-brand {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 .rc-logo {
-  height: 100px;
+  height: 44px;
   width: auto;
   object-fit: contain;
   flex-shrink: 0;
-  margin-left: -8px; /* pull closer to left edge */
-}
-.rc-title-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 4px;
 }
 .rc-title {
-  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
   font-weight: 800;
   color: var(--navy);
   margin: 0;
   letter-spacing: -0.3px;
-  line-height: 1.1;
+  line-height: 1.2;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .rc-subtitle {
   font-size: 0.97rem;
   color: #64748b;
-  margin: 0;
+  margin: 10px 0 0;
 }
 .rc-header-actions {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 /* ─── buttons ──────────────── */

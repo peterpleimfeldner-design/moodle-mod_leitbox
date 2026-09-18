@@ -193,9 +193,9 @@ class external extends external_api {
             // multilingual even though they are stored as plain keys in the DB.
             $resolve = function ($text) {
                 if (preg_match('/^##(demo_[a-z0-9]+)##$/', $text, $m)) {
-                    return get_string($m[1], 'mod_leitbox');
+                    $text = get_string($m[1], 'mod_leitbox');
                 }
-                return $text;
+                return clean_param($text, PARAM_CLEANHTML);
             };
             $result[] = [
                 'id'       => $card->id,
@@ -206,24 +206,19 @@ class external extends external_api {
             ];
         }
 
-        // Apply random shuffle if cardorder is 0 (random).
+        // The tutorial demo cards form a fixed narrative sequence (##demo_q1##
+        // through ##demo_q5##) and must never be shuffled or reordered among
+        // themselves - only the user's own cards are subject to cardorder.
+        $democards = array_values(array_filter($result, fn($c) => $c['category'] === 'demo'));
+        $regularcards = array_values(array_filter($result, fn($c) => $c['category'] !== 'demo'));
+        usort($democards, fn($a, $b) => $a['id'] <=> $b['id']);
+
+        // Apply random shuffle to the user's own cards if cardorder is 0 (random).
         if ($leitbox->cardorder == 0) {
-            shuffle($result);
+            shuffle($regularcards);
         }
 
-        // Always force the very first tutorial demo card to be strictly the
-        // first card if it's in this set.
-        foreach ($result as $index => $c) {
-            if ($c['category'] === 'demo') {
-                // Move it to the very front of the array.
-                $democard = $result[$index];
-                unset($result[$index]);
-                array_unshift($result, $democard);
-                break;
-            }
-        }
-
-        return array_values($result);
+        return array_merge($democards, $regularcards);
     }
 
     /**

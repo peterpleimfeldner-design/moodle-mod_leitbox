@@ -32,6 +32,14 @@ export default defineConfig({
     rollupOptions: {
       input: 'src/main.js',
       output: {
+        // IIFE, not Rollup's default: the bundle runs as a classic <script>
+        // alongside Moodle's own page scripts, sharing one global scope.
+        // Without this wrapper, Vue's minified top-level function/var
+        // declarations (e.g. a helper minified down to the single letter
+        // "Y") become globals and can silently clobber unrelated ones that
+        // Moodle relies on - such as YUI's own window.Y sandbox - breaking
+        // core JS elsewhere on the page.
+        format: 'iife',
         entryFileNames: 'assets/index.js',
         assetFileNames: 'assets/index[extname]',
       }

@@ -88,12 +88,22 @@ if ($action === 'bulkdelete' && data_submitted() && confirm_sesskey()) {
 if ($action === 'export' && confirm_sesskey()) {
     $cards         = $DB->get_records('leitbox_cards', ['leitboxid' => $leitbox->id], 'id ASC');
     $exportcontent = "";
+    // Resolve language-neutral demo card markers (e.g. ##demo_q1##) to plain
+    // text, the same way classes/external.php does for the learner-facing
+    // view - otherwise exporting before adding any real cards yields the
+    // raw, meaningless marker keys instead of the actual demo content.
+    $resolvedemo = function ($text) {
+        if (preg_match('/^##(demo_[a-z0-9]+)##$/', $text, $m)) {
+            return get_string($m[1], 'mod_leitbox');
+        }
+        return $text;
+    };
     foreach ($cards as $c) {
         $exportcontent .= "===CARD===\n";
-        $exportcontent .= "Q: " . $c->question . "\n";
-        $exportcontent .= "A: " . $c->answer . "\n";
+        $exportcontent .= "Q: " . $resolvedemo($c->question) . "\n";
+        $exportcontent .= "A: " . $resolvedemo($c->answer) . "\n";
         if (!empty($c->hint)) {
-            $exportcontent .= "H: " . $c->hint . "\n";
+            $exportcontent .= "H: " . $resolvedemo($c->hint) . "\n";
         }
         $exportcontent .= "\n";
     }

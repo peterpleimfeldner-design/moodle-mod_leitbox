@@ -29,6 +29,8 @@ export const initApi = (cfg) => {
     config = cfg;
 };
 
+export const getConfig = () => config;
+
 export const moodleCall = async (methodname, args) => {
     const url = `${config.wwwroot}/lib/ajax/service.php?sesskey=${config.sesskey}`;
     const payload = [{

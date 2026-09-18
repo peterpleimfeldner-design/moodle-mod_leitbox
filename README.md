@@ -55,6 +55,8 @@ Full Moodle Privacy API integration. All student data stays on the institution's
 
 ### 🛡️ Moodle-Native & Admin-Friendly
 - Full Backup & Restore API support
+- Integrates with Moodle's standard Course Reset tool, so reusing a course for a new term
+  cleanly clears the previous cohort's learning progress
 - No CSS bleeding, no external dependencies
 - Uses only Moodle's built-in role, permission and session management
 - Compatible with all standard Moodle themes

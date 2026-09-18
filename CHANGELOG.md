@@ -2,6 +2,63 @@
 
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.6.0] - 2026-09-19 (Live-UI-Test-Runde: Kartenladen, Kurs-Reset, Design, Sicherheit)
+
+Vollständige, manuelle Durchtestung der Aktivität in einer echten lokalen Moodle-Instanz
+(Browser-gesteuert, nicht nur statischer Code-Review), inklusive Massen-Import, Backup/Restore,
+Privacy-API, Berechtigungen und XSS-Härtungstest. Dabei wurden mehrere funktionale Bugs
+gefunden und live verifiziert behoben.
+
+### Behoben (Funktionalität)
+- **Karten luden nie:** `get_cards_by_box` gab `question`/`answer`/`hint` unbereinigt zurück,
+  obwohl die Rückgabedefinition `PARAM_CLEANHTML` verlangt – Moodles strikte
+  Rückgabewert-Validierung (`clean_returnvalue()`) lehnte jede Karte mit Formatierung
+  (`<b>`, `<br>`) mit `invalidresponse` ab. Werte werden jetzt vor der Rückgabe mit
+  `clean_param(..., PARAM_CLEANHTML)` normalisiert.
+- **Demo-Tutorial in zufälliger statt fortlaufender Reihenfolge:** Die fünf Einführungskarten
+  (`##demo_q1##`–`##demo_q5##`) wurden durch die Zufalls-Durchmischung in beliebiger Reihenfolge
+  gezeigt; nur eine einzelne Karte wurde hart nach vorne gezogen. Demo-Karten werden jetzt aus
+  der Durchmischung ausgenommen und immer nach ID sortiert vorangestellt.
+- **Export löste Demo-Marker nicht auf:** `manage.php`-Export gab bei noch unveränderten
+  Demo-Karten die rohen Platzhalter (`##demo_q1##`) statt des tatsächlichen Texts aus.
+- **Grammatikfehler "1 Karten" statt "1 Karte"** in Box-Zählungen (DE und EN) behoben.
+- **`mod/leitbox:manageactivities`-Check bestätigt:** Schüler/innen können Karten ansehen, aber
+  nicht verwalten – keine Änderung nötig, per Test mit echten Test-Accounts verifiziert.
+- **Kurs-Reset nicht unterstützt:** `leitbox_reset_userdata()` fehlte komplett. Bei einer
+  Kurs-Wiederverwendung (z. B. neues Semester) blieb der gesamte Lernfortschritt der alten
+  Kohorte dauerhaft in der Datenbank. Jetzt implementiert inkl. eigenem Abschnitt im
+  Kurs-Reset-Formular ("LeitBox" → Lernfortschritt aller Teilnehmer/innen löschen).
+
+### Behoben (Frontend-Stabilität)
+- **JS-Fehler auf jeder LeitBox-Seite** (`Y.NodeList is not a constructor`,
+  `amd.init is not a function`): Das Vue-Bundle war nicht in eine IIFE gekapselt, wodurch Vues
+  minifizierte interne Funktion `Y()` versehentlich Moodles globalen YUI-Namespace `window.Y`
+  überschrieb. Vite baut jetzt mit `format: 'iife'`.
+  Zusätzlich wurde Tailwinds globaler CSS-Reset (`@tailwind base` / Preflight) deaktiviert, da er
+  ungezielt auf die gesamte Moodle-Seite wirkte statt nur auf die eigene Komponente.
+- **Kopfzeile brach bei langen Kurstiteln komplett auseinander** (Buttons rutschten unkontrolliert
+  weg, Logo wirkte fehlplatziert): Layout neu strukturiert – Logo, Titel und Buttons bleiben in
+  einer Zeile, lange Titel werden mit Ellipsis gekürzt (voller Text als Tooltip).
+- **Leere Box beim Sitzungsstart** (z. B. durch Bearbeitung in einem zweiten Tab/Gerät) zeigt
+  jetzt eine verständliche Meldung statt eines leeren "Karte 0 von 0"-Zustands.
+
+### Geändert
+- Dashboard-Titel zeigt jetzt den tatsächlichen Aktivitätsnamen statt einer festen Phrase;
+  LeitBox-Logo verkleinert, um die Redundanz zur Moodle-eigenen Kopfzeile zu reduzieren.
+- Fortschrittsbalken zeigt jetzt den gewichteten Lernfortschritt über alle sechs Leitner-Boxen
+  (Box 0 = 0 %, Box 5 = 100 %, dazwischen anteilig), unabhängig von etwaigen
+  Abschlussbedingungen – vorher wurden nur vollständig gemeisterte Karten gezählt.
+- `pix/monologo.png` neu erstellt: transparenter Hintergrund statt eines eigenen
+  Quadrat-Hintergrunds, der sich mit Moodles eigener Icon-Umrandung zu einem doppelten Rahmen
+  überlagerte.
+
+### Sicherheit (verifiziert, keine Änderung nötig)
+- XSS-Härtungstest mit `<script>`- und `<img onerror>`-Payloads in Kartenfeldern: In der
+  Verwaltungsansicht und in der Lernenden-Oberfläche wird beides zuverlässig bereinigt
+  (Script-Tag entfernt, gefährliche Attribute gestrippt), keine Codeausführung möglich.
+- Das im UI beworbene 200-Karten-Limit ist serverseitig durchgesetzt (Einzelkarte und
+  Massen-Import), nicht nur eine Frontend-Anzeige.
+
 ## [1.5.13] - 2026-09-18 (Vollständiger Review-Fix: Issues #10-#12, #16 + Sicherheitsaudit)
 
 Alle vier seit der zweiten Moodle-Plugin-Directory-Einreichung offenen GitHub-Issues wurden

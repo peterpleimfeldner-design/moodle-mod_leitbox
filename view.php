@@ -42,20 +42,24 @@ $PAGE->set_title(format_string($leitbox->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 
-// Include standard Moodle JS for ajax if needed.
+// Needed so the Vue app's own axios-based calls to lib/ajax/service.php
+// (see frontend/src/api.js) share the page with a correctly initialised
+// AMD/YUI environment - omitting this surfaces as unrelated-looking core
+// JS errors (e.g. inside require.min.js) once any extra footer script is
+// present, not as anything obviously tied to this call.
 $PAGE->requires->js_call_amd('core/ajax', 'init');
 
 // Export strings for Vue frontend.
 $vuestrings = [
-    'dashboardtitle', 'dashboardsbtitle', 'howitworks', 'cards', 'systemtitle',
+    'dashboardtitle', 'dashboardsbtitle', 'howitworks', 'cards', 'card_singular', 'systemtitle',
     'systemintro', 'known_btn', 'known_desc', 'again_btn', 'again_desc',
     'hard_btn', 'hard_desc', 'systemtip', 'gotit', 'showhint', 'hint',
     'taptoflip', 'action_back', 'action_stay', 'action_next', 'backtodashboard',
     'cardxofy_x', 'cardxofy_y', 'loadingcards', 'sessiondone', 'sessiondonedesc',
-    'completed', 'error_loading_cards', 'box0', 'box1', 'box2', 'box3', 'box4', 'box5',
+    'completed', 'error_loading_cards', 'box_empty_now', 'box0', 'box1', 'box2', 'box3', 'box4', 'box5',
     'reset_progress', 'reset_progress_confirm_title', 'reset_progress_confirm_msg',
     'reset_progress_btn', 'reset_progress_cancel', 'reset_progress_done',
-    'progress_label', 'progress_aria',
+    'progress_label', 'progress_overall', 'progress_aria',
     'feedback_grand_title', 'feedback_grand_desc', 'feedback_perfect_title', 'feedback_perfect_desc',
     'feedback_good_title', 'feedback_good_desc', 'feedback_okay_title', 'feedback_okay_desc',
     'feedback_learn_title', 'feedback_learn_desc',
@@ -63,11 +67,14 @@ $vuestrings = [
 ];
 $PAGE->requires->strings_for_js($vuestrings, 'mod_leitbox');
 
-// Queue the built Vue frontend assets via Moodle's Output/JS APIs (instead of
-// echoing raw <script>/<link> tags) so they go through Moodle's normal
-// caching/aggregation. The bundle is a single, self-contained classic script
-// (Vite build without code-splitting or top-level ESM syntax), so it can be
-// safely loaded via $PAGE->requires->js() like any other plugin script.
+// Queue the built Vue frontend bundle via Moodle's Output/JS API (instead of
+// echoing a raw <script> tag) so it goes through Moodle's normal
+// caching/aggregation. The bundle is built as an IIFE so none of Vue's
+// top-level declarations leak into the shared page scope - without that,
+// a minified helper can collide with an unrelated Moodle/YUI global of the
+// same short name. Its CSS is injected by the bundle itself at runtime
+// (Vite's IIFE output has no separate asset to link), so no separate
+// $PAGE->requires->css() call is needed here.
 $frontendfound = file_exists(__DIR__ . '/dist/assets/index.js');
 if ($frontendfound) {
     $jsmtime = filemtime(__DIR__ . '/dist/assets/index.js');
@@ -76,11 +83,6 @@ if ($frontendfound) {
     // #v-app-mod-leitbox on execution, and that mount point is only echoed
     // into the body below - it must not run before the DOM node exists.
     $PAGE->requires->js($jsurl, false);
-}
-if (file_exists(__DIR__ . '/dist/assets/index.css')) {
-    $cssmtime = filemtime(__DIR__ . '/dist/assets/index.css');
-    $cssurl = new \moodle_url('/mod/leitbox/dist/assets/index.css', ['v' => $cssmtime]);
-    $PAGE->requires->css($cssurl);
 }
 
 // Fire the course_module_viewed event (required for Moodle activity logging).
@@ -108,10 +110,11 @@ if (!empty(trim($leitbox->intro))) {
 
 // Pass parameters to the Vue app via a data attribute.
 $appdata = [
-    'wwwroot'    => $CFG->wwwroot,
-    'sesskey'    => sesskey(),
-    'instanceid' => (int)$leitbox->id,
-    'cmid'       => (int)$cm->id,
+    'wwwroot'      => $CFG->wwwroot,
+    'sesskey'      => sesskey(),
+    'instanceid'   => (int)$leitbox->id,
+    'cmid'         => (int)$cm->id,
+    'activityname' => format_string($leitbox->name),
 ];
 
 // Mount point for Vue.

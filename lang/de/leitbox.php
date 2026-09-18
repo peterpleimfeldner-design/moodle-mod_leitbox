@@ -61,6 +61,7 @@ $string['hint'] = 'Hinweis';
 
 // Progress bar.
 $string['progress_label'] = 'Karten in Stufe Experte';
+$string['progress_overall'] = '{percent}% Gesamtfortschritt';
 $string['progress_aria'] = 'Fortschritt: {mastered} von {total} Karten gelernt';
 
 
@@ -231,6 +232,7 @@ $string['dashboardtitle'] = 'Deine LeitBox Karten';
 $string['dashboardsbtitle'] = 'Wähle einen Lernstapel zum Üben aus';
 $string['howitworks'] = 'Wie funktioniert das?';
 $string['cards'] = 'Karten';
+$string['card_singular'] = 'Karte';
 $string['systemtitle'] = 'Das Lernstapel-System';
 $string['systemintro'] = 'Dieses Plugin basiert auf der Leitner-Methode – 1972 vom österreichischen Wissenschaftler Sebastian Leitner erfunden und heute weltweit in der Lernforschung anerkannt. Ziel ist es, Karten von links nach rechts in den letzten Stapel ("Gelernt") zu befördern.';
 $string['known_btn'] = 'Gewusst';
@@ -264,11 +266,13 @@ $string['feedback_learn_title'] = 'Wiederholung empfohlen';
 $string['feedback_learn_desc'] = 'Einige Antworten fielen dir schwer. Nutze die nächste Runde, um diese zu trainieren.';
 $string['completed'] = 'Abgeschlossen';
 $string['error_loading_cards'] = 'Karten konnten nicht geladen werden. Bitte überprüfe deine Verbindung.';
+$string['box_empty_now'] = 'Dieser Stapel enthält gerade keine Karten mehr. Vermutlich wurde er inzwischen in einem anderen Tab oder Gerät bearbeitet.';
 $string['reset_progress'] = 'Lernfortschritt zurücksetzen';
 $string['reset_progress_confirm_title'] = 'Lernfortschritt zurücksetzen?';
 $string['reset_progress_confirm_msg'] = 'Wirklich zurücksetzen? Dadurch geht dein bisheriger Fortschritt verloren.';
 $string['reset_progress_btn'] = 'Ja, zurücksetzen';
 $string['reset_progress_cancel'] = 'Abbrechen';
 $string['reset_progress_done'] = 'Lernfortschritt wurde zurückgesetzt!';
+$string['reset_progress_all'] = 'Lernfortschritt aller Teilnehmer/innen in allen LeitBox-Aktivitäten löschen';
 
 $string['event_course_module_viewed'] = 'LeitBox-Aktivität aufgerufen';

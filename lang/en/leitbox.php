@@ -61,6 +61,7 @@ $string['hint'] = 'Hint';
 
 // Progress bar.
 $string['progress_label'] = 'cards at Expert level';
+$string['progress_overall'] = '{percent}% overall progress';
 $string['progress_aria'] = 'Progress: {mastered} of {total} cards mastered';
 
 
@@ -231,6 +232,7 @@ $string['dashboardtitle'] = 'Your LeitBox Cards';
 $string['dashboardsbtitle'] = 'Select a learning deck to practice';
 $string['howitworks'] = 'How does this work?';
 $string['cards'] = 'Cards';
+$string['card_singular'] = 'Card';
 $string['systemtitle'] = 'The Spaced Repetition System';
 $string['systemintro'] = 'This plugin is based on the Leitner System – invented in 1972 by the Austrian scientist Sebastian Leitner and globally recognized in learning research today. The goal is to move cards from left to right into the final deck ("Graduated").';
 $string['known_btn'] = 'Got it';
@@ -264,11 +266,13 @@ $string['feedback_learn_title'] = 'Review Recommended';
 $string['feedback_learn_desc'] = 'Some answers were difficult to leitbox. Use the next round to train these specific topics.';
 $string['completed'] = 'Completed';
 $string['error_loading_cards'] = 'Could not load cards. Please check your connection.';
+$string['box_empty_now'] = 'This stack no longer has any cards. It was probably just updated in another tab or device.';
 $string['reset_progress'] = 'Reset Learning Progress';
 $string['reset_progress_confirm_title'] = 'Reset Learning Progress?';
 $string['reset_progress_confirm_msg'] = 'Warning: This will reset all your learning progress. All cards will be moved back to "New". This cannot be undone!';
 $string['reset_progress_btn'] = 'Yes, Reset';
 $string['reset_progress_cancel'] = 'Cancel';
 $string['reset_progress_done'] = 'Learning progress has been reset!';
+$string['reset_progress_all'] = 'Delete all participants\' learning progress in every LeitBox activity';
 
 $string['event_course_module_viewed'] = 'LeitBox activity viewed';

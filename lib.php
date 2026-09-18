@@ -222,6 +222,60 @@ function leitbox_get_completion_active_rule_descriptions($course, $cm) {
 }
 
 /**
+ * Adds the "Delete all LeitBox learning progress" option to the standard
+ * course reset form (Course administration > Reset), so teachers reusing a
+ * course for a new term can clear the previous cohort's progress without
+ * having to open every LeitBox activity individually.
+ *
+ * @param moodleform $mform The course reset form to extend.
+ */
+function leitbox_reset_course_form_definition(&$mform) {
+    $mform->addElement('header', 'leitboxheader', get_string('modulenameplural', 'mod_leitbox'));
+    $mform->addElement('checkbox', 'reset_leitbox_progress', get_string('reset_progress_all', 'mod_leitbox'));
+}
+
+/**
+ * Default values for the course reset form elements added above.
+ *
+ * @param stdClass $course The course to be reset.
+ * @return array Default values, keyed by form element name.
+ */
+function leitbox_reset_course_form_defaults($course) {
+    return ['reset_leitbox_progress' => 1];
+}
+
+/**
+ * Removes all LeitBox learning progress for every instance in a course, as
+ * part of a standard Moodle course reset. Cards and settings are left
+ * untouched - only per-user Leitner box progress is cleared.
+ *
+ * @param stdClass $data The course reset form data (must include ->courseid).
+ * @return array Status array in the format expected by the reset UI.
+ */
+function leitbox_reset_userdata($data) {
+    global $DB;
+
+    $status = [];
+
+    if (!empty($data->reset_leitbox_progress)) {
+        $sql = "SELECT p.id
+                  FROM {leitbox_progress} p
+                  JOIN {leitbox_cards} c ON c.id = p.cardid
+                  JOIN {leitbox} l ON l.id = c.leitboxid
+                 WHERE l.course = :courseid";
+        $DB->delete_records_select('leitbox_progress', "id IN ($sql)", ['courseid' => $data->courseid]);
+
+        $status[] = [
+            'component' => get_string('modulenameplural', 'mod_leitbox'),
+            'item' => get_string('reset_progress_all', 'mod_leitbox'),
+            'error' => false,
+        ];
+    }
+
+    return $status;
+}
+
+/**
  * Extends the settings navigation for the leitbox module.
  *
  * @param settings_navigation $settings

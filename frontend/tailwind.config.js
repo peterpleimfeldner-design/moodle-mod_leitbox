@@ -29,5 +29,14 @@ export default {
     theme: {
         extend: {},
     },
+    // This bundle mounts into an existing Moodle page, not a blank document -
+    // Preflight is a global reset (bare `h1`, `button`, `*` selectors, etc.)
+    // that leaks onto the whole page and fights Moodle/Bootstrap's own base
+    // styles (observed breaking the theme's responsive grid on narrow
+    // viewports). Utility classes are unaffected; only the base reset layer
+    // is skipped.
+    corePlugins: {
+        preflight: false,
+    },
     plugins: [],
 }
