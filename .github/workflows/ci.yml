@@ -48,7 +48,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: mbstring, pgsql, zip, gd
+          extensions: mbstring, pgsql, zip, gd, intl, soap, curl, xml, dom
           coverage: none
 
       - name: Initialise moodle-plugin-ci
@@ -69,19 +69,12 @@ jobs:
             --db-pass postgres \
             --db-name moodle \
             --db-port 5432 \
-            --moodle-branch ${{ matrix.moodle-branch }} \
-            --db ${{ matrix.database }}
-        env:
-          DB: ${{ matrix.database }}
-          MOODLE_BRANCH: ${{ matrix.moodle-branch }}
+            --branch ${{ matrix.moodle-branch }} \
+            --db-type ${{ matrix.database }}
 
       - name: PHP Lint
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phplint
-
-      - name: PHP Copy/Paste Detector
-        if: ${{ !cancelled() }}
-        run: moodle-plugin-ci phpcpd
 
       - name: PHP Mess Detector
         if: ${{ !cancelled() }}
@@ -105,15 +98,11 @@ jobs:
 
       - name: Mustache Lint
         if: ${{ !cancelled() }}
-        run: moodle-plugin-ci mustachelint
+        run: moodle-plugin-ci mustache
 
-      - name: Javascript Lint
+      - name: Grunt (JS lint + verify AMD build is up to date)
         if: ${{ !cancelled() }}
-        run: moodle-plugin-ci jslint
-
-      - name: Grunt (verify AMD build is up to date)
-        if: ${{ !cancelled() }}
-        run: moodle-plugin-ci grunt --tasks=amd
+        run: moodle-plugin-ci grunt --tasks amd --show-lint-warnings
 
       - name: Check for missing language strings
         if: ${{ !cancelled() }}
