@@ -22,7 +22,7 @@
  * - Delete confirmation dialogs (single and bulk)
  *
  * @module     mod_leitbox/manage
- * @package    mod_leitbox
+ * @package
  * @copyright  2026 Peter Pleimfeldner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -47,7 +47,7 @@ define([], function() {
 
             // --- Prompt type selector ---
             var selector = document.getElementById('leitbox-prompt-selector');
-            var display  = document.getElementById('leitbox-prompt-display');
+            var display = document.getElementById('leitbox-prompt-display');
             if (selector && display) {
                 selector.addEventListener('change', function() {
                     var key = selector.value;
@@ -80,6 +80,7 @@ define([], function() {
             document.querySelectorAll('.leitbox-delete-card').forEach(function(link) {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
+                    // eslint-disable-next-line no-alert
                     if (window.confirm(params.confirmDelete)) {
                         window.location.href = link.getAttribute('href');
                     }
@@ -91,6 +92,7 @@ define([], function() {
             if (bulkForm) {
                 bulkForm.addEventListener('submit', function(e) {
                     e.preventDefault();
+                    // eslint-disable-next-line no-alert
                     if (window.confirm(params.confirmBulkDelete)) {
                         bulkForm.submit();
                     }

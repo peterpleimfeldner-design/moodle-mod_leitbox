@@ -77,8 +77,8 @@ class restore_leitbox_activity_task extends restore_activity_task {
     }
 
     /**
-     * Defines the restore log rules that will be applied by the
-     * {@link restore_logs_processor} when restoring leitbox logs.
+     * Defines the restore log rules that will be applied by the restore
+     * logs processor when restoring leitbox logs.
      *
      * @return array of restore_log_rule objects.
      */
@@ -91,9 +91,9 @@ class restore_leitbox_activity_task extends restore_activity_task {
     }
 
     /**
-     * Defines the restore log rules that will be applied by the
-     * {@link restore_logs_processor} when restoring course logs, with
-     * "view all" advanced items.
+     * Defines the restore log rules that will be applied by the restore
+     * logs processor when restoring course logs, with "view all" advanced
+     * items.
      *
      * @return array of restore_log_rule objects.
      */
