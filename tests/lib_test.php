@@ -23,6 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_leitbox;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -31,21 +33,29 @@ require_once($CFG->dirroot . '/mod/leitbox/lib.php');
 /**
  * Library unit tests for mod_leitbox.
  */
-class lib_test extends advanced_testcase {
+final class lib_test extends \advanced_testcase {
+    /**
+     * Set up for every test.
+     */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
     }
 
     /**
      * Test adding, updating, and deleting an instance.
+     *
+     * @covers ::leitbox_add_instance
+     * @covers ::leitbox_update_instance
+     * @covers ::leitbox_delete_instance
      */
-    public function test_instance_lifecycle() {
+    public function test_instance_lifecycle(): void {
         global $DB;
 
         $course = $this->getDataGenerator()->create_course();
 
-        // 1. Test Add
+        // 1. Test Add.
         $leitbox = new \stdClass();
         $leitbox->course = $course->id;
         $leitbox->name = 'LeitBox Test Activity';
@@ -60,7 +70,7 @@ class lib_test extends advanced_testcase {
         $cardcount = $DB->count_records('leitbox_cards', ['leitboxid' => $module->id]);
         $this->assertEquals(5, $cardcount); // Add_instance inserts 5 demo cards.
 
-        // 2. Test Update
+        // 2. Test Update.
         $module->name = 'Updated LeitBox Name';
         $module->instance = $module->id;
         $result = leitbox_update_instance($module);
@@ -69,7 +79,7 @@ class lib_test extends advanced_testcase {
         $updated = $DB->get_record('leitbox', ['id' => $module->id]);
         $this->assertEquals('Updated LeitBox Name', $updated->name);
 
-        // 3. Test Delete
+        // 3. Test Delete.
         $result = leitbox_delete_instance($module->id);
         $this->assertTrue($result);
 

@@ -40,19 +40,22 @@ require_once($CFG->dirroot . '/mod/leitbox/classes/external.php');
  *
  * @runTestsInSeparateProcesses
  */
-class external_test extends externallib_advanced_testcase {
+final class external_test extends externallib_advanced_testcase {
     /**
-     * Set up for every test
+     * Set up for every test.
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
     }
 
     /**
      * Helper to create a basic leitbox activity with some cards.
+     *
+     * @return array {course, student, leitbox, card}
      */
-    protected function create_leitbox_activity() {
+    protected function create_leitbox_activity(): array {
         global $DB;
 
         // Create course and user.
@@ -79,8 +82,10 @@ class external_test extends externallib_advanced_testcase {
 
     /**
      * Test getting cards by box.
+     *
+     * @covers \mod_leitbox\external::get_cards_by_box
      */
-    public function test_get_cards_by_box() {
+    public function test_get_cards_by_box(): void {
         [$course, $student, $leitbox, $card] = $this->create_leitbox_activity();
 
         // Must be logged in as the student.
@@ -99,8 +104,10 @@ class external_test extends externallib_advanced_testcase {
 
     /**
      * Test submitting an answer (Spaced Repetition Logic).
+     *
+     * @covers \mod_leitbox\external::submit_answer
      */
-    public function test_submit_answer() {
+    public function test_submit_answer(): void {
         global $DB;
         [$course, $student, $leitbox, $card] = $this->create_leitbox_activity();
 
@@ -129,8 +136,10 @@ class external_test extends externallib_advanced_testcase {
 
     /**
      * Test resetting progress.
+     *
+     * @covers \mod_leitbox\external::reset_progress
      */
-    public function test_reset_progress() {
+    public function test_reset_progress(): void {
         global $DB;
         [$course, $student, $leitbox, $card] = $this->create_leitbox_activity();
 
@@ -154,8 +163,10 @@ class external_test extends externallib_advanced_testcase {
     }
     /**
      * Test that invalid box number throws exception.
+     *
+     * @covers \mod_leitbox\external::get_cards_by_box
      */
-    public function test_get_cards_by_box_invalid_box() {
+    public function test_get_cards_by_box_invalid_box(): void {
         [$course, $student, $leitbox, $card] = $this->create_leitbox_activity();
         $this->setUser($student);
         $this->expectException(\moodle_exception::class);
@@ -164,8 +175,10 @@ class external_test extends externallib_advanced_testcase {
 
     /**
      * Test completion state: min_cards condition uses DISTINCT card count.
+     *
+     * @covers \mod_leitbox\external::submit_answer
      */
-    public function test_completion_min_cards_counts_unique_cards() {
+    public function test_completion_min_cards_counts_unique_cards(): void {
         global $DB;
         [$course, $student, $leitbox, $card] = $this->create_leitbox_activity();
         $this->setUser($student);
