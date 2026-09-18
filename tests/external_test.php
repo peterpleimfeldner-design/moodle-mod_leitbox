@@ -39,12 +39,20 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  *
  * Deliberately does not require_once classes/external.php: doing so at the
  * top of the file makes PHPUnit load lib/externallib.php while it is still
- * scanning test files to build the suite (before any test is actually
- * running), which trips Moodle's "must run in an isolated process" guard.
- * Relying on the autoloader to load \mod_leitbox\external lazily, the first
- * time a test method actually calls it, avoids that entirely - this is the
- * same pattern used by Moodle core's own external function tests (e.g.
- * mod_choice's externallib_test.php).
+ * scanning test files to build the suite, before any test is actually
+ * running (and therefore before @runTestsInSeparateProcesses below has a
+ * chance to isolate anything) - that trips Moodle's "must run in an
+ * isolated process" guard on its own. Relying on the autoloader to load
+ * \mod_leitbox\external lazily, the first time a test method actually
+ * calls it, defers that load until a test is genuinely executing.
+ *
+ * That still isn't enough on its own though: the guard checks the
+ * PHPUNIT_ISOLATED_TEST constant, which is only true inside a process
+ * PHPUnit actually forked for isolation - not merely "some test is
+ * running". Hence @runTestsInSeparateProcesses is still required so each
+ * test method (where the lazy autoload happens) runs in such a process.
+ *
+ * @runTestsInSeparateProcesses
  */
 final class external_test extends externallib_advanced_testcase {
     /**
