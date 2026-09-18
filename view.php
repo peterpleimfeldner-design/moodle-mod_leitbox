@@ -15,14 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * View page for a mod_leitbox instance.
+ *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once('../../config.php');
 require_once(__DIR__ . '/lib.php');
 
-$id = required_param('id', PARAM_INT); // Course module ID
+$id = required_param('id', PARAM_INT); // Course module ID.
 $cm = get_coursemodule_from_id('leitbox', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $leitbox = $DB->get_record('leitbox', ['id' => $cm->instance], '*', MUST_EXIST);
@@ -42,13 +45,13 @@ $PAGE->set_context($context);
 // Include standard Moodle JS for ajax if needed.
 $PAGE->requires->js_call_amd('core/ajax', 'init');
 
-// Export strings for Vue frontend
+// Export strings for Vue frontend.
 $vuestrings = [
-    'dashboardtitle', 'dashboardsbtitle', 'howitworks', 'cards', 'systemtitle', 
-    'systemintro', 'known_btn', 'known_desc', 'again_btn', 'again_desc', 
+    'dashboardtitle', 'dashboardsbtitle', 'howitworks', 'cards', 'systemtitle',
+    'systemintro', 'known_btn', 'known_desc', 'again_btn', 'again_desc',
     'hard_btn', 'hard_desc', 'systemtip', 'gotit', 'showhint', 'hint',
-    'taptoflip', 'action_back', 'action_stay', 'action_next', 'backtodashboard', 
-    'cardxofy_x', 'cardxofy_y', 'loadingcards', 'sessiondone', 'sessiondonedesc', 
+    'taptoflip', 'action_back', 'action_stay', 'action_next', 'backtodashboard',
+    'cardxofy_x', 'cardxofy_y', 'loadingcards', 'sessiondone', 'sessiondonedesc',
     'completed', 'error_loading_cards', 'box0', 'box1', 'box2', 'box3', 'box4', 'box5',
     'reset_progress', 'reset_progress_confirm_title', 'reset_progress_confirm_msg',
     'reset_progress_btn', 'reset_progress_cancel', 'reset_progress_done',
@@ -111,10 +114,10 @@ $appdata = [
     'cmid'       => (int)$cm->id,
 ];
 
-// Mount point for Vue
+// Mount point for Vue.
 echo \html_writer::tag('div', '', [
     'id' => 'v-app-mod-leitbox',
-    'data-config' => json_encode($appdata)
+    'data-config' => json_encode($appdata),
 ]);
 
 if (!$frontendfound) {

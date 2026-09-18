@@ -39,7 +39,6 @@ require_once($CFG->dirroot . '/mod/leitbox/classes/external.php');
  * External functions unit tests for mod_leitbox.
  */
 class external_test extends externallib_advanced_testcase {
-
     /**
      * Set up for every test
      */
@@ -80,7 +79,7 @@ class external_test extends externallib_advanced_testcase {
      * Test getting cards by box.
      */
     public function test_get_cards_by_box() {
-        list($course, $student, $leitbox, $card) = $this->create_leitbox_activity();
+        [$course, $student, $leitbox, $card] = $this->create_leitbox_activity();
 
         // Must be logged in as the student.
         $this->setUser($student);
@@ -101,28 +100,28 @@ class external_test extends externallib_advanced_testcase {
      */
     public function test_submit_answer() {
         global $DB;
-        list($course, $student, $leitbox, $card) = $this->create_leitbox_activity();
+        [$course, $student, $leitbox, $card] = $this->create_leitbox_activity();
 
         $this->setUser($student);
 
         // 1. Test "Green" rating (Rating = 2)
         $result = external::submit_answer($card->id, 2);
         $result = external_api::clean_returnvalue(external::submit_answer_returns(), $result);
-        
-        $this->assertTrue($result['success']);
-        $this->assertEquals(1, $result['new_box']); // Should move from Box 0 to Box 1
 
-        // Check DB
+        $this->assertTrue($result['success']);
+        $this->assertEquals(1, $result['new_box']); // Should move from Box 0 to Box 1.
+
+        // Check DB.
         $progress = $DB->get_record('leitbox_progress', ['userid' => $student->id, 'cardid' => $card->id]);
         $this->assertEquals(1, $progress->box_number);
         $this->assertEquals(1, $progress->count_correct);
 
-        // 2. Test "Red" rating on Box 1 (Rating = 0) -> Should stay in Box 1 (minimum bound)
+        // 2. Test "Red" rating on Box 1 (Rating = 0) -> should stay in Box 1 (minimum bound).
         $result = external::submit_answer($card->id, 0);
         $result = external_api::clean_returnvalue(external::submit_answer_returns(), $result);
-        
+
         $progress = $DB->get_record('leitbox_progress', ['userid' => $student->id, 'cardid' => $card->id]);
-        $this->assertEquals(1, $progress->box_number); // Cannot drop below 1
+        $this->assertEquals(1, $progress->box_number); // Cannot drop below 1.
         $this->assertEquals(1, $progress->count_wrong);
     }
 
@@ -131,13 +130,13 @@ class external_test extends externallib_advanced_testcase {
      */
     public function test_reset_progress() {
         global $DB;
-        list($course, $student, $leitbox, $card) = $this->create_leitbox_activity();
+        [$course, $student, $leitbox, $card] = $this->create_leitbox_activity();
 
         $this->setUser($student);
 
         // Submit an answer to create a progress record.
         external::submit_answer($card->id, 2);
-        
+
         // Ensure progress exists.
         $this->assertEquals(1, $DB->count_records('leitbox_progress', ['userid' => $student->id]));
 
@@ -155,7 +154,7 @@ class external_test extends externallib_advanced_testcase {
      * Test that invalid box number throws exception.
      */
     public function test_get_cards_by_box_invalid_box() {
-        list($course, $student, $leitbox, $card) = $this->create_leitbox_activity();
+        [$course, $student, $leitbox, $card] = $this->create_leitbox_activity();
         $this->setUser($student);
         $this->expectException(\moodle_exception::class);
         external::get_cards_by_box($leitbox->id, 99);
@@ -166,16 +165,16 @@ class external_test extends externallib_advanced_testcase {
      */
     public function test_completion_min_cards_counts_unique_cards() {
         global $DB;
-        list($course, $student, $leitbox, $card) = $this->create_leitbox_activity();
+        [$course, $student, $leitbox, $card] = $this->create_leitbox_activity();
         $this->setUser($student);
 
-        // Answer the same card 5 times
+        // Answer the same card 5 times.
         for ($i = 0; $i < 5; $i++) {
             external::submit_answer($card->id, 2);
         }
 
-        // Despite 5 interactions, only 1 unique card was learned
-        $progress_count = $DB->count_records('leitbox_progress', ['userid' => $student->id]);
-        $this->assertEquals(1, $progress_count); // Only 1 unique progress record (UNIQUE INDEX)
+        // Despite 5 interactions, only 1 unique card was learned.
+        $progresscount = $DB->count_records('leitbox_progress', ['userid' => $student->id]);
+        $this->assertEquals(1, $progresscount); // Only 1 unique progress record (UNIQUE INDEX).
     }
 }

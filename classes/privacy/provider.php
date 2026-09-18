@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Privacy API implementation for mod_leitbox.
+ *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,11 +32,17 @@ use core_privacy\local\metadata\provider as metadata_provider;
 use core_privacy\local\request\plugin\provider as plugin_provider;
 use core_privacy\local\request\core_userlist_provider;
 
-defined('MOODLE_INTERNAL') || die();
-
-class provider implements metadata_provider, plugin_provider, core_userlist_provider {
-
-    public static function get_metadata(collection $collection) : collection {
+/**
+ * Privacy API provider for mod_leitbox.
+ */
+class provider implements core_userlist_provider, metadata_provider, plugin_provider {
+    /**
+     * Returns metadata about the personal data stored by this plugin.
+     *
+     * @param collection $collection The initialised collection to add items to.
+     * @return collection The updated collection.
+     */
+    public static function get_metadata(collection $collection): collection {
         $collection->add_database_table(
             'leitbox_progress',
             [
@@ -50,7 +58,13 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
         return $collection;
     }
 
-    public static function get_contexts_for_userid(int $userid) : contextlist {
+    /**
+     * Returns the list of contexts containing personal data for a user.
+     *
+     * @param int $userid The user id.
+     * @return contextlist The list of contexts containing personal data.
+     */
+    public static function get_contexts_for_userid(int $userid): contextlist {
         $contextlist = new contextlist();
         $sql = "SELECT c.id
                   FROM {context} c
@@ -69,6 +83,11 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
         return $contextlist;
     }
 
+    /**
+     * Adds the userids of all users with personal data in the given context.
+     *
+     * @param userlist $userlist The userlist to add userids to.
+     */
     public static function get_users_in_context(userlist $userlist) {
         $context = $userlist->get_context();
         if ($context->contextlevel != CONTEXT_MODULE) {
@@ -82,15 +101,20 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
                   JOIN {leitbox_cards} rc ON rc.leitboxid = r.id
                   JOIN {leitbox_progress} rp ON rp.cardid = rc.id
                  WHERE cm.id = :cmid";
-        
+
         $params = [
             'modname' => 'leitbox',
-            'cmid' => $context->instanceid
+            'cmid' => $context->instanceid,
         ];
-        
+
         $userlist->add_from_sql('userid', $sql, $params);
     }
 
+    /**
+     * Exports personal data for the given approved contexts.
+     *
+     * @param approved_contextlist $contextlist The approved contexts to export data for.
+     */
     public static function export_user_data(approved_contextlist $contextlist) {
         global $DB;
         if (empty($contextlist->count())) {
@@ -109,21 +133,21 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
                           FROM {leitbox_progress} rp
                           JOIN {leitbox_cards} rc ON rc.id = rp.cardid
                          WHERE rc.leitboxid = ? AND rp.userid = ?";
-                $progress_records = $DB->get_records_sql($sql, [$cm->instance, $userid]);
+                $progressrecords = $DB->get_records_sql($sql, [$cm->instance, $userid]);
 
-                if (!empty($progress_records)) {
+                if (!empty($progressrecords)) {
                     $exportdata = [];
-                    foreach ($progress_records as $rec) {
+                    foreach ($progressrecords as $rec) {
                         $exportdata[] = (object)[
                             'question' => format_text($rec->question),
                             'answer' => format_text($rec->answer),
                             'box_number' => $rec->box_number,
                             'count_correct' => $rec->count_correct,
                             'count_wrong' => $rec->count_wrong,
-                            'last_reviewed' => date('Y-m-d H:i:s', $rec->last_reviewed)
+                            'last_reviewed' => date('Y-m-d H:i:s', $rec->last_reviewed),
                         ];
                     }
-                    
+
                     \core_privacy\local\request\writer::with_context($context)->export_data(
                         [get_string('pluginname', 'mod_leitbox'), get_string('cards', 'mod_leitbox')],
                         (object)['progress' => $exportdata]
@@ -133,6 +157,11 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
         }
     }
 
+    /**
+     * Deletes all personal data for all users in the given context.
+     *
+     * @param \context $context The context to delete data in.
+     */
     public static function delete_data_for_all_users_in_context(\context $context) {
         global $DB;
         if ($context->contextlevel != CONTEXT_MODULE) {
@@ -140,7 +169,7 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
         }
 
         if ($cm = get_coursemodule_from_id('leitbox', $context->instanceid)) {
-            $sql = "SELECT p.id 
+            $sql = "SELECT p.id
                       FROM {leitbox_progress} p
                       JOIN {leitbox_cards} c ON c.id = p.cardid
                      WHERE c.leitboxid = ?";
@@ -148,6 +177,11 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
         }
     }
 
+    /**
+     * Deletes personal data for a user in the given approved contexts.
+     *
+     * @param approved_contextlist $contextlist The approved contexts to delete data in.
+     */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
         if (empty($contextlist->count())) {
@@ -158,7 +192,7 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
         foreach ($contextlist->get_contexts() as $context) {
             if ($context->contextlevel == CONTEXT_MODULE) {
                 if ($cm = get_coursemodule_from_id('leitbox', $context->instanceid)) {
-                    $sql = "SELECT p.id 
+                    $sql = "SELECT p.id
                               FROM {leitbox_progress} p
                               JOIN {leitbox_cards} c ON c.id = p.cardid
                              WHERE c.leitboxid = ? AND p.userid = ?";
@@ -168,6 +202,11 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
         }
     }
 
+    /**
+     * Deletes personal data for multiple users in the given approved userlist.
+     *
+     * @param approved_userlist $userlist The approved userlist to delete data for.
+     */
     public static function delete_data_for_users(approved_userlist $userlist) {
         global $DB;
         $context = $userlist->get_context();
@@ -181,15 +220,15 @@ class provider implements metadata_provider, plugin_provider, core_userlist_prov
         }
 
         if ($cm = get_coursemodule_from_id('leitbox', $context->instanceid)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($userids);
-            
-            $sql = "SELECT p.id 
+            [$insql, $inparams] = $DB->get_in_or_equal($userids);
+
+            $sql = "SELECT p.id
                       FROM {leitbox_progress} p
                       JOIN {leitbox_cards} c ON c.id = p.cardid
                      WHERE c.leitboxid = ? AND p.userid $insql";
-            
+
             $params = array_merge([$cm->instance], $inparams);
-            
+
             $DB->delete_records_select('leitbox_progress', "id IN ($sql)", $params);
         }
     }

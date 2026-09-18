@@ -15,18 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Bulk-import text parser for mod_leitbox.
+ *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_leitbox;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Parses the plugin's custom Q:/A:/H:/===CARD=== bulk-import text format.
+ */
 class import_handler {
     /**
      * Parses the custom text-block format into an array of cards.
-     * 
+     *
      * @param string $text The raw text input containing card definitions.
      * @return array Array of associative arrays with 'question', 'answer', 'hint' keys.
      */
@@ -44,8 +47,8 @@ class import_handler {
             }
 
             $lines = explode("\n", $block);
-            $current_key = '';
-            $current_val = [];
+            $currentkey = '';
+            $currentval = [];
 
             $q = '';
             $a = '';
@@ -53,30 +56,48 @@ class import_handler {
 
             foreach ($lines as $line) {
                 if (preg_match('/^Q:\s*(.*)/i', $line, $matches)) {
-                    if ($current_key === 'A') $a = implode("\n", $current_val);
-                    if ($current_key === 'H') $h = implode("\n", $current_val);
-                    $current_key = 'Q';
-                    $current_val = [$matches[1]];
-                } elseif (preg_match('/^A:\s*(.*)/i', $line, $matches)) {
-                    if ($current_key === 'Q') $q = implode("\n", $current_val);
-                    if ($current_key === 'H') $h = implode("\n", $current_val);
-                    $current_key = 'A';
-                    $current_val = [$matches[1]];
-                } elseif (preg_match('/^H:\s*(.*)/i', $line, $matches)) {
-                    if ($current_key === 'Q') $q = implode("\n", $current_val);
-                    if ($current_key === 'A') $a = implode("\n", $current_val);
-                    $current_key = 'H';
-                    $current_val = [$matches[1]];
+                    if ($currentkey === 'A') {
+                        $a = implode("\n", $currentval);
+                    }
+                    if ($currentkey === 'H') {
+                        $h = implode("\n", $currentval);
+                    }
+                    $currentkey = 'Q';
+                    $currentval = [$matches[1]];
+                } else if (preg_match('/^A:\s*(.*)/i', $line, $matches)) {
+                    if ($currentkey === 'Q') {
+                        $q = implode("\n", $currentval);
+                    }
+                    if ($currentkey === 'H') {
+                        $h = implode("\n", $currentval);
+                    }
+                    $currentkey = 'A';
+                    $currentval = [$matches[1]];
+                } else if (preg_match('/^H:\s*(.*)/i', $line, $matches)) {
+                    if ($currentkey === 'Q') {
+                        $q = implode("\n", $currentval);
+                    }
+                    if ($currentkey === 'A') {
+                        $a = implode("\n", $currentval);
+                    }
+                    $currentkey = 'H';
+                    $currentval = [$matches[1]];
                 } else {
-                    if ($current_key) {
-                        $current_val[] = $line;
+                    if ($currentkey) {
+                        $currentval[] = $line;
                     }
                 }
             }
 
-            if ($current_key === 'Q') $q = implode("\n", $current_val);
-            if ($current_key === 'A') $a = implode("\n", $current_val);
-            if ($current_key === 'H') $h = implode("\n", $current_val);
+            if ($currentkey === 'Q') {
+                $q = implode("\n", $currentval);
+            }
+            if ($currentkey === 'A') {
+                $a = implode("\n", $currentval);
+            }
+            if ($currentkey === 'H') {
+                $h = implode("\n", $currentval);
+            }
 
             $q = trim($q);
             $a = trim($a);
@@ -86,7 +107,7 @@ class import_handler {
                 $cards[] = [
                     'question' => $q,
                     'answer' => $a,
-                    'hint' => $h
+                    'hint' => $h,
                 ];
             }
         }
@@ -94,4 +115,3 @@ class import_handler {
         return $cards;
     }
 }
-

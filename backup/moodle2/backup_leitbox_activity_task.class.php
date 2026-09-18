@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Backup task for mod_leitbox.
+ *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,18 +27,34 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/leitbox/backup/moodle2/backup_leitbox_stepslib.php');
 
+/**
+ * Backup task that provides all the settings and steps to perform a backup
+ * of a leitbox activity.
+ */
 class backup_leitbox_activity_task extends backup_activity_task {
-
+    /**
+     * Defines particular settings this activity can have.
+     */
     protected function define_my_settings() {
         // No particular settings for this activity.
     }
 
+    /**
+     * Defines particular steps this activity can have.
+     */
     protected function define_my_steps() {
         // Add the leitbox structure step.
         $this->add_step(new backup_leitbox_activity_structure_step('leitbox_structure', 'leitbox.xml'));
     }
 
-    static public function encode_content_links($content) {
+    /**
+     * Encodes URLs to the current activity so that they can be restored
+     * to the new site correctly.
+     *
+     * @param string $content Some HTML content to process.
+     * @return string The content with the URLs encoded.
+     */
+    public static function encode_content_links($content) {
         global $CFG;
 
         $base = preg_quote($CFG->wwwroot, "/");

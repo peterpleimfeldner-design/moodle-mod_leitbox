@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * German language strings for mod_leitbox.
+ *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -57,7 +59,7 @@ $string['question'] = 'Frage';
 $string['answer'] = 'Antwort';
 $string['hint'] = 'Hinweis';
 
-// Progress bar
+// Progress bar.
 $string['progress_label'] = 'Karten in Stufe Experte';
 $string['progress_aria'] = 'Fortschritt: {mastered} von {total} Karten gelernt';
 
@@ -72,7 +74,7 @@ $string['privacy:metadata:leitbox_progress:count_correct'] = 'Die Anzahl, wie of
 $string['privacy:metadata:leitbox_progress:count_wrong'] = 'Die Anzahl, wie oft der Benutzer die Karte falsch beantwortet hat.';
 $string['privacy:metadata:leitbox_progress:last_reviewed'] = 'Der Zeitstempel, wann die Karte zuletzt überprüft wurde.';
 
-// Management Interface
+// Management interface.
 $string['demo_q1'] = 'Willkommen bei LeitBox.<br><br>Was ist das Ziel dieses Lernsystems?';
 $string['demo_a1'] = 'Das Ziel ist es, alle Lernkarten durch korrektes Beantworten in den letzten Stapel ("Experte") zu befördern.<br><br>Das System nutzt dafür die Methode der <b>verteilten Wiederholung</b> (Spaced Repetition).';
 $string['demo_h1'] = 'Denke daran, wie man sich Dinge langfristig am besten merkt.';
@@ -117,8 +119,8 @@ $string['prompt_type_cloze'] = 'Lückentext';
 $string['prompt_type_jeopardy'] = 'Jeopardy (Antwort-Frage)';
 $string['prompt_type_transfer'] = 'Transfer & Alltagsbezug';
 
-$string['prompt_template_standard'] = 'Erstelle aus folgendem Text Karteikarten zum Lernen. 
-Formatiere jede Karte EXAKT in diesem Format, ohne Abweichungen, ohne Markdown (keine Sternchen, keine Rauten) und trenne alle Karten mit ===CARD===. 
+$string['prompt_template_standard'] = 'Erstelle aus folgendem Text Karteikarten zum Lernen.
+Formatiere jede Karte EXAKT in diesem Format, ohne Abweichungen, ohne Markdown (keine Sternchen, keine Rauten) und trenne alle Karten mit ===CARD===.
 Schreibe keine Einleitung, nur den reinen Text-Code.
 
 Beispiel für das gewünschte Ausgabeformat:
@@ -133,8 +135,8 @@ A: Albert Einstein
 
 Hier ist der Text, aus dem du die Karten erstellen sollst:';
 
-$string['prompt_template_tf'] = 'Erstelle aus folgendem Text Wahr/Falsch-Karteikarten zum Lernen. 
-Formatiere jede Karte EXAKT in diesem Format, ohne Abweichungen, ohne Markdown und trenne alle Karten mit ===CARD===. 
+$string['prompt_template_tf'] = 'Erstelle aus folgendem Text Wahr/Falsch-Karteikarten zum Lernen.
+Formatiere jede Karte EXAKT in diesem Format, ohne Abweichungen, ohne Markdown und trenne alle Karten mit ===CARD===.
 Schreibe keine Einleitung, nur den reinen Text-Code.
 
 Beispiel für das gewünschte Ausgabeformat:
@@ -149,8 +151,8 @@ A: Falsch.
 
 Hier ist der Text, aus dem du die Karten erstellen sollst:';
 
-$string['prompt_template_vocab'] = 'Extrahiere aus folgendem Text die wichtigsten Vokabeln oder Fachbegriffe und erstelle daraus Karteikarten zum Lernen. 
-Formatiere jede Karte EXAKT in diesem Format, ohne Abweichungen, ohne Markdown und trenne alle Karten mit ===CARD===. 
+$string['prompt_template_vocab'] = 'Extrahiere aus folgendem Text die wichtigsten Vokabeln oder Fachbegriffe und erstelle daraus Karteikarten zum Lernen.
+Formatiere jede Karte EXAKT in diesem Format, ohne Abweichungen, ohne Markdown und trenne alle Karten mit ===CARD===.
 Schreibe keine Einleitung, nur den reinen Text-Code.
 
 Beispiel für das gewünschte Ausgabeformat:
@@ -165,7 +167,7 @@ A: Zellkernteilung (Biologie)
 
 Hier ist der Text, aus dem du die Karten erstellen sollst:';
 
-$string['prompt_template_cloze'] = 'Erstelle aus folgendem Text Lückentext-Karteikarten zum Lernen. 
+$string['prompt_template_cloze'] = 'Erstelle aus folgendem Text Lückentext-Karteikarten zum Lernen.
 Formatiere jede Karte EXAKT in diesem Format, ohne Abweichungen, ohne Markdown und trenne alle Karten mit ===CARD===. Die Lücke in der Frage wird mit [...] markiert, die gesuchte Antwort kommt in das Feld A.
 Schreibe keine Einleitung, nur den reinen Text-Code.
 
@@ -181,9 +183,9 @@ A: Relativitätstheorie
 
 Hier ist der Text, aus dem du die Karten erstellen sollst:';
 
-$string['prompt_template_jeopardy'] = 'Erstelle basierend auf dem folgenden Thema oder Text Karteikarten im Jeopardy-Stil zum Lernen. 
+$string['prompt_template_jeopardy'] = 'Erstelle basierend auf dem folgenden Thema oder Text Karteikarten im Jeopardy-Stil zum Lernen.
 Die Frage (Q) beschreibt eine Wirkung, einen Begriff oder ein Phänomen, und die Antwort (A) muss zwingend als Gegenfrage formuliert sein (z.B. "Was ist...?").
-Formatiere jede Karte EXAKT in diesem Format, ohne Abweichungen, ohne Markdown und trenne alle Karten mit ===CARD===. 
+Formatiere jede Karte EXAKT in diesem Format, ohne Abweichungen, ohne Markdown und trenne alle Karten mit ===CARD===.
 Schreibe keine Einleitung, nur den reinen Text-Code.
 
 Beispiele für das gewünschte Ausgabeformat:
@@ -198,9 +200,9 @@ A: Was ist Glukose (Traubenzucker)?
 
 Hier ist der Text, aus dem du die Karten erstellen sollst:';
 
-$string['prompt_template_transfer'] = 'Erstelle basierend auf dem folgenden Thema oder Text Karteikarten mit Fokus auf Transferleistungen und Alltagsbezug. 
+$string['prompt_template_transfer'] = 'Erstelle basierend auf dem folgenden Thema oder Text Karteikarten mit Fokus auf Transferleistungen und Alltagsbezug.
 Die Fragen sollen zum "Um-die-Ecke-Denken" anregen (Warum-Fragen, Was-wäre-wenn-Szenarien).
-Formatiere jede Karte EXAKT in diesem Format, ohne Abweichungen, ohne Markdown und trenne alle Karten mit ===CARD===. 
+Formatiere jede Karte EXAKT in diesem Format, ohne Abweichungen, ohne Markdown und trenne alle Karten mit ===CARD===.
 Schreibe keine Einleitung, nur den reinen Text-Code.
 
 Beispiele für das gewünschte Ausgabeformat:
@@ -224,7 +226,7 @@ $string['import_placeholder'] = 'Füge hier deinen formatierten Kartentext ein (
 $string['frontendnotfound'] = 'Die LeitBox-Frontend-Anwendung wurde nicht gefunden. Bitte kontaktiere deine Administration.';
 $string['close'] = 'Schließen';
 
-// Vue Frontend App Strings
+// Vue frontend app strings.
 $string['dashboardtitle'] = 'Deine LeitBox Karten';
 $string['dashboardsbtitle'] = 'Wähle einen Lernstapel zum Üben aus';
 $string['howitworks'] = 'Wie funktioniert das?';

@@ -15,30 +15,38 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Backup step for mod_leitbox.
+ *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Defines the complete backup structure for the leitbox activity.
+ */
 class backup_leitbox_activity_structure_step extends backup_activity_structure_step {
+    /**
+     * Defines the backup structure of the module.
+     *
+     * @return backup_nested_element The backup structure.
+     */
     protected function define_structure() {
 
         // Define each element separated.
         $leitbox = new backup_nested_element('leitbox', ['id'], [
-            'course', 'name', 'intro', 'introformat', 'cardorder', 
-            'completion_min_cards', 'completion_min_mastered', 'completion_all_mastered', 'timecreated', 'timemodified'
+            'course', 'name', 'intro', 'introformat', 'cardorder',
+            'completion_min_cards', 'completion_min_mastered', 'completion_all_mastered', 'timecreated', 'timemodified',
         ]);
 
         $cards = new backup_nested_element('cards');
         $card = new backup_nested_element('card', ['id'], [
-            'question', 'answer', 'hint', 'category'
+            'question', 'answer', 'hint', 'category',
         ]);
 
         $progresses = new backup_nested_element('progresses');
         $progress = new backup_nested_element('progress', ['id'], [
-            'userid', 'box_number', 'status', 'count_correct', 'count_wrong', 'last_reviewed'
+            'userid', 'box_number', 'status', 'count_correct', 'count_wrong', 'last_reviewed',
         ]);
 
         // Build the tree.
@@ -61,7 +69,7 @@ class backup_leitbox_activity_structure_step extends backup_activity_structure_s
         $progress->annotate_ids('user', 'userid');
 
         // Annotate file areas (intro text files).
-        $leitbox->annotate_files('mod_leitbox', 'intro', null); // Intro might have embedded images
+        $leitbox->annotate_files('mod_leitbox', 'intro', null); // Intro might have embedded images.
 
         return $this->prepare_activity_structure($leitbox);
     }

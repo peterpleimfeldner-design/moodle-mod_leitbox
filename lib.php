@@ -15,11 +15,43 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Library of interface functions and constants for mod_leitbox.
+ *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Automatically cleans up the 5 tutorial demo cards when the teacher adds
+ * their first custom card.
+ *
+ * @param int $leitboxid The leitbox instance ID.
+ */
+function leitbox_auto_delete_demos($leitboxid) {
+    global $DB;
+    // Only auto-delete if no custom (non-demo) cards exist yet.
+    $customcount = $DB->count_records_select(
+        'leitbox_cards',
+        "leitboxid = ? AND (category IS NULL OR category != 'demo')",
+        [$leitboxid]
+    );
+    if ($customcount > 0) {
+        return; // Custom cards already exist, don't touch anything.
+    }
+    // Delete all remaining demo cards and their progress.
+    $demoids = $DB->get_fieldset_select(
+        'leitbox_cards',
+        'id',
+        "leitboxid = ? AND category = 'demo'",
+        [$leitboxid]
+    );
+    if (!empty($demoids)) {
+        [$in, $params] = $DB->get_in_or_equal($demoids);
+        $DB->delete_records_select('leitbox_progress', "cardid $in", $params);
+        $DB->delete_records_select('leitbox_cards', "id $in", $params);
+    }
+}
 
 /**
  * Adds a new leitbox instance
@@ -36,7 +68,7 @@ function leitbox_add_instance($leitbox) {
     // Insert tutorial demo cards using language-neutral marker keys.
     // The markers (e.g. ##demo_q1##) are resolved to the user's language
     // at display time in external.php, so the correct language is always shown.
-    $demo_cards = [
+    $democards = [
         ['leitboxid' => $id, 'category' => 'demo', 'question' => '##demo_q1##', 'answer' => '##demo_a1##', 'hint' => '##demo_h1##'],
         ['leitboxid' => $id, 'category' => 'demo', 'question' => '##demo_q2##', 'answer' => '##demo_a2##', 'hint' => '##demo_h2##'],
         ['leitboxid' => $id, 'category' => 'demo', 'question' => '##demo_q3##', 'answer' => '##demo_a3##', 'hint' => '##demo_h3##'],
@@ -44,7 +76,7 @@ function leitbox_add_instance($leitbox) {
         ['leitboxid' => $id, 'category' => 'demo', 'question' => '##demo_q5##', 'answer' => '##demo_a5##', 'hint' => '##demo_h5##'],
     ];
 
-    foreach ($demo_cards as $card) {
+    foreach ($democards as $card) {
         $DB->insert_record('leitbox_cards', (object)$card);
     }
 
@@ -75,13 +107,13 @@ function leitbox_delete_instance($id) {
     if (!$leitbox = $DB->get_record('leitbox', ['id' => $id])) {
         return false;
     }
-    
+
     $sql = "SELECT id FROM {leitbox_cards} WHERE leitboxid = ?";
     if ($cards = $DB->get_records_sql($sql, [$id])) {
-        list($in, $params) = $DB->get_in_or_equal(array_keys($cards));
+        [$in, $params] = $DB->get_in_or_equal(array_keys($cards));
         $DB->delete_records_select('leitbox_progress', "cardid $in", $params);
     }
-    
+
     $DB->delete_records('leitbox_cards', ['leitboxid' => $id]);
     $DB->delete_records('leitbox', ['id' => $id]);
     return true;
@@ -94,13 +126,19 @@ function leitbox_delete_instance($id) {
  * @return mixed
  */
 function leitbox_supports($feature) {
-    switch($feature) {
-        case FEATURE_MOD_INTRO: return true;
-        case FEATURE_SHOW_DESCRIPTION: return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
-        case FEATURE_COMPLETION_HAS_RULES: return true;
-        case FEATURE_BACKUP_MOODLE2: return true;
-        default: return null;
+    switch ($feature) {
+        case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_SHOW_DESCRIPTION:
+            return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return true;
+        case FEATURE_COMPLETION_HAS_RULES:
+            return true;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+        default:
+            return null;
     }
 }
 
@@ -115,8 +153,11 @@ function leitbox_supports($feature) {
 function leitbox_get_coursemodule_info($coursemodule) {
     global $DB;
 
-    $leitbox = $DB->get_record('leitbox', ['id' => $coursemodule->instance],
-        'id, name, completion_min_cards, completion_min_mastered, completion_all_mastered');
+    $leitbox = $DB->get_record(
+        'leitbox',
+        ['id' => $coursemodule->instance],
+        'id, name, completion_min_cards, completion_min_mastered, completion_all_mastered'
+    );
     if (!$leitbox) {
         return false;
     }
@@ -164,20 +205,21 @@ function leitbox_get_custom_completion_rules() {
  */
 function leitbox_get_completion_active_rule_descriptions($course, $cm) {
     $rules = [];
-    if (!empty($cm->customdata['customcompletionrules']['completion_min_cards'])) {
-        $rules[] = get_string('completion_min_cards_desc', 'mod_leitbox') . ' ' . $cm->customdata['customcompletionrules']['completion_min_cards'];
+    $customrules = $cm->customdata['customcompletionrules'] ?? [];
+    if (!empty($customrules['completion_min_cards'])) {
+        $rules[] = get_string('completion_min_cards_desc', 'mod_leitbox') . ' ' .
+            $customrules['completion_min_cards'];
     }
-    if (!empty($cm->customdata['customcompletionrules']['completion_min_mastered'])) {
-        $rules[] = get_string('completion_min_mastered_desc', 'mod_leitbox') . ' ' . $cm->customdata['customcompletionrules']['completion_min_mastered'];
+    if (!empty($customrules['completion_min_mastered'])) {
+        $rules[] = get_string('completion_min_mastered_desc', 'mod_leitbox') . ' ' .
+            $customrules['completion_min_mastered'];
     }
 
-    if (!empty($cm->customdata['customcompletionrules']['completion_all_mastered'])) {
+    if (!empty($customrules['completion_all_mastered'])) {
         $rules[] = get_string('completion_all_mastered', 'mod_leitbox');
     }
     return $rules;
 }
-
-
 
 /**
  * Extends the settings navigation for the leitbox module.
@@ -200,4 +242,3 @@ function leitbox_extend_settings_navigation(settings_navigation $settings, navig
         );
     }
 }
-

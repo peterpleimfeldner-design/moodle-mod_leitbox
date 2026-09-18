@@ -15,19 +15,35 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Upgrade steps for mod_leitbox.
+ *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Runs the upgrade steps for mod_leitbox.
+ *
+ * @param int $oldversion the version being upgraded from.
+ * @return bool true on success.
+ */
 function xmldb_leitbox_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2026010103) {
         $table = new xmldb_table('leitbox');
-        $field = new xmldb_field('completion_min_mastered', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'completion_min_cards');
+        $field = new xmldb_field(
+            'completion_min_mastered',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'completion_min_cards'
+        );
 
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
@@ -49,7 +65,16 @@ function xmldb_leitbox_upgrade($oldversion) {
 
     if ($oldversion < 2026030100) {
         $table = new xmldb_table('leitbox');
-        $field = new xmldb_field('completion_all_mastered', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'completion_min_mastered');
+        $field = new xmldb_field(
+            'completion_all_mastered',
+            XMLDB_TYPE_INTEGER,
+            '2',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'completion_min_mastered'
+        );
 
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
@@ -60,4 +85,3 @@ function xmldb_leitbox_upgrade($oldversion) {
 
     return true;
 }
-

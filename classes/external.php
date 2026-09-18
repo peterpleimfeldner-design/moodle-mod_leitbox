@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * External web service functions for mod_leitbox.
+ *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,21 +33,34 @@ use external_value;
 use external_single_structure;
 use external_multiple_structure;
 
+/**
+ * External web service functions for the LeitBox Vue frontend.
+ */
 class external extends external_api {
-
+    /**
+     * Parameters for get_box_counts.
+     *
+     * @return external_function_parameters
+     */
     public static function get_box_counts_parameters() {
         return new external_function_parameters([
             'instanceid' => new external_value(PARAM_INT, 'The leitbox instance id'),
         ]);
     }
 
+    /**
+     * Returns the number of cards the current user has in each Leitner box.
+     *
+     * @param int $instanceid The leitbox instance id.
+     * @return array List of {box_number, count} entries.
+     */
     public static function get_box_counts($instanceid) {
         global $DB, $USER;
-        
+
         $params = self::validate_parameters(self::get_box_counts_parameters(), [
             'instanceid' => $instanceid,
         ]);
-        
+
         $cm = get_coursemodule_from_instance('leitbox', $params['instanceid']);
         if (!$cm) {
             throw new \moodle_exception('invalidcoursemodule');
@@ -57,34 +72,39 @@ class external extends external_api {
         $userid = $USER->id;
         $results = [];
 
-        // Box 0: Cards with NO progress entry OR box_number = 0
-        $sql_new = "SELECT COUNT(*) AS cnt
-                      FROM {leitbox_cards} c
-                 LEFT JOIN {leitbox_progress} p ON c.id = p.cardid AND p.userid = :userid
-                     WHERE c.leitboxid = :instanceid
-                       AND (p.id IS NULL OR p.box_number = 0)";
-        $count_new = $DB->count_records_sql($sql_new, ['instanceid' => $params['instanceid'], 'userid' => $userid]);
-        if ($count_new > 0) {
-            $results[] = ['box_number' => 0, 'count' => $count_new];
+        // Box 0: cards with no progress entry or box_number = 0.
+        $sqlnew = "SELECT COUNT(*) AS cnt
+                     FROM {leitbox_cards} c
+                LEFT JOIN {leitbox_progress} p ON c.id = p.cardid AND p.userid = :userid
+                    WHERE c.leitboxid = :instanceid
+                      AND (p.id IS NULL OR p.box_number = 0)";
+        $countnew = $DB->count_records_sql($sqlnew, ['instanceid' => $params['instanceid'], 'userid' => $userid]);
+        if ($countnew > 0) {
+            $results[] = ['box_number' => 0, 'count' => $countnew];
         }
 
-        // Boxes 1-5: Aggregate query
-        $sql_boxes = "SELECT p.box_number, COUNT(*) AS cnt
-                        FROM {leitbox_cards} c
-                        JOIN {leitbox_progress} p ON c.id = p.cardid
-                       WHERE c.leitboxid = :instanceid
-                         AND p.userid   = :userid
-                         AND p.box_number > 0
-                    GROUP BY p.box_number";
-        $box_counts = $DB->get_records_sql($sql_boxes, ['instanceid' => $params['instanceid'], 'userid' => $userid]);
-        
-        foreach ($box_counts as $box_number => $data) {
-            $results[] = ['box_number' => $box_number, 'count' => $data->cnt];
+        // Boxes 1-5: aggregate query.
+        $sqlboxes = "SELECT p.box_number, COUNT(*) AS cnt
+                       FROM {leitbox_cards} c
+                       JOIN {leitbox_progress} p ON c.id = p.cardid
+                      WHERE c.leitboxid = :instanceid
+                        AND p.userid   = :userid
+                        AND p.box_number > 0
+                   GROUP BY p.box_number";
+        $boxcounts = $DB->get_records_sql($sqlboxes, ['instanceid' => $params['instanceid'], 'userid' => $userid]);
+
+        foreach ($boxcounts as $boxnumber => $data) {
+            $results[] = ['box_number' => $boxnumber, 'count' => $data->cnt];
         }
 
         return $results;
     }
 
+    /**
+     * Return structure for get_box_counts.
+     *
+     * @return external_multiple_structure
+     */
     public static function get_box_counts_returns() {
         return new external_multiple_structure(
             new external_single_structure([
@@ -94,6 +114,11 @@ class external extends external_api {
         );
     }
 
+    /**
+     * Parameters for get_cards_by_box.
+     *
+     * @return external_function_parameters
+     */
     public static function get_cards_by_box_parameters() {
         return new external_function_parameters([
             'instanceid' => new external_value(PARAM_INT, 'The leitbox instance id'),
@@ -101,14 +126,21 @@ class external extends external_api {
         ]);
     }
 
+    /**
+     * Returns the cards currently in a given Leitner box for the current user.
+     *
+     * @param int $instanceid The leitbox instance id.
+     * @param int $boxnumber The Leitner box number (0-5).
+     * @return array List of card data arrays.
+     */
     public static function get_cards_by_box($instanceid, $boxnumber) {
         global $DB, $USER;
-        
+
         $params = self::validate_parameters(self::get_cards_by_box_parameters(), [
             'instanceid' => $instanceid,
-            'boxnumber' => $boxnumber
+            'boxnumber' => $boxnumber,
         ]);
-        
+
         $cm = get_coursemodule_from_instance('leitbox', $params['instanceid']);
         if (!$cm) {
             throw new \moodle_exception('invalidcoursemodule');
@@ -124,33 +156,33 @@ class external extends external_api {
 
         $userid = $USER->id;
         $instanceid = $params['instanceid'];
-        
-        // Fetch instance to read cardorder setting
+
+        // Fetch instance to read cardorder setting.
         $leitbox = $DB->get_record('leitbox', ['id' => $instanceid], 'cardorder', MUST_EXIST);
-        $order_by = ($leitbox->cardorder == 1) ? "ORDER BY c.id ASC" : "";
+        $orderby = ($leitbox->cardorder == 1) ? "ORDER BY c.id ASC" : "";
 
         if ($box == 0) {
-            // New cards: box_number = 0 or no progress record yet
+            // New cards: box_number = 0 or no progress record yet.
             $sql = "SELECT c.*
                       FROM {leitbox_cards} c
                  LEFT JOIN {leitbox_progress} p ON c.id = p.cardid AND p.userid = :userid
                      WHERE c.leitboxid = :instanceid
                        AND (p.id IS NULL OR p.box_number = 0)
-                       $order_by";
+                       $orderby";
             $cards = $DB->get_records_sql($sql, ['userid' => $userid, 'instanceid' => $instanceid]);
         } else {
-            // Existing cards in a specific box
+            // Existing cards in a specific box.
             $sql = "SELECT c.*
                       FROM {leitbox_cards} c
                       JOIN {leitbox_progress} p ON c.id = p.cardid
                      WHERE c.leitboxid = :instanceid
                        AND p.userid = :userid
                        AND p.box_number = :boxnumber
-                       $order_by";
+                       $orderby";
             $cards = $DB->get_records_sql($sql, [
-                'userid' => $userid, 
-                'instanceid' => $instanceid, 
-                'boxnumber' => $box
+                'userid' => $userid,
+                'instanceid' => $instanceid,
+                'boxnumber' => $box,
             ]);
         }
 
@@ -159,7 +191,7 @@ class external extends external_api {
             // Resolve language-neutral demo card markers (e.g. ##demo_q1##) to
             // the user's current Moodle language. This allows demo cards to be
             // multilingual even though they are stored as plain keys in the DB.
-            $resolve = function($text) {
+            $resolve = function ($text) {
                 if (preg_match('/^##(demo_[a-z0-9]+)##$/', $text, $m)) {
                     return get_string($m[1], 'mod_leitbox');
                 }
@@ -174,18 +206,19 @@ class external extends external_api {
             ];
         }
 
-        // Apply random shuffle if cardorder is 0 (Random)
+        // Apply random shuffle if cardorder is 0 (random).
         if ($leitbox->cardorder == 0) {
             shuffle($result);
         }
 
-        // Always force the very first tutorial demo card to be strictly the first card if it's in this set
+        // Always force the very first tutorial demo card to be strictly the
+        // first card if it's in this set.
         foreach ($result as $index => $c) {
             if ($c['category'] === 'demo') {
-                // Move it to the very front of the array
-                $demo_card = $result[$index];
+                // Move it to the very front of the array.
+                $democard = $result[$index];
                 unset($result[$index]);
-                array_unshift($result, $demo_card);
+                array_unshift($result, $democard);
                 break;
             }
         }
@@ -193,6 +226,11 @@ class external extends external_api {
         return array_values($result);
     }
 
+    /**
+     * Return structure for get_cards_by_box.
+     *
+     * @return external_multiple_structure
+     */
     public static function get_cards_by_box_returns() {
         return new external_multiple_structure(
             new external_single_structure([
@@ -205,6 +243,11 @@ class external extends external_api {
         );
     }
 
+    /**
+     * Parameters for submit_answer.
+     *
+     * @return external_function_parameters
+     */
     public static function submit_answer_parameters() {
         return new external_function_parameters([
             'cardid' => new external_value(PARAM_INT, 'The card ID'),
@@ -212,24 +255,31 @@ class external extends external_api {
         ]);
     }
 
+    /**
+     * Records the current user's rating for a card and updates its Leitner box.
+     *
+     * @param int $cardid The card id.
+     * @param int $rating 0=Red, 1=Yellow, 2=Green.
+     * @return array {success, new_box}.
+     */
     public static function submit_answer($cardid, $rating) {
         global $DB, $USER;
 
         $params = self::validate_parameters(self::submit_answer_parameters(), [
             'cardid' => $cardid,
-            'rating' => $rating
+            'rating' => $rating,
         ]);
 
         // Security check: get card and ensure it exists and user can access its module.
         $card = $DB->get_record('leitbox_cards', ['id' => $params['cardid']], '*', MUST_EXIST);
         $leitbox = $DB->get_record('leitbox', ['id' => $card->leitboxid], '*', MUST_EXIST);
         $course = $DB->get_record('course', ['id' => $leitbox->course], '*', MUST_EXIST);
-        
-        // get_coursemodule_from_instance() returns the CM-ID.
-        // get_fast_modinfo()->get_cm() requires CM-ID (not Instance-ID!).
-        $cm_raw = get_coursemodule_from_instance('leitbox', $leitbox->id, $course->id, false, MUST_EXIST);
+
+        // Note: get_coursemodule_from_instance() returns the CM-ID, while
+        // get_fast_modinfo()->get_cm() requires the CM-ID (not the instance ID).
+        $cmraw = get_coursemodule_from_instance('leitbox', $leitbox->id, $course->id, false, MUST_EXIST);
         $modinfo = get_fast_modinfo($course);
-        $cm = $modinfo->get_cm($cm_raw->id); // cm_info object with customdata
+        $cm = $modinfo->get_cm($cmraw->id); // The cm_info object with customdata.
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
         require_capability('mod/leitbox:view', $context);
@@ -240,7 +290,7 @@ class external extends external_api {
 
         $userid = $USER->id;
         $progress = $DB->get_record('leitbox_progress', ['userid' => $userid, 'cardid' => $card->id]);
-        
+
         $now = time();
 
         if (!$progress) {
@@ -257,25 +307,26 @@ class external extends external_api {
             $progress->last_reviewed = $now;
         }
 
-        if ($params['rating'] == 2) { // Green
+        if ($params['rating'] == 2) {
+            // Green: card advances one box.
             $progress->count_correct++;
             if ($progress->box_number < 5) {
                 $progress->box_number++;
             }
-        } elseif ($params['rating'] == 1) { // Yellow
-            // Stays in current box, just updates timestamp
-        } else { // Red
+        } else if ($params['rating'] != 1) {
+            // Red: card falls back one box, minimum box 1.
             $progress->count_wrong++;
             if ($progress->box_number > 1) {
-                $progress->box_number--; // Go back one box
+                $progress->box_number--;
             } else {
-                $progress->box_number = 1; // Stay in box 1 as minimum
+                $progress->box_number = 1;
             }
         }
+        // Yellow (rating == 1): stays in the current box, timestamp updated above.
 
         $DB->update_record('leitbox_progress', $progress);
 
-        // Trigger Moodle's completion API to re-evaluate conditions
+        // Trigger Moodle's completion API to re-evaluate conditions.
         $completion = new \completion_info($course);
         if ($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
             $completion->update_state($cm, COMPLETION_UNKNOWN, $userid);
@@ -283,10 +334,15 @@ class external extends external_api {
 
         return [
             'success' => true,
-            'new_box' => $progress->box_number
+            'new_box' => $progress->box_number,
         ];
     }
 
+    /**
+     * Return structure for submit_answer.
+     *
+     * @return external_single_structure
+     */
     public static function submit_answer_returns() {
         return new external_single_structure([
             'success' => new external_value(PARAM_BOOL, 'Success indicator'),
@@ -294,12 +350,23 @@ class external extends external_api {
         ]);
     }
 
+    /**
+     * Parameters for reset_progress.
+     *
+     * @return external_function_parameters
+     */
     public static function reset_progress_parameters() {
         return new external_function_parameters([
             'instanceid' => new external_value(PARAM_INT, 'The leitbox instance id'),
         ]);
     }
 
+    /**
+     * Resets all of the current user's learning progress for a leitbox instance.
+     *
+     * @param int $instanceid The leitbox instance id.
+     * @return array {success, reset_count}.
+     */
     public static function reset_progress($instanceid) {
         global $DB, $USER;
 
@@ -309,10 +376,10 @@ class external extends external_api {
 
         $leitbox = $DB->get_record('leitbox', ['id' => $params['instanceid']], '*', MUST_EXIST);
         $course = $DB->get_record('course', ['id' => $leitbox->course], '*', MUST_EXIST);
-        
-        $cm_raw = get_coursemodule_from_instance('leitbox', $params['instanceid'], $course->id, false, MUST_EXIST);
+
+        $cmraw = get_coursemodule_from_instance('leitbox', $params['instanceid'], $course->id, false, MUST_EXIST);
         $modinfo = get_fast_modinfo($course);
-        $cm = $modinfo->get_cm($cm_raw->id); // cm_info object with customdata
+        $cm = $modinfo->get_cm($cmraw->id); // The cm_info object with customdata.
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
         require_capability('mod/leitbox:view', $context);
@@ -321,12 +388,12 @@ class external extends external_api {
         $cardids = $DB->get_fieldset_select('leitbox_cards', 'id', 'leitboxid = ?', [$params['instanceid']]);
 
         if (!empty($cardids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($cardids);
+            [$insql, $inparams] = $DB->get_in_or_equal($cardids);
             $inparams[] = $USER->id;
             $DB->delete_records_select('leitbox_progress', "cardid $insql AND userid = ?", $inparams);
         }
 
-        // Ensure completion triggers also run for progress resets
+        // Ensure completion triggers also run for progress resets.
         $completion = new \completion_info($course);
         if ($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
             $completion->update_state($cm, COMPLETION_UNKNOWN, $USER->id);
@@ -335,10 +402,15 @@ class external extends external_api {
         return ['success' => true, 'reset_count' => count($cardids)];
     }
 
+    /**
+     * Return structure for reset_progress.
+     *
+     * @return external_single_structure
+     */
     public static function reset_progress_returns() {
         return new external_single_structure([
             'success'     => new external_value(PARAM_BOOL, 'Success indicator'),
-            'reset_count' => new external_value(PARAM_INT,  'Number of cards reset'),
+            'reset_count' => new external_value(PARAM_INT, 'Number of cards reset'),
         ]);
     }
 }

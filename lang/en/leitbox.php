@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * English language strings for mod_leitbox.
+ *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -57,7 +59,7 @@ $string['question'] = 'Question';
 $string['answer'] = 'Answer';
 $string['hint'] = 'Hint';
 
-// Progress bar
+// Progress bar.
 $string['progress_label'] = 'cards at Expert level';
 $string['progress_aria'] = 'Progress: {mastered} of {total} cards mastered';
 
@@ -72,7 +74,7 @@ $string['privacy:metadata:leitbox_progress:count_correct'] = 'The number of time
 $string['privacy:metadata:leitbox_progress:count_wrong'] = 'The number of times the user answered the card incorrectly.';
 $string['privacy:metadata:leitbox_progress:last_reviewed'] = 'The timestamp when the card was last reviewed.';
 
-// Management Interface
+// Management interface.
 $string['demo_q1'] = 'Welcome to LeitBox.<br><br>What is the goal of this learning system?';
 $string['demo_a1'] = 'The goal is to move all flashcards to the final deck ("Expert") by answering them correctly.<br><br>The system uses the method of <b>spaced repetition</b> for this purpose.';
 $string['demo_h1'] = 'Think about how you remember things best long-term.';
@@ -117,8 +119,8 @@ $string['prompt_type_cloze'] = 'Fill-in-the-blank';
 $string['prompt_type_jeopardy'] = 'Jeopardy (Answer-Question)';
 $string['prompt_type_transfer'] = 'Transfer & Everyday Context';
 
-$string['prompt_template_standard'] = 'Create flashcards from the following text for studying. 
-Format each card EXACTLY like this, with no markdown (no asterisks, no hashes), and separate all cards with ===CARD===. 
+$string['prompt_template_standard'] = 'Create flashcards from the following text for studying.
+Format each card EXACTLY like this, with no markdown (no asterisks, no hashes), and separate all cards with ===CARD===.
 Do not write an introduction, only the pure text code.
 
 Example of the requested output format:
@@ -133,8 +135,8 @@ A: Albert Einstein
 
 Here is the text you should create the cards from:';
 
-$string['prompt_template_tf'] = 'Create True/False flashcards from the following text for studying. 
-Format each card EXACTLY like this, with no markdown, and separate all cards with ===CARD===. 
+$string['prompt_template_tf'] = 'Create True/False flashcards from the following text for studying.
+Format each card EXACTLY like this, with no markdown, and separate all cards with ===CARD===.
 Do not write an introduction, only the pure text code.
 
 Example of the requested output format:
@@ -149,8 +151,8 @@ A: False.
 
 Here is the text you should create the cards from:';
 
-$string['prompt_template_vocab'] = 'Extract the most important vocabulary or terms from the following text and create flashcards for studying. 
-Format each card EXACTLY like this, with no markdown, and separate all cards with ===CARD===. 
+$string['prompt_template_vocab'] = 'Extract the most important vocabulary or terms from the following text and create flashcards for studying.
+Format each card EXACTLY like this, with no markdown, and separate all cards with ===CARD===.
 Do not write an introduction, only the pure text code.
 
 Example of the requested output format:
@@ -165,7 +167,7 @@ A: Cell nucleus division
 
 Here is the text you should create the cards from:';
 
-$string['prompt_template_cloze'] = 'Create fill-in-the-blank flashcards from the following text for studying. 
+$string['prompt_template_cloze'] = 'Create fill-in-the-blank flashcards from the following text for studying.
 Format each card EXACTLY like this, with no markdown, and separate all cards with ===CARD===. The blank in the question is marked with [...], the required answer goes into the A field.
 Do not write an introduction, only the pure text code.
 
@@ -181,9 +183,9 @@ A: Theory of Relativity
 
 Here is the text you should create the cards from:';
 
-$string['prompt_template_jeopardy'] = 'Create Jeopardy-style flashcards based on the following topic or text for studying. 
+$string['prompt_template_jeopardy'] = 'Create Jeopardy-style flashcards based on the following topic or text for studying.
 The question (Q) describes an effect, term, or phenomenon, and the answer (A) must strictly be formulated as a counter-question (e.g., "What is...?").
-Format each card EXACTLY like this, with no markdown, and separate all cards with ===CARD===. 
+Format each card EXACTLY like this, with no markdown, and separate all cards with ===CARD===.
 Do not write an introduction, only the pure text code.
 
 Example of the requested output format:
@@ -198,9 +200,9 @@ A: What is Glucose?
 
 Here is the text you should create the cards from:';
 
-$string['prompt_template_transfer'] = 'Create flashcards based on the following topic or text focusing on transfer of learning and everyday context. 
+$string['prompt_template_transfer'] = 'Create flashcards based on the following topic or text focusing on transfer of learning and everyday context.
 The questions should encourage out-of-the-box thinking (why-questions, what-if scenarios).
-Format each card EXACTLY like this, with no markdown, and separate all cards with ===CARD===. 
+Format each card EXACTLY like this, with no markdown, and separate all cards with ===CARD===.
 Do not write an introduction, only the pure text code.
 
 Example of the requested output format:
@@ -224,7 +226,7 @@ $string['import_placeholder'] = 'Paste your formatted card text here (see prompt
 $string['frontendnotfound'] = 'The LeitBox frontend application could not be found. Please contact your site administrator.';
 $string['close'] = 'Close';
 
-// Vue Frontend App Strings
+// Vue frontend app strings.
 $string['dashboardtitle'] = 'Your LeitBox Cards';
 $string['dashboardsbtitle'] = 'Select a learning deck to practice';
 $string['howitworks'] = 'How does this work?';

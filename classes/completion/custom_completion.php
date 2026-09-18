@@ -24,8 +24,6 @@
 
 namespace mod_leitbox\completion;
 
-defined('MOODLE_INTERNAL') || die();
-
 use core_completion\activity_custom_completion;
 
 /**
@@ -45,7 +43,6 @@ use core_completion\activity_custom_completion;
  * 3. If ALL active rules return COMPLETION_COMPLETE, the activity is complete.
  */
 class custom_completion extends activity_custom_completion {
-
     /**
      * Fetches the list of custom completion rule names that this module defines.
      * This is the full list of possible rules — not which are active per instance.
@@ -112,7 +109,7 @@ class custom_completion extends activity_custom_completion {
             if (empty($customrules['completion_min_mastered'])) {
                 return COMPLETION_COMPLETE;
             }
-            
+
             $target = (int)$customrules['completion_min_mastered'];
             $sql = "SELECT COUNT(DISTINCT cardid)
                       FROM {leitbox_progress}
@@ -132,12 +129,12 @@ class custom_completion extends activity_custom_completion {
             if (empty($customrules['completion_all_mastered'])) {
                 return COMPLETION_COMPLETE;
             }
-            
+
             $total = (int)$DB->count_records('leitbox_cards', ['leitboxid' => $instanceid]);
             if ($total === 0) {
                 return COMPLETION_INCOMPLETE; // No cards exist yet.
             }
-            
+
             $sql = "SELECT COUNT(DISTINCT p.cardid)
                       FROM {leitbox_progress} p
                       JOIN {leitbox_cards} c ON p.cardid = c.id

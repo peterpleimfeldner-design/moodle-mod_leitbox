@@ -15,35 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Version details for mod_leitbox.
+ *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
- * @contact   leitbox.moodle@gmail.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * VERSIONING RULES (For Developers / AI Tooling):
- * This plugin uses Semantic Versioning (MAJOR.MINOR.PATCH):
- * 
- * - MAJOR (e.g., 1.0.0 -> 2.0.0): 
- *   Use for deep architectural changes, replacing frameworks, or formally 
- *   dropping compatibility with older Moodle versions.
- *
- * - MINOR (e.g., 1.4.0 -> 1.5.0): 
- *   Use for new features, new settings in the Moodle form (e.g., completion conditions), 
- *   or structural database updates (XMLDB).
- *
- * - PATCH (e.g., 1.4.0 -> 1.4.1): 
- *   Use strictly for bugfixes, language string corrections, minor CSS tweaks, 
- *   or anything that carries zero architectural risk.
- *
- * EVERY release must be officially block-documented in CHANGELOG.md!
- */
+// Versioning rules: this plugin uses Semantic Versioning (MAJOR.MINOR.PATCH).
+// - MAJOR (e.g. 1.0.0 -> 2.0.0): deep architectural changes, replacing
+// frameworks, or formally dropping compatibility with older Moodle versions.
+// - MINOR (e.g. 1.4.0 -> 1.5.0): new features, new settings in the Moodle
+// form (e.g. completion conditions), or structural database updates (XMLDB).
+// - PATCH (e.g. 1.4.0 -> 1.4.1): bugfixes, language string corrections, minor
+// CSS tweaks, or anything that carries zero architectural risk.
+// Every release must be documented in CHANGELOG.md.
 
 $plugin->version   = 2026091800; // The current module version (Date: YYYYMMDDXX).
 $plugin->requires  = 2022112800; // Requires Moodle 4.1 (LTS).
 $plugin->component = 'mod_leitbox'; // Full name of the plugin (used for diagnostics).
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->release   = '1.5.13';
-

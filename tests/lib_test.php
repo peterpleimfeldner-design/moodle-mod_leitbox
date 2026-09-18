@@ -31,8 +31,7 @@ require_once($CFG->dirroot . '/mod/leitbox/lib.php');
 /**
  * Library unit tests for mod_leitbox.
  */
-class mod_leitbox_lib_testcase extends advanced_testcase {
-
+class lib_test extends advanced_testcase {
     public function setUp(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -45,7 +44,7 @@ class mod_leitbox_lib_testcase extends advanced_testcase {
         global $DB;
 
         $course = $this->getDataGenerator()->create_course();
-        
+
         // 1. Test Add
         $leitbox = new \stdClass();
         $leitbox->course = $course->id;
@@ -53,13 +52,13 @@ class mod_leitbox_lib_testcase extends advanced_testcase {
         $leitbox->intro = 'Intro text';
         $leitbox->introformat = FORMAT_HTML;
         $leitbox->cardorder = 0;
-        
+
         $module = $this->getDataGenerator()->create_module('leitbox', (array)$leitbox);
         $this->assertNotEmpty($module->id);
 
         // Verify demo cards were created by our custom add_instance logic.
         $cardcount = $DB->count_records('leitbox_cards', ['leitboxid' => $module->id]);
-        $this->assertEquals(5, $cardcount); // add_instance inserts 5 demo cards
+        $this->assertEquals(5, $cardcount); // Add_instance inserts 5 demo cards.
 
         // 2. Test Update
         $module->name = 'Updated LeitBox Name';
@@ -76,9 +75,9 @@ class mod_leitbox_lib_testcase extends advanced_testcase {
 
         $deleted = $DB->get_record('leitbox', ['id' => $module->id]);
         $this->assertFalse($deleted);
-        
-        // Cards should also be deleted
-        $cardcount_after = $DB->count_records('leitbox_cards', ['leitboxid' => $module->id]);
-        $this->assertEquals(0, $cardcount_after);
+
+        // Cards should also be deleted.
+        $cardcountafter = $DB->count_records('leitbox_cards', ['leitboxid' => $module->id]);
+        $this->assertEquals(0, $cardcountafter);
     }
 }

@@ -15,14 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Web service function definitions for mod_leitbox.
+ *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
-$functions = array(
-    'mod_leitbox_get_box_counts' => array(
+$functions = [
+    'mod_leitbox_get_box_counts' => [
         'classname' => 'mod_leitbox\external',
         'methodname' => 'get_box_counts',
         'classpath' => 'mod/leitbox/classes/external.php',
@@ -30,8 +32,8 @@ $functions = array(
         'type' => 'read',
         'ajax' => true,
         'capabilities' => 'mod/leitbox:view',
-    ),
-    'mod_leitbox_get_cards_by_box' => array(
+    ],
+    'mod_leitbox_get_cards_by_box' => [
         'classname' => 'mod_leitbox\external',
         'methodname' => 'get_cards_by_box',
         'classpath' => 'mod/leitbox/classes/external.php',
@@ -39,8 +41,8 @@ $functions = array(
         'type' => 'read',
         'ajax' => true,
         'capabilities' => 'mod/leitbox:view',
-    ),
-    'mod_leitbox_submit_answer' => array(
+    ],
+    'mod_leitbox_submit_answer' => [
         'classname' => 'mod_leitbox\external',
         'methodname' => 'submit_answer',
         'classpath' => 'mod/leitbox/classes/external.php',
@@ -48,8 +50,8 @@ $functions = array(
         'type' => 'write',
         'ajax' => true,
         'capabilities' => 'mod/leitbox:view',
-    ),
-    'mod_leitbox_reset_progress' => array(
+    ],
+    'mod_leitbox_reset_progress' => [
         'classname' => 'mod_leitbox\external',
         'methodname' => 'reset_progress',
         'classpath' => 'mod/leitbox/classes/external.php',
@@ -57,5 +59,5 @@ $functions = array(
         'type' => 'write',
         'ajax' => true,
         'capabilities' => 'mod/leitbox:view',
-    ),
-);
+    ],
+];

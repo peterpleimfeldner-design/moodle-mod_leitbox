@@ -15,16 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * The main mod_leitbox configuration form.
+ *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
+/**
+ * Module instance settings form for mod_leitbox.
+ */
 class mod_leitbox_mod_form extends moodleform_mod {
-
+    /**
+     * Defines the elements of the settings form.
+     */
     public function definition() {
         global $CFG;
 
@@ -32,7 +39,7 @@ class mod_leitbox_mod_form extends moodleform_mod {
 
         // General section.
         $mform->addElement('header', 'general', get_string('general', 'form'));
-        
+
         $mform->addElement('text', 'name', get_string('leitboxname', 'mod_leitbox'), ['size' => '64']);
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
@@ -74,58 +81,79 @@ class mod_leitbox_mod_form extends moodleform_mod {
         // multiple instances of the same activity appear on one page.
         $suffix = $this->get_suffix();
 
-        // ----------------------------------------------------------------
-        // Rule 1: Minimum number of unique cards practiced
-        // ----------------------------------------------------------------
-        $group1_name   = 'completion_min_cards_group' . $suffix;
-        $enabled1_name = 'completion_min_cards_enabled' . $suffix;
-        $value1_name   = 'completion_min_cards' . $suffix;
+        // Rule 1: minimum number of unique cards practiced.
+        $group1name   = 'completion_min_cards_group' . $suffix;
+        $enabled1name = 'completion_min_cards_enabled' . $suffix;
+        $value1name   = 'completion_min_cards' . $suffix;
 
         $group1 = [];
-        $group1[] = $mform->createElement('checkbox', $enabled1_name, '',
-            get_string('completion_min_cards_desc', 'mod_leitbox'));
-        $group1[] = $mform->createElement('text', $value1_name, '', ['size' => 3]);
-        $mform->setType($value1_name, PARAM_INT);
+        $group1[] = $mform->createElement(
+            'checkbox',
+            $enabled1name,
+            '',
+            get_string('completion_min_cards_desc', 'mod_leitbox')
+        );
+        $group1[] = $mform->createElement('text', $value1name, '', ['size' => 3]);
+        $mform->setType($value1name, PARAM_INT);
 
-        $mform->addGroup($group1, $group1_name,
-            get_string('completion_min_cards', 'mod_leitbox'), [' '], false);
-        $mform->addHelpButton($group1_name, 'completion_min_cards', 'mod_leitbox');
-        $mform->hideIf($value1_name, $enabled1_name, 'notchecked');
+        $mform->addGroup(
+            $group1,
+            $group1name,
+            get_string('completion_min_cards', 'mod_leitbox'),
+            [' '],
+            false
+        );
+        $mform->addHelpButton($group1name, 'completion_min_cards', 'mod_leitbox');
+        $mform->hideIf($value1name, $enabled1name, 'notchecked');
 
-        // ----------------------------------------------------------------
-        // Rule 2: Minimum number of cards mastered (reached Box 5)
-        // ----------------------------------------------------------------
-        $group2_name   = 'completion_min_mastered_group' . $suffix;
-        $enabled2_name = 'completion_min_mastered_enabled' . $suffix;
-        $value2_name   = 'completion_min_mastered' . $suffix;
+        // Rule 2: minimum number of cards mastered (reached Box 5).
+        $group2name   = 'completion_min_mastered_group' . $suffix;
+        $enabled2name = 'completion_min_mastered_enabled' . $suffix;
+        $value2name   = 'completion_min_mastered' . $suffix;
 
         $group2 = [];
-        $group2[] = $mform->createElement('checkbox', $enabled2_name, '',
-            get_string('completion_min_mastered_desc', 'mod_leitbox'));
-        $group2[] = $mform->createElement('text', $value2_name, '', ['size' => 3]);
-        $mform->setType($value2_name, PARAM_INT);
+        $group2[] = $mform->createElement(
+            'checkbox',
+            $enabled2name,
+            '',
+            get_string('completion_min_mastered_desc', 'mod_leitbox')
+        );
+        $group2[] = $mform->createElement('text', $value2name, '', ['size' => 3]);
+        $mform->setType($value2name, PARAM_INT);
 
-        $mform->addGroup($group2, $group2_name,
-            get_string('completion_min_mastered', 'mod_leitbox'), [' '], false);
-        $mform->addHelpButton($group2_name, 'completion_min_mastered', 'mod_leitbox');
-        $mform->hideIf($value2_name, $enabled2_name, 'notchecked');
+        $mform->addGroup(
+            $group2,
+            $group2name,
+            get_string('completion_min_mastered', 'mod_leitbox'),
+            [' '],
+            false
+        );
+        $mform->addHelpButton($group2name, 'completion_min_mastered', 'mod_leitbox');
+        $mform->hideIf($value2name, $enabled2name, 'notchecked');
 
-        // ----------------------------------------------------------------
-        // Rule 3: ALL cards must be mastered (Box 5)
-        // Use addGroup (like Rules 1 & 2) so the help icon renders on the left.
-        // ----------------------------------------------------------------
-        $all_group_name = 'completion_all_mastered_group' . $suffix;
-        $all_name       = 'completion_all_mastered' . $suffix;
+        // Rule 3: all cards must be mastered (Box 5). Use addGroup (like
+        // rules 1 & 2) so the help icon renders on the left.
+        $allgroupname = 'completion_all_mastered_group' . $suffix;
+        $allname      = 'completion_all_mastered' . $suffix;
 
         $group3 = [];
-        $group3[] = $mform->createElement('checkbox', $all_name, '',
-            get_string('completion_all_mastered_desc', 'mod_leitbox'));
+        $group3[] = $mform->createElement(
+            'checkbox',
+            $allname,
+            '',
+            get_string('completion_all_mastered_desc', 'mod_leitbox')
+        );
 
-        $mform->addGroup($group3, $all_group_name,
-            get_string('completion_all_mastered', 'mod_leitbox'), [' '], false);
-        $mform->addHelpButton($all_group_name, 'completion_all_mastered', 'mod_leitbox');
+        $mform->addGroup(
+            $group3,
+            $allgroupname,
+            get_string('completion_all_mastered', 'mod_leitbox'),
+            [' '],
+            false
+        );
+        $mform->addHelpButton($allgroupname, 'completion_all_mastered', 'mod_leitbox');
 
-        return [$group1_name, $group2_name, $all_group_name];
+        return [$group1name, $group2name, $allgroupname];
     }
 
     /**
@@ -140,13 +168,13 @@ class mod_leitbox_mod_form extends moodleform_mod {
     public function completion_rule_enabled($data) {
         $suffix = $this->get_suffix();
 
-        $min_cards_on   = !empty($data['completion_min_cards_enabled' . $suffix])
+        $mincardson   = !empty($data['completion_min_cards_enabled' . $suffix])
                           && (int)($data['completion_min_cards' . $suffix] ?? 0) > 0;
-        $min_mastered_on = !empty($data['completion_min_mastered_enabled' . $suffix])
+        $minmasteredon = !empty($data['completion_min_mastered_enabled' . $suffix])
                            && (int)($data['completion_min_mastered' . $suffix] ?? 0) > 0;
-        $all_mastered_on = !empty($data['completion_all_mastered' . $suffix]);
+        $allmasteredon = !empty($data['completion_all_mastered' . $suffix]);
 
-        return $min_cards_on || $min_mastered_on || $all_mastered_on;
+        return $mincardson || $minmasteredon || $allmasteredon;
     }
 
     /**
@@ -156,38 +184,38 @@ class mod_leitbox_mod_form extends moodleform_mod {
      * corresponding DB field has a non-zero value, so the UI correctly
      * reflects the saved state.
      *
-     * @param array $default_values Reference to the array of default values.
+     * @param array $defaultvalues Reference to the array of default values.
      */
-    public function data_preprocessing(&$default_values) {
-        parent::data_preprocessing($default_values);
+    public function data_preprocessing(&$defaultvalues) {
+        parent::data_preprocessing($defaultvalues);
         $suffix = $this->get_suffix();
 
-        // Rule 1: completion_min_cards
-        $key_val     = 'completion_min_cards' . $suffix;
-        $key_enabled = 'completion_min_cards_enabled' . $suffix;
+        // Rule 1: completion_min_cards.
+        $keyval     = 'completion_min_cards' . $suffix;
+        $keyenabled = 'completion_min_cards_enabled' . $suffix;
 
-        if (!empty($default_values[$key_val])) {
-            $default_values[$key_enabled] = 1;
+        if (!empty($defaultvalues[$keyval])) {
+            $defaultvalues[$keyenabled] = 1;
         } else {
-            $default_values[$key_val]     = 10; // Sensible default shown in the field.
-            $default_values[$key_enabled] = 0;
+            $defaultvalues[$keyval]     = 10; // Sensible default shown in the field.
+            $defaultvalues[$keyenabled] = 0;
         }
 
-        // Rule 2: completion_min_mastered
-        $key_val2     = 'completion_min_mastered' . $suffix;
-        $key_enabled2 = 'completion_min_mastered_enabled' . $suffix;
+        // Rule 2: completion_min_mastered.
+        $keyval2     = 'completion_min_mastered' . $suffix;
+        $keyenabled2 = 'completion_min_mastered_enabled' . $suffix;
 
-        if (!empty($default_values[$key_val2])) {
-            $default_values[$key_enabled2] = 1;
+        if (!empty($defaultvalues[$keyval2])) {
+            $defaultvalues[$keyenabled2] = 1;
         } else {
-            $default_values[$key_val2]     = 0;
-            $default_values[$key_enabled2] = 0;
+            $defaultvalues[$keyval2]     = 0;
+            $defaultvalues[$keyenabled2] = 0;
         }
 
-        // Rule 3: completion_all_mastered — nothing special needed; the
+        // Rule 3: completion_all_mastered - nothing special needed; the
         // checkbox value comes straight from the DB field.
-        if (!isset($default_values['completion_all_mastered' . $suffix])) {
-            $default_values['completion_all_mastered' . $suffix] = 0;
+        if (!isset($defaultvalues['completion_all_mastered' . $suffix])) {
+            $defaultvalues['completion_all_mastered' . $suffix] = 0;
         }
     }
 

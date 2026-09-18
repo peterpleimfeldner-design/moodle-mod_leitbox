@@ -17,13 +17,14 @@
 /**
  * Manage cards page for mod_leitbox.
  *
- * Refactored to use Moodle Output API (render_from_template),
- * Mustache templates, and AMD JavaScript modules.
+ * Uses the Moodle Output API (render_from_template), Mustache templates,
+ * and an AMD JavaScript module.
  *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once('../../config.php');
 require_once(__DIR__ . '/lib.php');
 
@@ -31,7 +32,7 @@ $id     = required_param('id', PARAM_INT);
 $action = optional_param('action', '', PARAM_ALPHA);
 $cardid = optional_param('cardid', 0, PARAM_INT);
 
-list($course, $cm) = get_course_and_cm_from_cmid($id, 'leitbox');
+[$course, $cm] = get_course_and_cm_from_cmid($id, 'leitbox');
 $leitbox = $DB->get_record('leitbox', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course, true, $cm);
@@ -43,111 +44,91 @@ $PAGE->set_title(format_string($leitbox->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 
-/**
- * Automatically cleans up the 5 tutorial demo cards when the teacher adds their first custom card.
- *
- * @param int $leitboxid The leitbox instance ID.
- */
-function mod_leitbox_auto_delete_demos($leitboxid) {
-    global $DB;
-    // Only auto-delete if NO custom (non-demo) cards exist yet.
-    $custom_count = $DB->count_records_select(
-        'leitbox_cards',
-        "leitboxid = ? AND (category IS NULL OR category != 'demo')",
-        [$leitboxid]
-    );
-    if ($custom_count > 0) {
-        return; // Custom cards already exist, don't touch anything.
-    }
-    // Delete all remaining demo cards and their progress.
-    $demo_ids = $DB->get_fieldset_select(
-        'leitbox_cards', 'id',
-        "leitboxid = ? AND category = 'demo'",
-        [$leitboxid]
-    );
-    if (!empty($demo_ids)) {
-        list($in, $params) = $DB->get_in_or_equal($demo_ids);
-        $DB->delete_records_select('leitbox_progress', "cardid $in", $params);
-        $DB->delete_records_select('leitbox_cards', "id $in", $params);
-    }
-}
-
-// =========================================================
-// Action processing (data changes only, no HTML output yet)
-// =========================================================
+// Action processing (data changes only, no HTML output yet).
 
 if ($action === 'delete' && $cardid && confirm_sesskey()) {
     $DB->delete_records('leitbox_progress', ['cardid' => $cardid]);
     $DB->delete_records('leitbox_cards', ['id' => $cardid, 'leitboxid' => $leitbox->id]);
-    redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
-        get_string('carddeleted', 'mod_leitbox'));
+    redirect(
+        new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
+        get_string('carddeleted', 'mod_leitbox')
+    );
 }
 
 if ($action === 'bulkdelete' && data_submitted() && confirm_sesskey()) {
     $cardids      = optional_param_array('cardids', [], PARAM_INT);
-    $deleted_count = 0;
+    $deletedcount = 0;
 
     if (!empty($cardids)) {
-        list($in, $params) = $DB->get_in_or_equal($cardids);
-        $params[]    = $leitbox->id;
-        $valid_cards = $DB->get_fieldset_sql(
-            "SELECT id FROM {leitbox_cards} WHERE id $in AND leitboxid = ?", $params);
+        [$in, $params] = $DB->get_in_or_equal($cardids);
+        $params[]  = $leitbox->id;
+        $validcards = $DB->get_fieldset_sql(
+            "SELECT id FROM {leitbox_cards} WHERE id $in AND leitboxid = ?",
+            $params
+        );
 
-        if (!empty($valid_cards)) {
-            $deleted_count = count($valid_cards);
-            list($in_valid, $params_valid) = $DB->get_in_or_equal($valid_cards);
-            $DB->delete_records_select('leitbox_progress', "cardid $in_valid", $params_valid);
-            $DB->delete_records_select('leitbox_cards', "id $in_valid", $params_valid);
+        if (!empty($validcards)) {
+            $deletedcount = count($validcards);
+            [$invalid, $paramsvalid] = $DB->get_in_or_equal($validcards);
+            $DB->delete_records_select('leitbox_progress', "cardid $invalid", $paramsvalid);
+            $DB->delete_records_select('leitbox_cards', "id $invalid", $paramsvalid);
         }
     }
 
-    if ($deleted_count > 0) {
-        redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
-            get_string('cardsdeleted', 'mod_leitbox', $deleted_count));
+    if ($deletedcount > 0) {
+        redirect(
+            new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
+            get_string('cardsdeleted', 'mod_leitbox', $deletedcount)
+        );
     } else {
         redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]));
     }
 }
 
 if ($action === 'export' && confirm_sesskey()) {
-    $cards          = $DB->get_records('leitbox_cards', ['leitboxid' => $leitbox->id], 'id ASC');
-    $export_content = "";
+    $cards         = $DB->get_records('leitbox_cards', ['leitboxid' => $leitbox->id], 'id ASC');
+    $exportcontent = "";
     foreach ($cards as $c) {
-        $export_content .= "===CARD===\n";
-        $export_content .= "Q: " . $c->question . "\n";
-        $export_content .= "A: " . $c->answer . "\n";
+        $exportcontent .= "===CARD===\n";
+        $exportcontent .= "Q: " . $c->question . "\n";
+        $exportcontent .= "A: " . $c->answer . "\n";
         if (!empty($c->hint)) {
-            $export_content .= "H: " . $c->hint . "\n";
+            $exportcontent .= "H: " . $c->hint . "\n";
         }
-        $export_content .= "\n";
+        $exportcontent .= "\n";
     }
     $filename = clean_filename($leitbox->name) . '_export.txt';
-    send_file($export_content, $filename, 0, 0, true, true, 'text/plain');
+    send_file($exportcontent, $filename, 0, 0, true, true, 'text/plain');
     die();
 }
 
 if ($action === 'add' && data_submitted() && confirm_sesskey()) {
-    $current_count = $DB->count_records('leitbox_cards', ['leitboxid' => $leitbox->id]);
-    if ($current_count >= 200) {
-        redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
-            get_string('error_limit_reached', 'mod_leitbox'), null,
-            \core\output\notification::NOTIFY_ERROR);
+    $currentcount = $DB->count_records('leitbox_cards', ['leitboxid' => $leitbox->id]);
+    if ($currentcount >= 200) {
+        redirect(
+            new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
+            get_string('error_limit_reached', 'mod_leitbox'),
+            null,
+            \core\output\notification::NOTIFY_ERROR
+        );
     }
 
     $q = required_param('question', PARAM_CLEANHTML);
-    $a = required_param('answer',   PARAM_CLEANHTML);
+    $a = required_param('answer', PARAM_CLEANHTML);
     $h = optional_param('hint', '', PARAM_CLEANHTML);
 
     if (!empty($q) && !empty($a)) {
-        mod_leitbox_auto_delete_demos($leitbox->id);
+        leitbox_auto_delete_demos($leitbox->id);
         $newcard            = new stdClass();
         $newcard->leitboxid = $leitbox->id;
         $newcard->question  = $q;
         $newcard->answer    = $a;
         $newcard->hint      = $h;
         $DB->insert_record('leitbox_cards', $newcard);
-        redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
-            get_string('cardadded', 'mod_leitbox'));
+        redirect(
+            new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
+            get_string('cardadded', 'mod_leitbox')
+        );
     }
 }
 
@@ -158,7 +139,7 @@ if ($action === 'update' && data_submitted() && confirm_sesskey() && $cardid) {
     }
 
     $q = required_param('question', PARAM_CLEANHTML);
-    $a = required_param('answer',   PARAM_CLEANHTML);
+    $a = required_param('answer', PARAM_CLEANHTML);
     $h = optional_param('hint', '', PARAM_CLEANHTML);
 
     if (!empty($q) && !empty($a)) {
@@ -168,8 +149,10 @@ if ($action === 'update' && data_submitted() && confirm_sesskey() && $cardid) {
         $updatecard->answer   = $a;
         $updatecard->hint     = $h;
         $DB->update_record('leitbox_cards', $updatecard);
-        redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
-            get_string('cardupdated', 'mod_leitbox'));
+        redirect(
+            new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
+            get_string('cardupdated', 'mod_leitbox')
+        );
     }
 }
 
@@ -180,25 +163,31 @@ if ($action === 'import' && data_submitted() && confirm_sesskey()) {
     // extracted from it is sanitised with PARAM_CLEANHTML below, before it is
     // ever written to the database - the same rule that already applies to
     // the single add/edit card forms above.
-    $importtext   = required_param('importdata', PARAM_RAW);
-    $parsed_cards = \mod_leitbox\import_handler::parse_text($importtext);
+    $importtext  = required_param('importdata', PARAM_RAW);
+    $parsedcards = \mod_leitbox\import_handler::parse_text($importtext);
 
-    $current_count = $DB->count_records('leitbox_cards', ['leitboxid' => $leitbox->id]);
-    $new_total     = $current_count + count($parsed_cards);
+    $currentcount = $DB->count_records('leitbox_cards', ['leitboxid' => $leitbox->id]);
+    $newtotal     = $currentcount + count($parsedcards);
 
-    if ($new_total > 200) {
-        redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
-            get_string('error_limit_exceeded_import', 'mod_leitbox',
-                max(0, 200 - $current_count)),
-            null, \core\output\notification::NOTIFY_ERROR);
+    if ($newtotal > 200) {
+        redirect(
+            new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
+            get_string(
+                'error_limit_exceeded_import',
+                'mod_leitbox',
+                max(0, 200 - $currentcount)
+            ),
+            null,
+            \core\output\notification::NOTIFY_ERROR
+        );
     }
 
-    if (!empty($parsed_cards)) {
-        mod_leitbox_auto_delete_demos($leitbox->id);
+    if (!empty($parsedcards)) {
+        leitbox_auto_delete_demos($leitbox->id);
     }
 
     $count = 0;
-    foreach ($parsed_cards as $card) {
+    foreach ($parsedcards as $card) {
         $newcard            = new stdClass();
         $newcard->leitboxid = $leitbox->id;
         $newcard->question  = clean_param($card['question'], PARAM_CLEANHTML);
@@ -207,27 +196,29 @@ if ($action === 'import' && data_submitted() && confirm_sesskey()) {
         $DB->insert_record('leitbox_cards', $newcard);
         $count++;
     }
-    redirect(new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
-        get_string('cardsimported', 'mod_leitbox', $count));
+    redirect(
+        new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
+        get_string('cardsimported', 'mod_leitbox', $count)
+    );
 }
 
-// =========================================================
-// Build template data
-// =========================================================
+// Build template data.
 
 // Card being edited (if applicable).
 $editcard = null;
 if ($action === 'edit' && $cardid) {
-    $editcard = $DB->get_record('leitbox_cards',
-        ['id' => $cardid, 'leitboxid' => $leitbox->id]);
+    $editcard = $DB->get_record(
+        'leitbox_cards',
+        ['id' => $cardid, 'leitboxid' => $leitbox->id]
+    );
 }
 
 // AI prompt templates (passed to AMD module for client-side switching).
 $prompts = [
     'standard' => get_string('prompt_template_standard', 'mod_leitbox'),
-    'tf'       => get_string('prompt_template_tf',       'mod_leitbox'),
-    'vocab'    => get_string('prompt_template_vocab',    'mod_leitbox'),
-    'cloze'    => get_string('prompt_template_cloze',    'mod_leitbox'),
+    'tf'       => get_string('prompt_template_tf', 'mod_leitbox'),
+    'vocab'    => get_string('prompt_template_vocab', 'mod_leitbox'),
+    'cloze'    => get_string('prompt_template_cloze', 'mod_leitbox'),
     'jeopardy' => get_string('prompt_template_jeopardy', 'mod_leitbox'),
     'transfer' => get_string('prompt_template_transfer', 'mod_leitbox'),
 ];
@@ -236,18 +227,28 @@ $prompts = [
 $page       = optional_param('page', 0, PARAM_INT);
 $perpage    = 50;
 $totalcards = $DB->count_records('leitbox_cards', ['leitboxid' => $leitbox->id]);
-$cards      = $DB->get_records('leitbox_cards', ['leitboxid' => $leitbox->id],
-    'id ASC', '*', $page * $perpage, $perpage);
+$cards      = $DB->get_records(
+    'leitbox_cards',
+    ['leitboxid' => $leitbox->id],
+    'id ASC',
+    '*',
+    $page * $perpage,
+    $perpage
+);
 
 // Build the cards array for the Mustache template.
 $cardrows = [];
 $rownum   = ($page * $perpage) + 1;
 foreach ($cards as $c) {
-    $editurl = (new moodle_url('/mod/leitbox/manage.php',
-        ['id' => $cm->id, 'action' => 'edit', 'cardid' => $c->id]))->out(false);
-    $delurl  = (new moodle_url('/mod/leitbox/manage.php',
+    $editurl = (new moodle_url(
+        '/mod/leitbox/manage.php',
+        ['id' => $cm->id, 'action' => 'edit', 'cardid' => $c->id]
+    ))->out(false);
+    $delurl  = (new moodle_url(
+        '/mod/leitbox/manage.php',
         ['id' => $cm->id, 'action' => 'delete', 'cardid' => $c->id,
-         'sesskey' => sesskey()]))->out(false);
+        'sesskey' => sesskey()]
+    ))->out(false);
 
     $cardrows[] = [
         'id'            => $c->id,
@@ -257,8 +258,8 @@ foreach ($cards as $c) {
         'hint'          => format_text($c->hint, FORMAT_HTML, ['context' => $context, 'para' => false]),
         'editurl'       => $editurl,
         'delurl'        => $delurl,
-        'editiconhtml'  => $OUTPUT->pix_icon('t/edit',   get_string('edit')),
-        'deleteiconhtml'=> $OUTPUT->pix_icon('t/delete', get_string('delete')),
+        'editiconhtml'  => $OUTPUT->pix_icon('t/edit', get_string('edit')),
+        'deleteiconhtml' => $OUTPUT->pix_icon('t/delete', get_string('delete')),
     ];
 }
 
@@ -274,50 +275,50 @@ if (!empty($cards)) {
 $templatedata = [
     // Navigation.
     'backurl'      => (new moodle_url('/mod/leitbox/view.php', ['id' => $cm->id]))->out(false),
-    'managebaseurl'=> (new moodle_url('/mod/leitbox/manage.php'))->out(false),
+    'managebaseurl' => (new moodle_url('/mod/leitbox/manage.php'))->out(false),
     'cmid'         => $cm->id,
     'sesskey'      => sesskey(),
 
     // Localised strings.
-    'strbacktoactivity'  => get_string('backtoactivity',        'mod_leitbox'),
-    'straddsinglecard'   => get_string('addsinglecard',         'mod_leitbox'),
-    'streditsinglecard'  => get_string('editsinglecard',        'mod_leitbox'),
-    'strquestion'        => get_string('question',              'mod_leitbox'),
-    'stranswer'          => get_string('answer',                'mod_leitbox'),
-    'strhint'            => get_string('hint',                  'mod_leitbox'),
-    'stroptional'        => get_string('optional',              'moodle'),
-    'straddcard'         => get_string('addcard',               'mod_leitbox'),
-    'strupdatecard'      => get_string('updatecard',            'mod_leitbox'),
-    'strcancel'          => get_string('cancel',                'mod_leitbox'),
-    'strbulkimport'      => get_string('bulkimport',            'mod_leitbox'),
-    'strbulkimportdesc'  => get_string('bulkimportdesc',        'mod_leitbox'),
+    'strbacktoactivity'  => get_string('backtoactivity', 'mod_leitbox'),
+    'straddsinglecard'   => get_string('addsinglecard', 'mod_leitbox'),
+    'streditsinglecard'  => get_string('editsinglecard', 'mod_leitbox'),
+    'strquestion'        => get_string('question', 'mod_leitbox'),
+    'stranswer'          => get_string('answer', 'mod_leitbox'),
+    'strhint'            => get_string('hint', 'mod_leitbox'),
+    'stroptional'        => get_string('optional', 'moodle'),
+    'straddcard'         => get_string('addcard', 'mod_leitbox'),
+    'strupdatecard'      => get_string('updatecard', 'mod_leitbox'),
+    'strcancel'          => get_string('cancel', 'mod_leitbox'),
+    'strbulkimport'      => get_string('bulkimport', 'mod_leitbox'),
+    'strbulkimportdesc'  => get_string('bulkimportdesc', 'mod_leitbox'),
     'strprompttypesel'   => get_string('prompt_type_selection', 'mod_leitbox'),
-    'strpromptinstruct'  => get_string('prompt_instruction',    'mod_leitbox'),
-    'strimportcards'     => get_string('importcards',           'mod_leitbox'),
-    'strimportph'        => get_string('import_placeholder',    'mod_leitbox'),
-    'strexistingcards'   => get_string('existingcards',         'mod_leitbox'),
-    'strnocards'         => get_string('nocards',               'mod_leitbox'),
-    'strquestioncol'     => get_string('question',              'mod_leitbox'),
-    'stranswercol'       => get_string('answer',                'mod_leitbox'),
-    'strhintcol'         => get_string('hint',                  'mod_leitbox'),
-    'stractionscol'      => get_string('actions',               'moodle'),
-    'strdeleteselected'  => get_string('deleteselected',        'mod_leitbox'),
-    'strexportcards'     => get_string('exportcards',           'mod_leitbox'),
-    'strselectall'       => get_string('selectall',             'moodle'),
+    'strpromptinstruct'  => get_string('prompt_instruction', 'mod_leitbox'),
+    'strimportcards'     => get_string('importcards', 'mod_leitbox'),
+    'strimportph'        => get_string('import_placeholder', 'mod_leitbox'),
+    'strexistingcards'   => get_string('existingcards', 'mod_leitbox'),
+    'strnocards'         => get_string('nocards', 'mod_leitbox'),
+    'strquestioncol'     => get_string('question', 'mod_leitbox'),
+    'stranswercol'       => get_string('answer', 'mod_leitbox'),
+    'strhintcol'         => get_string('hint', 'mod_leitbox'),
+    'stractionscol'      => get_string('actions', 'moodle'),
+    'strdeleteselected'  => get_string('deleteselected', 'mod_leitbox'),
+    'strexportcards'     => get_string('exportcards', 'mod_leitbox'),
+    'strselectall'       => get_string('selectall', 'moodle'),
 
     // Card form fields.
     'isedit'      => (bool)$editcard,
     'editcardid'  => $editcard ? $editcard->id : 0,
     'qval'        => $editcard ? $editcard->question : '',
-    'aval'        => $editcard ? $editcard->answer   : '',
-    'hval'        => $editcard ? $editcard->hint     : '',
+    'aval'        => $editcard ? $editcard->answer : '',
+    'hval'        => $editcard ? $editcard->hint : '',
 
     // Prompt type selector options.
     'prompttypes' => [
         ['key' => 'standard', 'label' => get_string('prompt_type_standard', 'mod_leitbox'), 'selected' => true],
-        ['key' => 'tf',       'label' => get_string('prompt_type_tf',       'mod_leitbox')],
-        ['key' => 'vocab',    'label' => get_string('prompt_type_vocab',    'mod_leitbox')],
-        ['key' => 'cloze',    'label' => get_string('prompt_type_cloze',    'mod_leitbox')],
+        ['key' => 'tf', 'label' => get_string('prompt_type_tf', 'mod_leitbox')],
+        ['key' => 'vocab', 'label' => get_string('prompt_type_vocab', 'mod_leitbox')],
+        ['key' => 'cloze', 'label' => get_string('prompt_type_cloze', 'mod_leitbox')],
         ['key' => 'jeopardy', 'label' => get_string('prompt_type_jeopardy', 'mod_leitbox')],
         ['key' => 'transfer', 'label' => get_string('prompt_type_transfer', 'mod_leitbox')],
     ],
@@ -327,27 +328,29 @@ $templatedata = [
     'hascards'       => !empty($cards),
     'cards'          => $cardrows,
     'pagingbartop'   => $pagingbartop,
-    'pagingbarbottom'=> $pagingbarbottom,
-    'exporturl'      => (new moodle_url('/mod/leitbox/manage.php',
-        ['id' => $cm->id, 'action' => 'export', 'sesskey' => sesskey()]))->out(false),
+    'pagingbarbottom' => $pagingbarbottom,
+    'exporturl'      => (new moodle_url(
+        '/mod/leitbox/manage.php',
+        ['id' => $cm->id, 'action' => 'export', 'sesskey' => sesskey()]
+    ))->out(false),
 ];
 
-// Pass prompt templates and confirmation strings to the AMD module via the template
-// (avoids Moodle's 1024-character limit on js_call_amd arguments).
+// Pass prompt templates and confirmation strings to the AMD module via the
+// template (avoids Moodle's 1024-character limit on js_call_amd arguments).
 $amdparams = [
     'prompts'            => $prompts,
-    'confirmDelete'      => get_string('confirmdeletecard',  'mod_leitbox'),
-    'confirmBulkDelete'  => get_string('confirmbulkdelete',  'mod_leitbox'),
+    'confirmDelete'      => get_string('confirmdeletecard', 'mod_leitbox'),
+    'confirmBulkDelete'  => get_string('confirmbulkdelete', 'mod_leitbox'),
 ];
 $templatedata['jsconfig'] = json_encode($amdparams);
 
-// =========================================================
-// Output
-// =========================================================
+// Output.
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('managecards', 'mod_leitbox'));
-echo $OUTPUT->notification(get_string('didactic_limit_notice', 'mod_leitbox'),
-    \core\output\notification::NOTIFY_INFO);
+echo $OUTPUT->notification(
+    get_string('didactic_limit_notice', 'mod_leitbox'),
+    \core\output\notification::NOTIFY_INFO
+);
 echo $OUTPUT->render_from_template('mod_leitbox/manage', $templatedata);
 echo $OUTPUT->footer();
