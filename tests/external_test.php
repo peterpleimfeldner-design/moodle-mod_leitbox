@@ -33,12 +33,18 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
-require_once($CFG->dirroot . '/mod/leitbox/classes/external.php');
 
 /**
  * External functions unit tests for mod_leitbox.
  *
- * @runTestsInSeparateProcesses
+ * Deliberately does not require_once classes/external.php: doing so at the
+ * top of the file makes PHPUnit load lib/externallib.php while it is still
+ * scanning test files to build the suite (before any test is actually
+ * running), which trips Moodle's "must run in an isolated process" guard.
+ * Relying on the autoloader to load \mod_leitbox\external lazily, the first
+ * time a test method actually calls it, avoids that entirely - this is the
+ * same pattern used by Moodle core's own external function tests (e.g.
+ * mod_choice's externallib_test.php).
  */
 final class external_test extends externallib_advanced_testcase {
     /**
