@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LeitBox — Karteikarten nach Leitner, direkt in Moodle</title>
+<meta name="description" content="LeitBox ist ein kostenloses, quelloffenes Moodle-Aktivitäts-Plugin für Karteikarten nach der Leitner-Methode. Schnelle KI-taugliche Kartenerstellung, sechs Lernstufen, keine externen Dienste, datenschutzfreundlich von Grund auf.">
+<link rel="icon" type="image/png" href="../assets/icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LeitBox — Karteikarten nach Leitner, direkt in Moodle">
+<meta property="og:description" content="Kostenloses, quelloffenes Moodle-Aktivitäts-Plugin für Karteikarten nach der Leitner-Methode. Schnelle KI-taugliche Kartenerstellung, sechs Lernstufen, keine externen Dienste.">
+<meta property="og:url" content="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/">
+<meta property="og:image" content="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    --teal-dark: #0E6A62;
+    --teal-light: #6FC3B8;
+    --bg: #ffffff;
+    --bg-alt: #F4F8F7;
+    --text: #182524;
+    --text-muted: #4B5A58;
+    --border: #DCE6E4;
+    --card-bg: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101716;
+      --bg-alt: #16211F;
+      --text: #EAF2F0;
+      --text-muted: #A9BBB8;
+      --border: #26332F;
+      --card-bg: #16211F;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+  }
+  a { color: var(--teal-dark); }
+  @media (prefers-color-scheme: dark) { a { color: var(--teal-light); } }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+  header.site {
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+  }
+  header.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.15rem; text-decoration: none; color: var(--text); }
+  .brand img { width: 28px; height: 28px; }
+  nav.site-nav { display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; }
+  nav.site-nav a { text-decoration: none; color: var(--text-muted); }
+  nav.site-nav a:hover { color: var(--teal-dark); }
+  .lang-switch { font-size: 0.85rem; }
+  .lang-switch a { text-decoration: none; }
+
+  .hero { padding: 64px 0 48px; text-align: center; }
+  .hero h1 { font-size: clamp(1.9rem, 4vw, 2.7rem); margin: 0 0 16px; letter-spacing: -0.01em; }
+  .hero p.lead { font-size: 1.15rem; color: var(--text-muted); max-width: 640px; margin: 0 auto 28px; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+  .btn {
+    display: inline-block; padding: 11px 22px; border-radius: 8px; text-decoration: none;
+    font-weight: 600; font-size: 0.95rem; border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--teal-dark); color: #fff; }
+  .btn-primary:hover { background: #0a5951; }
+  .btn-secondary { background: transparent; color: var(--text); border-color: var(--border); }
+  .btn-secondary:hover { border-color: var(--teal-dark); color: var(--teal-dark); }
+  .carousel { position: relative; max-width: 720px; margin: 0 auto; }
+  .carousel-viewport {
+    overflow: hidden; border-radius: 12px; border: 1px solid var(--border);
+    box-shadow: 0 12px 32px rgba(14,106,98,0.12); background: var(--card-bg);
+    transition: height 0.35s ease;
+  }
+  .carousel-track { display: flex; align-items: flex-start; transition: transform 0.35s ease; }
+  .carousel-slide { flex: 0 0 100%; margin: 0; }
+  .carousel-slide img { width: 100%; display: block; cursor: zoom-in; }
+  .carousel-slide figcaption { padding: 12px 18px; font-size: 0.88rem; color: var(--text-muted); text-align: left; }
+  .carousel-arrow {
+    position: absolute; top: 38%; transform: translateY(-50%); width: 40px; height: 40px;
+    border-radius: 50%; border: 1px solid var(--border); background: var(--card-bg); color: var(--text);
+    font-size: 1.3rem; line-height: 1; cursor: pointer;
+  }
+  .carousel-arrow:hover { border-color: var(--teal-dark); color: var(--teal-dark); }
+  .carousel-prev { left: -18px; }
+  .carousel-next { right: -18px; }
+  @media (max-width: 760px) {
+    .carousel-prev { left: 6px; } .carousel-next { right: 6px; }
+    .carousel-arrow { background: rgba(255,255,255,0.85); }
+  }
+  .carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
+  .carousel-dots button {
+    width: 8px; height: 8px; border-radius: 50%; border: none; padding: 0;
+    background: var(--border); cursor: pointer;
+  }
+  .carousel-dots button.active { background: var(--teal-dark); }
+
+  .lightbox {
+    position: fixed; inset: 0; background: rgba(10,20,19,0.88); z-index: 100;
+    display: flex; align-items: center; justify-content: center; padding: 40px;
+  }
+  .lightbox[hidden] { display: none; }
+  .lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+  .lightbox-close {
+    position: absolute; top: 18px; right: 24px; background: none; border: none;
+    color: #fff; font-size: 2rem; line-height: 1; cursor: pointer;
+  }
+
+  section { padding: 48px 0; }
+  section.alt { background: var(--bg-alt); }
+  h2 { font-size: 1.6rem; margin: 0 0 8px; }
+  p.section-lead { color: var(--text-muted); max-width: 680px; margin: 0 0 32px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 24px; }
+  @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 22px;
+  }
+  .card h3 { margin: 0 0 10px; font-size: 1.05rem; }
+  .card p { margin: 0; color: var(--text-muted); font-size: 0.95rem; }
+
+  .who-box { border-left: 3px solid var(--teal-light); padding: 4px 0 4px 20px; margin: 28px 0; color: var(--text-muted); }
+
+  .privacy-box {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
+    padding: 32px; margin-top: 20px;
+  }
+  .privacy-box ul { margin: 14px 0 0; padding-left: 20px; color: var(--text-muted); }
+  .privacy-box li { margin-bottom: 6px; }
+
+  .boxes-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .box-pill {
+    flex: 1 1 100px; text-align: center; padding: 10px 8px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--card-bg); font-size: 0.85rem; color: var(--text-muted);
+  }
+  .box-pill strong { display: block; color: var(--text); font-size: 0.95rem; margin-bottom: 2px; }
+
+  details.faq { border-bottom: 1px solid var(--border); padding: 16px 0; }
+  details.faq summary { cursor: pointer; font-weight: 600; font-size: 1.02rem; list-style: none; }
+  details.faq summary::-webkit-details-marker { display: none; }
+  details.faq summary::before { content: "+ "; color: var(--teal-dark); }
+  details.faq[open] summary::before { content: "– "; }
+  details.faq p { color: var(--text-muted); margin: 12px 0 0; }
+
+  footer.site {
+    border-top: 1px solid var(--border); padding: 32px 0 48px; text-align: center;
+    color: var(--text-muted); font-size: 0.9rem;
+  }
+  footer.site a { color: var(--text-muted); }
+  footer.site .foot-links { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="../assets/icon.png" alt=""> LeitBox</a>
+    <nav class="site-nav">
+      <a href="#was">Was es ist</a>
+      <a href="#funktionen">Funktionen</a>
+      <a href="#screenshots">Screenshots</a>
+      <a href="#qualitaet">Qualität &amp; Datenschutz</a>
+      <a href="#faq">Häufige Fragen</a>
+      <a href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox">GitHub</a>
+    </nav>
+    <span class="lang-switch"><a href="../">English</a></span>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero wrap">
+    <h1>Karteikarten direkt in Moodle, gebaut auf der Leitner-Methode.</h1>
+    <p class="lead">LeitBox macht aus jedem Kursinhalt einen Karteikartenstapel zum eigenständigen Üben — sechs Lernstufen, schnelle KI-taugliche Kartenerstellung für Lehrende, und keine Daten verlassen jemals den eigenen Moodle-Server.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox/releases/latest">Neueste Version herunterladen</a>
+      <a class="btn btn-secondary" href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox">Auf GitHub ansehen</a>
+    </div>
+    <div class="carousel" id="screenshots">
+      <div class="carousel-viewport">
+        <div class="carousel-track">
+          <figure class="carousel-slide">
+            <img src="../assets/screenshots/dashboard.png" alt="LeitBox-Übersicht mit sechs Lernstufen und Gesamtfortschritt">
+            <figcaption>Übersicht mit sechs Stufen: Neu, Beginner, Learner, Advanced, Experienced, Expert — Gesamtfortschritt auf einen Blick.</figcaption>
+          </figure>
+          <figure class="carousel-slide">
+            <img src="../assets/screenshots/card-front.png" alt="Kartenvorderseite mit Frage und optionalem Hinweis">
+            <figcaption>Erst die Frage — mit optionalem Hinweis, falls jemand nicht weiterkommt.</figcaption>
+          </figure>
+          <figure class="carousel-slide">
+            <img src="../assets/screenshots/card-back.png" alt="Kartenrückseite mit Antwort und drei Bewertungsknöpfen">
+            <figcaption>Karte umdrehen und selbst bewerten: Gewusst, Nochmal oder Schwer. Ein Fehler wirft nie den ganzen Fortschritt zurück.</figcaption>
+          </figure>
+          <figure class="carousel-slide">
+            <img src="../assets/screenshots/bulk-import.png" alt="Massen-Import-Ansicht mit fertiger KI-Prompt-Vorlage">
+            <figcaption>Fertige Vorlage in einen beliebigen KI-Assistenten kopieren, Ergebnis einfügen — ein ganzer Kartensatz auf einmal.</figcaption>
+          </figure>
+          <figure class="carousel-slide">
+            <img src="../assets/screenshots/manage-cards.png" alt="Kartenverwaltung mit Tabelle aller Karten, Bearbeiten und Löschen">
+            <figcaption>Alle Karten in einer übersichtlichen Tabelle verwalten — bearbeiten, löschen oder als Text exportieren.</figcaption>
+          </figure>
+        </div>
+      </div>
+      <button class="carousel-arrow carousel-prev" type="button" aria-label="Vorheriger Screenshot">‹</button>
+      <button class="carousel-arrow carousel-next" type="button" aria-label="Nächster Screenshot">›</button>
+      <div class="carousel-dots"></div>
+    </div>
+  </section>
+
+  <section id="was" class="wrap">
+    <h2>Wofür LeitBox gedacht ist</h2>
+    <p class="section-lead">Benannt nach Sebastian Leitner, dem österreichischen Wissenschaftler, der die Karteikarten-Methode 1972 erfand. LeitBox bringt diese Methode direkt in Moodle — ohne zusätzliche Anmeldung, ohne externe Werkzeuge.</p>
+    <div class="grid-cards">
+      <div class="card">
+        <h3>Karten in Minuten statt Stunden</h3>
+        <p>Massen-Import per einfachem Textformat, dazu fertige Prompt-Vorlagen für sechs Fragetypen — Material in einen KI-Assistenten einfügen und das Ergebnis direkt importieren, ohne CSV, ohne Datei-Upload.</p>
+      </div>
+      <div class="card">
+        <h3>Nichts geht verloren</h3>
+        <p>Eine falsche Antwort wirft eine Karte genau eine Stufe zurück, nie ganz an den Anfang. Karten und Fortschritt sind in normalen Moodle-Kurssicherungen enthalten.</p>
+      </div>
+      <div class="card">
+        <h3>Keine externen Dienste</h3>
+        <p>Alle Karten und Lernfortschritte bleiben auf dem eigenen Moodle-Server. Keine Anmeldung bei Dritten, keine externen API-Aufrufe, kein Tracking.</p>
+      </div>
+      <div class="card">
+        <h3>Bewusst ruhig</h3>
+        <p>Kein Ranking, keine Bestenlisten, keine Spielpunkte, keine Bilder auf Karten — gebaut für Konzentration und Tempo statt Wettbewerb.</p>
+      </div>
+    </div>
+    <p class="who-box">LeitBox plant keine Erinnerungen oder feste Termine für dich — Lernende entscheiden selbst, wann und wie oft sie einen Stapel üben.</p>
+  </section>
+
+  <section id="funktionen" class="alt">
+    <div class="wrap">
+      <h2>Funktionen</h2>
+      <p class="section-lead">Alles Folgende ist im kostenlosen Plugin enthalten. Es gibt keine Bezahlstufe und nichts wird zurückgehalten.</p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Für Lehrende</h3>
+          <p>
+            Zwei Wege, Karten anzulegen: einzeln eintippen oder einen ganzen Stapel per einfachem Textformat auf
+            einmal einfügen — auch von einer KI anhand einer fertigen Vorlage erstellt. Vollständige
+            Kartenverwaltungstabelle mit Bearbeiten, Löschen und Export. Drei kombinierbare
+            Abschlussbedingungen, verknüpft mit Moodles Aktivitätsabschluss.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Für Lernende</h3>
+          <p>
+            Sechs Lernstufen von Neu bis Expert, drei einfache Bewertungsoptionen je Karte, ein optionaler
+            Hinweis und eine ruhige, ablenkungsfreie Oberfläche ohne Ranking oder Wettbewerb. Im eigenen Tempo
+            üben — es gibt keinen festen Zeitplan.
+          </p>
+        </div>
+      </div>
+      <div class="boxes-row">
+        <div class="box-pill"><strong>Neu</strong>gerade angelegt</div>
+        <div class="box-pill"><strong>Beginner</strong>auf dem Weg</div>
+        <div class="box-pill"><strong>Learner</strong>zur Hälfte</div>
+        <div class="box-pill"><strong>Advanced</strong>solide</div>
+        <div class="box-pill"><strong>Experienced</strong>fast geschafft</div>
+        <div class="box-pill"><strong>Expert</strong>gemeistert</div>
+      </div>
+
+      <div class="grid-2" style="margin-top:28px;">
+        <div class="card">
+          <h3>Sechs fertige Fragetypen</h3>
+          <p>
+            Jede Vorlage hat einen eigenen Copy-Paste-KI-Prompt, damit Lehrende aus vorhandenem Material in
+            wenigen Minuten einen fertigen Kartensatz machen können:
+          </p>
+          <ul style="margin:12px 0 0; padding-left:20px; color:var(--text-muted); font-size:0.95rem;">
+            <li>Standard-Frage/Antwort (Faktenwissen)</li>
+            <li>Wahr oder Falsch (mit Erklärung)</li>
+            <li>Vokabeln &amp; Begriffe (Übersetzungen, Definitionen)</li>
+            <li>Lückentext (Cloze-Stil)</li>
+            <li>Jeopardy (erst die Antwort, dann die Frage erraten)</li>
+            <li>Transfer &amp; Praxisanwendung (höchste didaktische Stufe)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Drei Abschlussbedingungen</h3>
+          <p>
+            Beliebig kombinierbar mit Moodles Aktivitätsabschluss:
+          </p>
+          <ul style="margin:12px 0 0; padding-left:20px; color:var(--text-muted); font-size:0.95rem;">
+            <li>Lernende(r) hat mit einer Mindestanzahl unterschiedlicher Karten interagiert</li>
+            <li>Lernende(r) hat eine Mindestanzahl an Karten auf Expert-Stufe gebracht</li>
+            <li>Lernende(r) hat <strong>alle</strong> Karten auf Expert-Stufe gebracht</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="qualitaet" class="wrap">
+    <h2>Qualität und Datenschutz</h2>
+    <p class="section-lead">Als echter Bestandteil von Moodle gebaut, nicht als angeflanschtes Werkzeug.</p>
+    <div class="privacy-box">
+      <ul>
+        <li>Vollständige Anbindung an die Moodle-Datenschutz-Schnittstelle — Lerndaten lassen sich über Moodle-Bordmittel exportieren oder löschen.</li>
+        <li>Keine externen Dienste, keine Anmeldung bei Dritten, keine Analyse- oder Tracking-Skripte jeglicher Art.</li>
+        <li>Volle Unterstützung für Sicherung &amp; Wiederherstellung, inklusive Kartenstapel und optional individuellem Fortschritt.</li>
+        <li>Nutzt Moodles Kurs-Zurücksetzen-Werkzeug, sodass eine Kurs-Wiederverwendung den Lernfortschritt der vorherigen Kohorte sauber entfernt.</li>
+        <li>Automatisierte Tests (PHPUnit) und Prüfung nach Moodle-Programmierstandard (CI) auf Moodle 4.1, 4.4 und 4.5.</li>
+        <li>Oberfläche auf Deutsch und Englisch verfügbar.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="faq" class="wrap">
+    <h2>Häufige Fragen</h2>
+    <details class="faq">
+      <summary>Welche Moodle-Version brauche ich?</summary>
+      <p>Moodle 4.1 LTS oder neuer (getestet bis 4.5), PHP 8.1 bis 8.3, sowie MySQL, MariaDB oder PostgreSQL.</p>
+    </details>
+    <details class="faq">
+      <summary>Ist LeitBox kostenlos?</summary>
+      <p>Ja. LeitBox ist freie, quelloffene Software (GPLv3), aktuell ohne Bezahlstufe.</p>
+    </details>
+    <details class="faq">
+      <summary>Verlassen Lerndaten meine Moodle-Instanz?</summary>
+      <p>Nein. LeitBox ruft keine externen Dienste auf — alle Karten und Fortschritte bleiben auf dem eigenen Server.</p>
+    </details>
+    <details class="faq">
+      <summary>Welche Sprachen unterstützt LeitBox?</summary>
+      <p>Deutsch und Englisch für die Oberfläche.</p>
+    </details>
+    <details class="faq">
+      <summary>Wie viele Karten sollte ein Stapel haben?</summary>
+      <p>Empfohlen sind 20 bis 60 Karten je Aktivität für das beste Lernerlebnis; aktuell sind bis zu 200 je Aktivität möglich.</p>
+    </details>
+    <details class="faq">
+      <summary>Kann ich LeitBox bei einer Kurs-Wiederverwendung für ein neues Semester weiternutzen?</summary>
+      <p>Ja — LeitBox ist an Moodles Kurs-Zurücksetzen-Werkzeug angebunden, sodass der Lernfortschritt der vorherigen Kohorte entfernt wird, während die Karten erhalten bleiben.</p>
+    </details>
+  </section>
+
+</main>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lightbox-close" type="button" aria-label="Schließen">×</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-links">
+      <a href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox">GitHub-Repository</a>
+      <a href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox/releases/latest">Neueste Version</a>
+      <a href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox/issues">Fehler melden</a>
+      <a href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox/blob/main/LICENSE">GPLv3-Lizenz</a>
+    </div>
+    <p>LeitBox ist freie, quelloffene Software (GPLv3), ohne Bezahlstufe — © 2026 Peter Pleimfeldner.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var carousel = document.querySelector('.carousel');
+  if (!carousel) return;
+  var track = carousel.querySelector('.carousel-track');
+  var slides = Array.prototype.slice.call(carousel.querySelectorAll('.carousel-slide'));
+  var dotsWrap = carousel.querySelector('.carousel-dots');
+  var prevBtn = carousel.querySelector('.carousel-prev');
+  var nextBtn = carousel.querySelector('.carousel-next');
+  var lightbox = document.getElementById('lightbox');
+  var lightboxImg = document.getElementById('lightbox-img');
+  var closeBtn = lightbox.querySelector('.lightbox-close');
+  var index = 0;
+
+  slides.forEach(function (slide, i) {
+    var dot = document.createElement('button');
+    dot.type = 'button';
+    dot.setAttribute('aria-label', 'Zu Screenshot ' + (i + 1));
+    dot.addEventListener('click', function () { goTo(i); });
+    dotsWrap.appendChild(dot);
+    slide.querySelector('img').addEventListener('click', function () { openLightbox(i); });
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  var viewport = carousel.querySelector('.carousel-viewport');
+  function setHeight() {
+    viewport.style.height = slides[index].offsetHeight + 'px';
+  }
+  slides.forEach(function (slide) {
+    var img = slide.querySelector('img');
+    if (img.complete) { setHeight(); } else { img.addEventListener('load', setHeight); }
+  });
+
+  function update() {
+    track.style.transform = 'translateX(-' + (index * 100) + '%)';
+    dots.forEach(function (d, i) { d.classList.toggle('active', i === index); });
+    setHeight();
+  }
+  function goTo(i) { index = (i + slides.length) % slides.length; update(); }
+  prevBtn.addEventListener('click', function () { goTo(index - 1); });
+  nextBtn.addEventListener('click', function () { goTo(index + 1); });
+  update();
+
+  function openLightbox(i) {
+    var img = slides[i].querySelector('img');
+    lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt;
+    lightbox.hidden = false;
+  }
+  function closeLightbox() {
+    lightbox.hidden = true;
+    lightboxImg.src = '';
+  }
+  closeBtn.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', function (e) { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', function (e) {
+    if (!lightbox.hidden) {
+      if (e.key === 'Escape') closeLightbox();
+    } else {
+      if (e.key === 'ArrowLeft') goTo(index - 1);
+      if (e.key === 'ArrowRight') goTo(index + 1);
+    }
+  });
+})();
+</script>
+</body>
+</html>
