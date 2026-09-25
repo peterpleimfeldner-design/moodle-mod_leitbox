@@ -6,6 +6,13 @@ node_modules/
 .idea/
 php_errors.log
 .claude/
+
+# Internal project notes (strategy, pricing ideas): keep out of the public repo
+docs-intern/
+CLAUDE.md
+
+# Peter's local screenshot working folder (originals live in docs-intern/marketing/screenshots/)
+/Screenshots/
  
 # OS generated files
 .DS_Store
