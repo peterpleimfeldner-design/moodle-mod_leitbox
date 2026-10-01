@@ -12,7 +12,7 @@ jobs:
     # on one database alone says nothing about the others.
     services:
       postgres:
-        image: postgres:14
+        image: postgres:16
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
