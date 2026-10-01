@@ -31,6 +31,27 @@
 @tailwind utilities;
 /* stylelint-enable csstree/validator */
 
+/* Minimal part of Tailwind's Preflight reset, limited to the app container.
+   The full Preflight is disabled because it would restyle the whole Moodle
+   page; without any reset, buttons show the browser's default grey frame.
+   :where() keeps the specificity at zero, so every utility class and every
+   component style still wins over these defaults. */
+:where(#v-app-mod-leitbox) :where(*, ::before, ::after) {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: #e5e7eb;
+}
+
+:where(#v-app-mod-leitbox) :where(button) {
+    background-color: transparent;
+    background-image: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
 .path-mod-leitbox .flip-container {
     perspective: 1000px;
 }

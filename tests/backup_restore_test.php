@@ -55,9 +55,8 @@ final class backup_restore_test extends \advanced_testcase {
         // A card that links to its own activity: the link must point to the
         // restored activity afterwards.
         $linkcard = end($cards);
-        $DB->set_field('leitbox_cards', 'question',
-            '<a href="' . $CFG->wwwroot . '/mod/leitbox/view.php?id=' . $leitbox->cmid . '">Link</a>',
-            ['id' => $linkcard->id]);
+        $link = '<a href="' . $CFG->wwwroot . '/mod/leitbox/view.php?id=' . $leitbox->cmid . '">Link</a>';
+        $DB->set_field('leitbox_cards', 'question', $link, ['id' => $linkcard->id]);
         reset($cards);
         foreach (array_slice($cards, 0, 2) as $index => $card) {
             $DB->insert_record('leitbox_progress', (object)[
@@ -71,20 +70,32 @@ final class backup_restore_test extends \advanced_testcase {
         }
 
         // Back up the whole course including user data.
-        $bc = new \backup_controller(\backup::TYPE_1COURSE, $course->id, \backup::FORMAT_MOODLE,
-            \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $USER->id);
+        $bc = new \backup_controller(
+            \backup::TYPE_1COURSE,
+            $course->id,
+            \backup::FORMAT_MOODLE,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_GENERAL,
+            $USER->id
+        );
         $bc->get_plan()->get_setting('users')->set_value(true);
         $bc->execute_plan();
         $file = $bc->get_results()['backup_destination'];
         $backupid = 'leitbox_backup_restore_test';
-        $file->extract_to_pathname(get_file_packer('application/vnd.moodle.backup'),
-            $CFG->tempdir . '/backup/' . $backupid);
+        $packer = get_file_packer('application/vnd.moodle.backup');
+        $file->extract_to_pathname($packer, $CFG->tempdir . '/backup/' . $backupid);
         $bc->destroy();
 
         // Restore it into a new course.
         $newcourseid = \restore_dbops::create_new_course('Restored course', 'RESTORED', $course->category);
-        $rc = new \restore_controller($backupid, $newcourseid, \backup::INTERACTIVE_NO,
-            \backup::MODE_GENERAL, $USER->id, \backup::TARGET_NEW_COURSE);
+        $rc = new \restore_controller(
+            $backupid,
+            $newcourseid,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_GENERAL,
+            $USER->id,
+            \backup::TARGET_NEW_COURSE
+        );
         $rc->get_plan()->get_setting('users')->set_value(true);
         $this->assertTrue($rc->execute_precheck());
         $rc->execute_plan();
@@ -111,9 +122,9 @@ final class backup_restore_test extends \advanced_testcase {
         // Links in card texts are rewritten to the restored activity.
         $newcm = get_coursemodule_from_instance('leitbox', $newleitbox->id, $newcourseid, false, MUST_EXIST);
         $this->assertNotEquals($leitbox->cmid, $newcm->id);
-        $this->assertEquals(1, $DB->count_records_select('leitbox_cards',
-            'leitboxid = ? AND ' . $DB->sql_like('question', '?'),
-            [$newleitbox->id, '%/mod/leitbox/view.php?id=' . $newcm->id . '"%']));
+        $where = 'leitboxid = ? AND ' . $DB->sql_like('question', '?');
+        $pattern = '%/mod/leitbox/view.php?id=' . $newcm->id . '"%';
+        $this->assertEquals(1, $DB->count_records_select('leitbox_cards', $where, [$newleitbox->id, $pattern]));
 
         // The original activity keeps its own progress.
         $this->assertEquals(2, $DB->count_records_sql(

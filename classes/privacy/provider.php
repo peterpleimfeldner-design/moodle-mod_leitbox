@@ -149,13 +149,14 @@ class provider implements core_userlist_provider, metadata_provider, plugin_prov
                 if (!empty($progressrecords)) {
                     $exportdata = [];
                     foreach ($progressrecords as $rec) {
+                        $options = ['context' => $context];
+                        $question = self::resolve_demo_text($rec->question);
+                        $answer = self::resolve_demo_text($rec->answer);
+                        $hint = self::resolve_demo_text((string)$rec->hint);
                         $exportdata[] = (object)[
-                            'question' => format_text(self::resolve_demo_text($rec->question), FORMAT_HTML,
-                                ['context' => $context]),
-                            'answer' => format_text(self::resolve_demo_text($rec->answer), FORMAT_HTML,
-                                ['context' => $context]),
-                            'hint' => format_text(self::resolve_demo_text((string)$rec->hint), FORMAT_HTML,
-                                ['context' => $context]),
+                            'question' => format_text($question, FORMAT_HTML, $options),
+                            'answer' => format_text($answer, FORMAT_HTML, $options),
+                            'hint' => format_text($hint, FORMAT_HTML, $options),
                             'box_number' => $rec->box_number,
                             'status' => $rec->status,
                             'count_correct' => $rec->count_correct,

@@ -58,10 +58,10 @@ A German version is kept in the repository as `CHANGELOG.de.md` (not part of the
   keyboard ("Tap to flip" is a real button), the keyboard focus moves to the rating buttons and then
   to the next card, the hidden side of the card is inert, the dialogs take the focus, close with
   Escape and lie above Moodle's navigation bar, and invalid landmark and list roles were removed.
+- **Buttons without their own border showed the browser's grey default frame** (for example "Back to dashboard") since Tailwind's global reset was disabled in 1.6.0. A minimal reset now applies inside the app container only, with zero specificity.
 - **A failed save of an answer is now shown to the learner** instead of being lost silently;
   messages that used `alert()` are now shown on the page.
-- "Display description on course page" now works; the course page shows the activity purpose
-  colour (`FEATURE_MOD_PURPOSE`); `index.php` triggers the instance list viewed event and shows
+- "Display description on course page" now works; `index.php` triggers the instance list viewed event and shows
   section names; the viewed event maps its object id for restored logs.
 - Privacy API: the `status` field of the progress table is declared and exported, the export
   includes the hint and resolves the demo card texts.

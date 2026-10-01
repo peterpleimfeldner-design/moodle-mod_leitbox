@@ -47,9 +47,12 @@ Fassung bleibt nur im Repository.
 - **Tastatur und Screenreader:** Karte per Tastatur umdrehbar, Fokus wandert zu den Bewertungsknöpfen
   und zur nächsten Karte, verdeckte Kartenseite ist inaktiv, Dialoge übernehmen den Fokus, schließen
   mit Escape und liegen über Moodles Navigationsleiste, ungültige Rollen entfernt.
+- **Knöpfe ohne eigenen Rahmen zeigten den grauen Browser-Standardrahmen** (z. B. „Zurück zum
+  Dashboard“), seit in 1.6.0 Tailwinds globaler Reset abgeschaltet wurde. Ein minimaler Reset gilt jetzt
+  nur innerhalb des App-Containers, ohne Spezifität.
 - **Speicherfehler werden angezeigt** statt still verloren zu gehen; Meldungen per `alert()` stehen
   jetzt auf der Seite.
-- „Beschreibung auf Kursseite anzeigen“ funktioniert; Aktivitätszweck (`FEATURE_MOD_PURPOSE`);
+- „Beschreibung auf Kursseite anzeigen“ funktioniert;
   `index.php` löst das Ereignis für die Aktivitätsliste aus und zeigt Abschnittsnamen; das
   Aufruf-Ereignis bildet seine Objekt-ID für wiederhergestellte Logs ab.
 - Datenschutz: Feld `status` deklariert und exportiert, Export mit Hinweis und aufgelösten Demo-Texten.
