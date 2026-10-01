@@ -30,6 +30,10 @@
 
 set -euo pipefail
 
+# Character-based (not byte-based) matching, so that emoji are not mistaken
+# for German umlauts in the language check below.
+export LC_ALL=C.UTF-8
+
 cd "$(dirname "$0")/../.."
 
 MAX_PACKAGE_BYTES=$((1024 * 1024))   # 1 MB for the whole (uncompressed) package.
