@@ -1,11 +1,34 @@
+<!--
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+The LeitBox dashboard: the six Leitner boxes, the overall progress and the help and reset dialogs.
+
+@package   mod_leitbox
+@copyright 2026 Peter Pleimfeldner
+@license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+-->
 <template>
   <div class="rc-wrap">
 
     <!-- ═══ HEADER ═══ -->
-    <header class="rc-header" role="banner">
+    <div class="rc-header">
       <div class="rc-header-top">
         <div class="rc-header-brand">
-          <img :src="getLogoUrl()" alt="LeitBox" class="rc-logo" />
+          <img :src="getLogoUrl()" alt="" class="rc-logo" />
           <h1 class="rc-title" :title="activityName || getString('dashboardtitle')">{{ activityName || getString('dashboardtitle') }}</h1>
         </div>
 
@@ -23,10 +46,10 @@
         </div>
       </div>
       <p class="rc-subtitle">{{ getString('dashboardsbtitle') }}</p>
-    </header>
+    </div>
 
     <!-- ═══ PROGRESS BAR ═══ -->
-    <div class="rc-progress-bar" role="progressbar" :aria-valuemin="0" :aria-valuemax="100" :aria-valuenow="progressPercent" :aria-label="progressLabelText()">
+    <div class="rc-progress-bar" role="progressbar" :aria-valuemin="0" :aria-valuemax="100" :aria-valuenow="progressPercent" :aria-valuetext="progressAriaText()" :aria-label="getString('progress_label')">
       <div class="rc-progress-fill" :style="{ width: progressPercent + '%' }"></div>
     </div>
     <p class="rc-progress-label" aria-hidden="true">
@@ -34,8 +57,8 @@
     </p>
 
     <!-- ═══ BOX GRID ═══ -->
-    <main>
-      <div class="rc-grid" role="list">
+    <div>
+      <div class="rc-grid">
         <div
           v-for="box in 6"
           :key="box"
@@ -43,7 +66,7 @@
           @keydown.enter.space.prevent="startSession(box - 1)"
           class="rc-box"
           :class="[getBoxColorClass(box - 1), (counts[box-1] || 0) === 0 ? 'rc-box--empty' : 'rc-box--active']"
-          :role="(counts[box-1] || 0) > 0 ? 'button' : 'listitem'"
+          :role="(counts[box-1] || 0) > 0 ? 'button' : undefined"
           :tabindex="(counts[box-1] || 0) > 0 ? 0 : -1"
           :aria-label="getBoxName(box - 1) + ': ' + (counts[box-1] || 0) + ' ' + getCardsLabel(counts[box-1] || 0)"
           :aria-disabled="(counts[box-1] || 0) === 0"
@@ -58,7 +81,7 @@
           <h2 class="rc-box-name">{{ getBoxName(box - 1) }}</h2>
 
           <!-- badge -->
-          <div v-if="counts[box-1] > 0" class="rc-badge rc-badge--active" aria-live="polite">
+          <div v-if="counts[box-1] > 0" class="rc-badge rc-badge--active">
             <span class="rc-badge-dot" aria-hidden="true"></span>
             {{ counts[box-1] }} {{ getCardsLabel(counts[box-1]) }}
           </div>
@@ -76,14 +99,14 @@
           <div v-if="(counts[box-1] || 0) > 0" class="rc-box-arrow" aria-hidden="true">→</div>
         </div>
       </div>
-    </main>
+    </div>
 
     <!-- ═══ HOW-IT-WORKS MODAL ═══ -->
     <Teleport to="body">
       <Transition name="rc-fade">
-        <div v-if="showInfo" class="rc-overlay" @click.self="showInfo = false" role="dialog" aria-modal="true" :aria-label="getString('systemtitle')">
+        <div v-if="showInfo" class="rc-overlay" @click.self="showInfo = false" @keydown.esc="showInfo = false" role="dialog" aria-modal="true" :aria-label="getString('systemtitle')">
           <div class="rc-modal rc-modal-flex">
-            <button @click="showInfo = false" class="rc-modal-close" :aria-label="getString('close')">×</button>
+            <button ref="infoClose" @click="showInfo = false" class="rc-modal-close" :aria-label="getString('close')"><span aria-hidden="true">×</span></button>
             <div class="rc-modal-head rc-modal-px rc-modal-pt" style="margin-bottom: 14px;">
               <span aria-hidden="true">🎓</span>
               <h2 style="margin: 0;">{{ getString('systemtitle') }}</h2>
@@ -119,15 +142,15 @@
     <!-- ═══ RESET CONFIRMATION MODAL ═══ -->
     <Teleport to="body">
       <Transition name="rc-fade">
-        <div v-if="showReset" class="rc-overlay" @click.self="showReset = false" role="alertdialog" aria-modal="true" :aria-label="getString('reset_progress_confirm_title')">
+        <div v-if="showReset" class="rc-overlay" @click.self="showReset = false" @keydown.esc="showReset = false" role="alertdialog" aria-modal="true" :aria-label="getString('reset_progress_confirm_title')" aria-describedby="leitbox-reset-desc">
           <div class="rc-modal rc-modal-flex rc-modal--warning">
-            <button @click="showReset = false" class="rc-modal-close" :aria-label="getString('cancel')">×</button>
+            <button ref="resetClose" @click="showReset = false" class="rc-modal-close" :aria-label="getString('cancel')"><span aria-hidden="true">×</span></button>
             <div class="rc-modal-scroll rc-modal-px rc-modal-pt rc-modal-pb">
               <div class="rc-modal-head" style="margin-bottom: 14px;">
                 <span aria-hidden="true">⚠️</span>
                 <h2 style="margin: 0;">{{ getString('reset_progress_confirm_title') }}</h2>
               </div>
-              <p class="rc-modal-warning-text" v-html="getString('reset_progress_confirm_msg')"></p>
+              <p id="leitbox-reset-desc" class="rc-modal-warning-text" v-html="getString('reset_progress_confirm_msg')"></p>
               <div v-if="resetError" class="rc-alert rc-alert--error" role="alert">
                 ❌ {{ resetError }}
               </div>
@@ -137,8 +160,8 @@
                 </button>
                 <button @click="doReset" class="rc-btn rc-btn--danger" :disabled="resetting">
                   <svg v-if="resetting" aria-hidden="true" class="rc-spin rc-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                   </svg>
                   {{ getString('reset_progress_btn') }}
                 </button>
@@ -153,11 +176,11 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, watch, nextTick } from 'vue';
 import { getBoxCounts, getConfig, getLogoUrl, resetProgress } from '../api';
 import { getString } from '../strings';
 
-const props = defineProps({
+defineProps({
     activityName: { type: String, default: '' },
 });
 const emit = defineEmits(['start-session']);
@@ -165,18 +188,33 @@ const counts = ref({});
 const showInfo = ref(false);
 const showReset = ref(false);
 const resetting = ref(false);
-const resetSuccess = ref(false);
 const resetError = ref('');
+const infoClose = ref(null);
+const resetClose = ref(null);
+
+// Move the keyboard focus into a dialog when it opens.
+watch(showInfo, async (open) => {
+    if (open) {
+        await nextTick();
+        infoClose.value?.focus();
+    }
+});
+watch(showReset, async (open) => {
+    if (open) {
+        await nextTick();
+        resetClose.value?.focus();
+    }
+});
 
 const totalCards = computed(() => Object.values(counts.value).reduce((s, v) => s + (v || 0), 0));
 const masteredCards = computed(() => counts.value[5] || 0);
 
 // Overall learning progress across all six Leitner boxes, independent of
-// whatever completion conditions (if any) are configured. A card in "Neu"
-// (box 0) contributes nothing yet; a card in "Experte" (box 5) counts as
+// whatever completion conditions (if any) are configured. A card in "New"
+// (box 0) contributes nothing yet; a card in "Expert" (box 5) counts as
 // fully done. Cards sitting in between contribute proportionally, so the
 // bar visibly moves well before any card reaches the final box - going
-// from box 0 to box 1 ("Einsteiger") is the first bit of visible progress.
+// from box 0 to box 1 ("Beginner") is the first bit of visible progress.
 const progressPercent = computed(() => {
     if (totalCards.value === 0) return 0;
     let weightedSum = 0;
@@ -189,6 +227,10 @@ const progressLabelText = () => {
     const overall = getString('progress_overall').replace('{percent}', progressPercent.value);
     return `${overall} · ${masteredCards.value}/${totalCards.value} ${getString('progress_label')}`;
 };
+
+const progressAriaText = () => getString('progress_aria')
+    .replace('{mastered}', masteredCards.value)
+    .replace('{total}', totalCards.value);
 
 const loadCounts = async () => {
     try { counts.value = await getBoxCounts(); }
@@ -216,7 +258,6 @@ const startSession = (boxnumber) => {
 
 const doReset = async () => {
     resetting.value = true;
-    resetSuccess.value = false;
     resetError.value = '';
     try {
         await resetProgress(getConfig().instanceid);
@@ -502,7 +543,7 @@ const doReset = async () => {
 
 /* ─── modals ──────────────── */
 .rc-overlay {
-  position: fixed; inset: 0; z-index: 100;
+  position: fixed; inset: 0; z-index: 1060;
   display: flex; align-items: center; justify-content: center; padding: 16px;
   background: rgba(15,23,42,0.5);
   backdrop-filter: blur(4px);

@@ -42,6 +42,15 @@ class course_module_viewed extends \core\event\course_module_viewed {
     }
 
     /**
+     * Maps the object id when course logs are restored.
+     *
+     * @return array
+     */
+    public static function get_objectid_mapping() {
+        return ['db' => 'leitbox', 'restore' => 'leitbox'];
+    }
+
+    /**
      * Returns description of what happened.
      *
      * @return string

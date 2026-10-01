@@ -7,7 +7,7 @@
 -->
 <libraries>
     <library>
-        <location>dist/assets</location>
+        <location>dist/assets/index.js</location>
         <name>Vue.js</name>
         <version>3.5.29</version>
         <license>MIT</license>
@@ -15,6 +15,17 @@
         <urls>
             <url>https://vuejs.org/</url>
             <url>https://github.com/vuejs/core</url>
+        </urls>
+    </library>
+    <library>
+        <location>dist/assets/index.js</location>
+        <name>Tailwind CSS (generated utility classes)</name>
+        <version>3.4.19</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+        <urls>
+            <url>https://tailwindcss.com/</url>
+            <url>https://github.com/tailwindlabs/tailwindcss</url>
         </urls>
     </library>
 </libraries>

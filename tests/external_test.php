@@ -205,4 +205,35 @@ final class external_test extends externallib_advanced_testcase {
         $progresscount = $DB->count_records('leitbox_progress', ['userid' => $student->id]);
         $this->assertEquals(1, $progresscount); // Only 1 unique progress record (UNIQUE INDEX).
     }
+
+    /**
+     * A new card rated red moves to box 1 but does not count as answered correctly.
+     *
+     * @covers \mod_leitbox\completion\custom_completion::get_state
+     */
+    public function test_completion_min_cards_ignores_cards_only_rated_red(): void {
+        global $DB;
+        $course = $this->getDataGenerator()->create_course(['enablecompletion' => 1]);
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $leitbox = $this->getDataGenerator()->create_module('leitbox', [
+            'course' => $course->id,
+            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+            'completion_min_cards' => 1,
+        ]);
+        $card = $DB->get_records('leitbox_cards', ['leitboxid' => $leitbox->id], 'id ASC', '*', 0, 1);
+        $card = reset($card);
+        $this->setUser($student);
+
+        $cm = get_fast_modinfo($course)->get_cm($leitbox->cmid);
+        $completion = new \mod_leitbox\completion\custom_completion($cm, (int)$student->id);
+
+        // Rated red: the card moves to box 1, but it was never answered correctly.
+        external::submit_answer($card->id, 0);
+        $this->assertEquals(1, $DB->get_field('leitbox_progress', 'box_number', ['cardid' => $card->id]));
+        $this->assertEquals(COMPLETION_INCOMPLETE, $completion->get_state('completion_min_cards'));
+
+        // Rated green: now it counts.
+        external::submit_answer($card->id, 2);
+        $this->assertEquals(COMPLETION_COMPLETE, $completion->get_state('completion_min_cards'));
+    }
 }

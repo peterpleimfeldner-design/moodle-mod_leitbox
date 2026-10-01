@@ -87,14 +87,15 @@ class custom_completion extends activity_custom_completion {
 
             $target = (int)$customrules['completion_min_cards'];
 
-            // Counts cards that have been answered correctly at least once (box_number >= 1).
-            // A card only reaches Box 1+ if it has been rated green at least once.
-            // This is the first real quality indicator in the Leitner system —
-            // as opposed to COUNT(DISTINCT cardid) which also counts red cards.
+            // Counts cards that have been answered correctly at least once.
+            // The box number alone is not enough: a new card rated red also
+            // moves to box 1 (external::submit_answer()), so count_correct
+            // must be checked as well.
             $sql = "SELECT COUNT(DISTINCT p.cardid)
                       FROM {leitbox_progress} p
                      WHERE p.userid      = :userid
                        AND p.box_number >= 1
+                       AND p.count_correct > 0
                        AND p.cardid IN (
                            SELECT id FROM {leitbox_cards} WHERE leitboxid = :instanceid
                        )";

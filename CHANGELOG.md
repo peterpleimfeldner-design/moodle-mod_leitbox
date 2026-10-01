@@ -38,6 +38,36 @@ A German version is kept in the repository as `CHANGELOG.de.md` (not part of the
 - Privacy export: dates are exported with `transform::datetime()`, card texts are formatted in the
   module context.
 
+### Fixed (found by our own full review before resubmission)
+- **Course restore with user data failed:** the restore step stored the card id mapping under a
+  different name than the one it read back, so every progress record was restored with an empty
+  card id and the restore stopped with a database error as soon as any learner had progress. Links
+  in card texts were not rewritten to the restored activity either. Both fixed and covered by a new
+  backup and restore test.
+- **Activity settings form crashed on Moodle 4.1 and 4.2:** `mod_form.php` called `get_suffix()`,
+  which only exists from Moodle 4.3. The form now works on every supported version; a new Behat
+  test opens and saves it.
+- **Completion "minimum cards answered correctly"** also counted new cards that were only rated
+  "Hard" (they move to box 1). It now counts only cards answered correctly at least once, as its
+  help text says.
+- **Learner view:** an error appeared in the browser console after the last card of a session; the
+  activity name was escaped twice ("Q&amp;A"); the description was shown twice on Moodle 4.0 and
+  later; Tailwind utility classes such as `.block` restyled Moodle's own blocks on the page (all
+  utility classes are now limited to the app container).
+- **Keyboard and screen reader use of the learner view:** the card can now be turned over with the
+  keyboard ("Tap to flip" is a real button), the keyboard focus moves to the rating buttons and then
+  to the next card, the hidden side of the card is inert, the dialogs take the focus, close with
+  Escape and lie above Moodle's navigation bar, and invalid landmark and list roles were removed.
+- **A failed save of an answer is now shown to the learner** instead of being lost silently;
+  messages that used `alert()` are now shown on the page.
+- "Display description on course page" now works; the course page shows the activity purpose
+  colour (`FEATURE_MOD_PURPOSE`); `index.php` triggers the instance list viewed event and shows
+  section names; the viewed event maps its object id for restored logs.
+- Privacy API: the `status` field of the progress table is declared and exported, the export
+  includes the hint and resolves the demo card texts.
+- Texts that promised behaviour the plugin does not have ("spaced repetition", cards "queried less
+  frequently") now describe the Leitner box method as it works: learners choose the deck.
+
 ### Changed
 - **New capability `mod/leitbox:managecards`** (#22): adding, editing, importing, exporting and
   deleting cards is controlled by this capability (editing teachers and managers by default)

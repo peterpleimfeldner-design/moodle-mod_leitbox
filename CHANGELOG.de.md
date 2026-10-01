@@ -31,6 +31,31 @@ Fassung bleibt nur im Repository.
   vorgelegt. Das tut das Plugin nicht; der Satz ist entfernt (Deutsch und Englisch).
 - Datenschutz-Export: Datum über `transform::datetime()`, Kartentexte im Modulkontext formatiert.
 
+### Behoben (aus unserem eigenen Gesamt-Review vor der erneuten Einreichung)
+- **Kurs-Wiederherstellung mit Nutzerdaten scheiterte:** Der Restore-Schritt speicherte die
+  Kartenzuordnung unter einem anderen Namen, als er sie wieder auslas. Jeder Fortschritt wurde ohne
+  Karten-ID wiederhergestellt, der Restore brach mit einem Datenbankfehler ab. Links in Kartentexten
+  wurden nicht auf die neue Aktivität umgeschrieben. Beides behoben, mit neuem Backup-/Restore-Test.
+- **Einstellungsformular stürzte unter Moodle 4.1 und 4.2 ab:** `get_suffix()` gibt es erst ab 4.3.
+  Das Formular funktioniert jetzt auf allen unterstützten Versionen; ein neuer Behat-Test öffnet und
+  speichert es.
+- **Abschlussregel „Mindestanzahl richtig beantworteter Karten“** zählte auch neue Karten, die nur
+  „Schwer“ bewertet wurden (sie wandern in Stapel 1). Jetzt zählen nur richtig beantwortete Karten.
+- **Lernoberfläche:** Konsolenfehler nach der letzten Karte; doppelt maskierter Aktivitätsname; doppelt
+  angezeigte Beschreibung ab Moodle 4.0; Tailwind-Klassen wie `.block` veränderten Moodles eigene
+  Blöcke (jetzt auf den App-Container begrenzt).
+- **Tastatur und Screenreader:** Karte per Tastatur umdrehbar, Fokus wandert zu den Bewertungsknöpfen
+  und zur nächsten Karte, verdeckte Kartenseite ist inaktiv, Dialoge übernehmen den Fokus, schließen
+  mit Escape und liegen über Moodles Navigationsleiste, ungültige Rollen entfernt.
+- **Speicherfehler werden angezeigt** statt still verloren zu gehen; Meldungen per `alert()` stehen
+  jetzt auf der Seite.
+- „Beschreibung auf Kursseite anzeigen“ funktioniert; Aktivitätszweck (`FEATURE_MOD_PURPOSE`);
+  `index.php` löst das Ereignis für die Aktivitätsliste aus und zeigt Abschnittsnamen; das
+  Aufruf-Ereignis bildet seine Objekt-ID für wiederhergestellte Logs ab.
+- Datenschutz: Feld `status` deklariert und exportiert, Export mit Hinweis und aufgelösten Demo-Texten.
+- Texte, die nicht vorhandenes Verhalten versprachen („Spaced Repetition“, „seltener abgefragt“),
+  beschreiben jetzt den Leitner-Karteikasten, wie er funktioniert: Lernende wählen den Stapel.
+
 ### Geändert
 - **Neues Recht `mod/leitbox:managecards`** (#22) für das Verwalten der Karten (standardmäßig
   Trainer/innen mit Bearbeitungsrecht und Manager/innen).

@@ -40,8 +40,8 @@ $context = context_module::instance($cm->id);
 require_capability('mod/leitbox:managecards', $context);
 
 $PAGE->set_url('/mod/leitbox/manage.php', ['id' => $cm->id]);
-$PAGE->set_title(format_string($leitbox->name));
-$PAGE->set_heading(format_string($course->fullname));
+$PAGE->set_title(format_string($leitbox->name, true, ['context' => $context]));
+$PAGE->set_heading(format_string($course->fullname, true, ['context' => context_course::instance($course->id)]));
 $PAGE->set_context($context);
 
 // Action processing (data changes only, no HTML output yet).

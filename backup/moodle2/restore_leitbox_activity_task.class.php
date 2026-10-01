@@ -56,7 +56,7 @@ class restore_leitbox_activity_task extends restore_activity_task {
     public static function define_decode_contents() {
         $contents = [];
         $contents[] = new restore_decode_content('leitbox', ['intro'], 'leitbox');
-        $contents[] = new restore_decode_content('leitbox_cards', ['question', 'answer', 'hint'], 'leitbox_cards');
+        $contents[] = new restore_decode_content('leitbox_cards', ['question', 'answer', 'hint'], 'leitbox_card');
         return $contents;
     }
 

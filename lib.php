@@ -169,6 +169,8 @@ function leitbox_supports($feature) {
             return true;
         case FEATURE_BACKUP_MOODLE2:
             return true;
+        case FEATURE_MOD_PURPOSE:
+            return MOD_PURPOSE_ASSESSMENT;
         default:
             return null;
     }
@@ -188,7 +190,7 @@ function leitbox_get_coursemodule_info($coursemodule) {
     $leitbox = $DB->get_record(
         'leitbox',
         ['id' => $coursemodule->instance],
-        'id, name, completion_min_cards, completion_min_mastered, completion_all_mastered'
+        'id, name, intro, introformat, completion_min_cards, completion_min_mastered, completion_all_mastered'
     );
     if (!$leitbox) {
         return false;
@@ -196,6 +198,11 @@ function leitbox_get_coursemodule_info($coursemodule) {
 
     $result = new cached_cm_info();
     $result->name = $leitbox->name;
+
+    if ($coursemodule->showdescription) {
+        // Display the description on the course page.
+        $result->content = format_module_intro('leitbox', $leitbox, $coursemodule->id, false);
+    }
 
     // Only write ACTIVE rules (value > 0) to customdata for automatic completion.
     // Moodle evaluates get_state() for EVERY rule in customcompletionrules and expects

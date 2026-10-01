@@ -80,7 +80,7 @@ class restore_leitbox_activity_structure_step extends restore_activity_structure
         $data->leitboxid = $this->get_new_parentid('leitbox');
 
         $newitemid = $DB->insert_record('leitbox_cards', $data);
-        $this->set_mapping('leitbox_cards', $oldid, $newitemid);
+        $this->set_mapping('leitbox_card', $oldid, $newitemid);
     }
 
     /**
@@ -100,7 +100,7 @@ class restore_leitbox_activity_structure_step extends restore_activity_structure
             return; // Don't restore if the user isn't found.
         }
 
-        $data->cardid = $this->get_new_parentid('leitbox_cards');
+        $data->cardid = $this->get_new_parentid('leitbox_card');
 
         $newitemid = $DB->insert_record('leitbox_progress', $data);
         $this->set_mapping('leitbox_progress', $oldid, $newitemid);

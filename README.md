@@ -13,11 +13,11 @@ inside Moodle – no extra login, no external tools, no data leaving the institu
 
 | | |
 |---|---|
-| ![Dashboard with six learning boxes and overall progress](docs/screenshots/dashboard.png) | ![Flashcard front side with question and optional hint](docs/screenshots/card-front.png) |
+| ![Dashboard with six learning boxes and overall progress](https://raw.githubusercontent.com/peterpleimfeldner-design/moodle-mod_leitbox/main/docs/screenshots/dashboard.png) | ![Flashcard front side with question and optional hint](https://raw.githubusercontent.com/peterpleimfeldner-design/moodle-mod_leitbox/main/docs/screenshots/card-front.png) |
 | Dashboard: six learning boxes (New to Expert) with overall progress at a glance | Flashcard front: the question first, with an optional hint |
-| ![Flashcard back side with answer and three rating buttons](docs/screenshots/card-back.png) | ![Bulk import screen with AI-ready prompt template](docs/screenshots/bulk-import.png) |
+| ![Flashcard back side with answer and three rating buttons](https://raw.githubusercontent.com/peterpleimfeldner-design/moodle-mod_leitbox/main/docs/screenshots/card-back.png) | ![Bulk import screen with AI-ready prompt template](https://raw.githubusercontent.com/peterpleimfeldner-design/moodle-mod_leitbox/main/docs/screenshots/bulk-import.png) |
 | Flashcard back: rate yourself Got it, Again, or Hard – a wrong answer never resets all progress | Bulk import: paste a ready-made AI prompt, then import a whole deck at once |
-| ![Card management table listing every flashcard](docs/screenshots/manage-cards.png) | |
+| ![Card management table listing every flashcard](https://raw.githubusercontent.com/peterpleimfeldner-design/moodle-mod_leitbox/main/docs/screenshots/manage-cards.png) | |
 | Card management: every card in one table, with edit, delete and export | |
 
 A live, browsable homepage with the same screenshots is also available at
@@ -35,7 +35,7 @@ Three answer options give learners full control:
 |--------|--------|
 | **Got it** | Card advances one box |
 | **Again** | Card stays in its current box – no penalty |
-| **Hard** | Card falls back **one box**, but never below Beginner (never all the way to the start) |
+| **Hard** | Card falls back **one box**, but never all the way to the start (a new card moves to Beginner) |
 
 A single mistake never erases all progress. Learners choose when and how often to practise – LeitBox
 does not schedule reminders or due dates.
@@ -56,7 +56,7 @@ no CSV headaches.
 
 ### Moodle-Native Completion Tracking
 Three granular, combinable completion conditions:
-- User interacted with X unique cards
+- User answered X unique cards correctly at least once
 - User promoted X cards to Expert level (box 5)
 - User promoted **all** cards to Expert level
 

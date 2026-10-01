@@ -62,6 +62,7 @@ class provider implements core_userlist_provider, metadata_provider, plugin_prov
                 'count_correct' => 'privacy:metadata:leitbox_progress:count_correct',
                 'count_wrong' => 'privacy:metadata:leitbox_progress:count_wrong',
                 'last_reviewed' => 'privacy:metadata:leitbox_progress:last_reviewed',
+                'status' => 'privacy:metadata:leitbox_progress:status',
             ],
             'privacy:metadata:leitbox_progress'
         );
@@ -139,7 +140,7 @@ class provider implements core_userlist_provider, metadata_provider, plugin_prov
                     continue;
                 }
 
-                $sql = "SELECT rp.*, rc.question, rc.answer
+                $sql = "SELECT rp.*, rc.question, rc.answer, rc.hint
                           FROM {leitbox_progress} rp
                           JOIN {leitbox_cards} rc ON rc.id = rp.cardid
                          WHERE rc.leitboxid = ? AND rp.userid = ?";
@@ -149,9 +150,14 @@ class provider implements core_userlist_provider, metadata_provider, plugin_prov
                     $exportdata = [];
                     foreach ($progressrecords as $rec) {
                         $exportdata[] = (object)[
-                            'question' => format_text($rec->question, FORMAT_HTML, ['context' => $context]),
-                            'answer' => format_text($rec->answer, FORMAT_HTML, ['context' => $context]),
+                            'question' => format_text(self::resolve_demo_text($rec->question), FORMAT_HTML,
+                                ['context' => $context]),
+                            'answer' => format_text(self::resolve_demo_text($rec->answer), FORMAT_HTML,
+                                ['context' => $context]),
+                            'hint' => format_text(self::resolve_demo_text((string)$rec->hint), FORMAT_HTML,
+                                ['context' => $context]),
                             'box_number' => $rec->box_number,
+                            'status' => $rec->status,
                             'count_correct' => $rec->count_correct,
                             'count_wrong' => $rec->count_wrong,
                             'last_reviewed' => transform::datetime($rec->last_reviewed),
@@ -165,6 +171,19 @@ class provider implements core_userlist_provider, metadata_provider, plugin_prov
                 }
             }
         }
+    }
+
+    /**
+     * Resolves the language-neutral demo card markers (e.g. ##demo_q1##) to text.
+     *
+     * @param string $text The stored card text.
+     * @return string The text to export.
+     */
+    private static function resolve_demo_text(string $text): string {
+        if (preg_match('/^##(demo_[a-z0-9]+)##$/', $text, $matches)) {
+            return get_string($matches[1], 'mod_leitbox');
+        }
+        return $text;
     }
 
     /**

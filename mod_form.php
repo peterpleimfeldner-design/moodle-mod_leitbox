@@ -67,6 +67,20 @@ class mod_leitbox_mod_form extends moodleform_mod {
     }
 
     /**
+     * Returns the suffix Moodle adds to completion field names.
+     *
+     * Moodle 4.3 and later add a suffix (get_suffix() from the
+     * core completion form trait) so that completion fields of several
+     * activities can share one page. Moodle 4.1 and 4.2 have neither the
+     * method nor the suffix.
+     *
+     * @return string The suffix, or an empty string before Moodle 4.3.
+     */
+    protected function get_completion_field_suffix(): string {
+        return method_exists($this, 'get_suffix') ? $this->get_suffix() : '';
+    }
+
+    /**
      * Add the custom completion rule form elements.
      *
      * Called by Moodle core when building the activity settings form.
@@ -77,9 +91,7 @@ class mod_leitbox_mod_form extends moodleform_mod {
     public function add_completion_rules() {
         $mform  = $this->_form;
 
-        // Moodle 4.3+ uses a suffix system to avoid naming collisions when
-        // multiple instances of the same activity appear on one page.
-        $suffix = $this->get_suffix();
+        $suffix = $this->get_completion_field_suffix();
 
         // Rule 1: minimum number of unique cards practiced.
         $group1name   = 'completion_min_cards_group' . $suffix;
@@ -166,7 +178,7 @@ class mod_leitbox_mod_form extends moodleform_mod {
      * @return bool True if at least one rule is enabled.
      */
     public function completion_rule_enabled($data) {
-        $suffix = $this->get_suffix();
+        $suffix = $this->get_completion_field_suffix();
 
         $mincardson   = !empty($data['completion_min_cards_enabled' . $suffix])
                           && (int)($data['completion_min_cards' . $suffix] ?? 0) > 0;
@@ -188,7 +200,7 @@ class mod_leitbox_mod_form extends moodleform_mod {
      */
     public function data_preprocessing(&$defaultvalues) {
         parent::data_preprocessing($defaultvalues);
-        $suffix = $this->get_suffix();
+        $suffix = $this->get_completion_field_suffix();
 
         // Rule 1: completion_min_cards.
         $keyval     = 'completion_min_cards' . $suffix;
@@ -230,7 +242,7 @@ class mod_leitbox_mod_form extends moodleform_mod {
      */
     public function data_postprocessing($data) {
         parent::data_postprocessing($data);
-        $suffix = $this->get_suffix();
+        $suffix = $this->get_completion_field_suffix();
 
         // Only touch completion fields when the completion lock is open
         // (completionunlocked is set by Moodle when the admin explicitly

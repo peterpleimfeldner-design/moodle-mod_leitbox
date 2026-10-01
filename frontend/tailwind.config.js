@@ -38,5 +38,9 @@ export default {
     corePlugins: {
         preflight: false,
     },
+    // Limit every utility class to the app container. Tailwind class names
+    // such as .block, .hidden or .border also exist in Moodle and Bootstrap;
+    // unscoped, they would restyle Moodle's own blocks on the same page.
+    important: '#v-app-mod-leitbox',
     plugins: [],
 };

@@ -29,10 +29,16 @@ $id = required_param('id', PARAM_INT); // Course ID.
 $course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
 
 require_course_login($course);
+$coursecontext = context_course::instance($course->id);
+
+$event = \mod_leitbox\event\course_module_instance_list_viewed::create(['context' => $coursecontext]);
+$event->add_record_snapshot('course', $course);
+$event->trigger();
 
 $PAGE->set_url('/mod/leitbox/index.php', ['id' => $id]);
-$PAGE->set_title(format_string($course->fullname));
-$PAGE->set_heading(format_string($course->fullname));
+$PAGE->set_pagelayout('incourse');
+$PAGE->set_title(format_string($course->fullname, true, ['context' => $coursecontext]));
+$PAGE->set_heading(format_string($course->fullname, true, ['context' => $coursecontext]));
 $PAGE->navbar->add(get_string('modulenameplural', 'mod_leitbox'));
 
 echo $OUTPUT->header();
@@ -57,10 +63,10 @@ $table->align = ['center', 'left'];
 foreach ($leitboxes as $leitbox) {
     $link = html_writer::link(
         new moodle_url('/mod/leitbox/view.php', ['id' => $leitbox->coursemodule]),
-        format_string($leitbox->name, true)
+        format_string($leitbox->name, true, ['context' => context_module::instance($leitbox->coursemodule)])
     );
     $table->data[] = [
-        $leitbox->section,
+        get_section_name($course, $leitbox->section),
         $link,
     ];
 }

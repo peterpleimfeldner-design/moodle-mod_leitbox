@@ -38,8 +38,8 @@ require_capability('mod/leitbox:view', $context);
 
 // Generate modern page layout.
 $PAGE->set_url('/mod/leitbox/view.php', ['id' => $cm->id]);
-$PAGE->set_title(format_string($leitbox->name));
-$PAGE->set_heading(format_string($course->fullname));
+$PAGE->set_title(format_string($leitbox->name, true, ['context' => $context]));
+$PAGE->set_heading(format_string($course->fullname, true, ['context' => context_course::instance($course->id)]));
 $PAGE->set_context($context);
 
 // Export strings for Vue frontend.
@@ -51,7 +51,7 @@ $vuestrings = [
     'cardxofy_x', 'cardxofy_y', 'loadingcards', 'sessiondone', 'sessiondonedesc',
     'completed', 'error_loading_cards', 'box_empty_now', 'box0', 'box1', 'box2', 'box3', 'box4', 'box5',
     'reset_progress', 'reset_progress_confirm_title', 'reset_progress_confirm_msg',
-    'reset_progress_btn', 'reset_progress_cancel', 'reset_progress_done', 'reset_progress_error',
+    'reset_progress_btn', 'reset_progress_cancel', 'reset_progress_error', 'error_saving_answer',
     'progress_label', 'progress_overall', 'progress_aria',
     'feedback_grand_title', 'feedback_grand_desc', 'feedback_perfect_title', 'feedback_perfect_desc',
     'feedback_good_title', 'feedback_good_desc', 'feedback_okay_title', 'feedback_okay_desc',
@@ -96,17 +96,13 @@ if ($completion->is_enabled($cm)) {
 
 echo $OUTPUT->header();
 
-// Display intro if present.
-if (!empty(trim($leitbox->intro))) {
-    echo $OUTPUT->box(format_module_intro('leitbox', $leitbox, $cm->id), 'generalbox mod_introbox', 'intro');
-}
-
 // Pass parameters to the Vue app via a data attribute. The app calls the web
 // services through Moodle's core/ajax module, which adds the sesskey itself.
 $appdata = [
     'instanceid'   => (int)$leitbox->id,
     'cmid'         => (int)$cm->id,
-    'activityname' => format_string($leitbox->name),
+    // Not HTML-escaped here: Vue escapes it when rendering.
+    'activityname' => format_string($leitbox->name, true, ['context' => $context, 'escape' => false]),
 ];
 
 // Mount point for Vue.
