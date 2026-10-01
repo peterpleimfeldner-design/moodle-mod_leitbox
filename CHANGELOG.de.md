@@ -20,7 +20,7 @@ Fassung bleibt nur im Repository.
   löschen jetzt über eine Unterabfrage auf `leitbox_cards` statt auf die eigene Tabelle.
 - **JavaScript-Fehler bei jedem Aufruf der Aktivität** (#23): Der Aufruf `core/ajax` `init()` in
   `view.php` ist entfernt. Die Lernoberfläche ruft die Web-Services jetzt über Moodles `core/ajax`
-  statt über Axios auf; Axios ist nicht mehr im Bundle (163 KB auf 124 KB).
+  statt über Axios auf; Axios ist nicht mehr im Bundle (130 KB statt 163 KB).
 - **`styles.css` wirkte auf andere Aktivitäten** (#21): Die Regeln für das Abschluss-Formular sind
   entfernt, alle übrigen Regeln gelten nur auf LeitBox-Seiten und ohne `!important`.
 - Fest eingebaute Ersatztexte (teils Deutsch) im Vue-Quellcode entfernt; alle Texte kommen aus den
@@ -70,7 +70,8 @@ Fassung bleibt nur im Repository.
   ZIP; die README beschreibt den Build.
 - **Änderungsprotokoll auf Englisch** (#24).
 - Kartenverwaltung: Beschriftungen mit den Feldern verknüpft, Auswahlkästchen beschriftet,
-  Inline-Styles nach `styles.css` verschoben, reine Bootstrap-4-Klassen ersetzt.
+  Inline-Styles nach `styles.css` verschoben; die Bootstrap-4-Klassen `text-right` und `sr-only`
+  ersetzt, `custom-select` um die Bootstrap-5-Klasse `form-select` ergänzt (Moodle 4.x und 5.x).
 - Sprachdateien alphabetisch sortiert; Frontend-Werkzeuge aktualisiert (Vite 6, `npm audit` ohne
   Befund); README-Beschreibung von „Nochmal“ und „Schwer“ an das tatsächliche Verhalten angepasst.
 

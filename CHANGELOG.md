@@ -24,8 +24,8 @@ A German version is kept in the repository as `CHANGELOG.de.md` (not part of the
 - **JavaScript error on every activity view** (#23): `view.php` called `init()` on `core/ajax`,
   which has no such function, so the page kept a pending JavaScript marker. The call is removed.
   The learner view now calls the web services through Moodle's `core/ajax` module instead of Axios,
-  so Moodle handles the sesskey, session expiry and errors. Axios is no longer bundled (bundle size
-  163 KB to 124 KB).
+  so Moodle handles the sesskey, session expiry and errors. Axios is no longer bundled (the bundle is
+  130 KB instead of 163 KB).
 - **`styles.css` affected other activities** (#21): the rules for the completion settings form
   applied to every activity type on the site. They are removed. All remaining rules are limited to
   LeitBox pages and use no `!important`.
@@ -58,11 +58,13 @@ A German version is kept in the repository as `CHANGELOG.de.md` (not part of the
   keyboard ("Tap to flip" is a real button), the keyboard focus moves to the rating buttons and then
   to the next card, the hidden side of the card is inert, the dialogs take the focus, close with
   Escape and lie above Moodle's navigation bar, and invalid landmark and list roles were removed.
-- **Buttons without their own border showed the browser's grey default frame** (for example "Back to dashboard") since Tailwind's global reset was disabled in 1.6.0. A minimal reset now applies inside the app container only, with zero specificity.
+- **Buttons without their own border showed the browser's grey default frame** (for example
+  "Back to dashboard") since Tailwind's global reset was disabled in 1.6.0. A minimal reset now
+  applies inside the app container only, with zero specificity.
 - **A failed save of an answer is now shown to the learner** instead of being lost silently;
   messages that used `alert()` are now shown on the page.
-- "Display description on course page" now works; `index.php` triggers the instance list viewed event and shows
-  section names; the viewed event maps its object id for restored logs.
+- "Display description on course page" now works; `index.php` triggers the instance list viewed
+  event and shows section names; the viewed event maps its object id for restored logs.
 - Privacy API: the `status` field of the progress table is declared and exported, the export
   includes the hint and resolves the demo card texts.
 - Texts that promised behaviour the plugin does not have ("spaced repetition", cards "queried less
@@ -81,7 +83,8 @@ A German version is kept in the repository as `CHANGELOG.de.md` (not part of the
   `node_modules`) and the tests are now part of the release ZIP. The README documents the build.
 - **English change log** (#24): this file is now in English.
 - Card management page: form labels are linked to their fields, the selection check boxes have
-  accessible names, inline styles moved to `styles.css`, Bootstrap 4-only utility classes replaced.
+  accessible names, inline styles moved to `styles.css`; the Bootstrap 4 classes `text-right` and `sr-only` replaced,
+  `custom-select` paired with the Bootstrap 5 class `form-select` (Moodle 4.x and 5.x).
 - Language files are sorted alphabetically.
 - Frontend build tools updated (Vite 6); `npm audit` reports no vulnerabilities.
 - README: the description of the "Again" and "Hard" buttons now matches what the plugin does.
