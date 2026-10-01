@@ -154,7 +154,8 @@
 
 <script setup>
 import { onMounted, ref, computed } from 'vue';
-import { getBoxCounts, getLogoUrl, resetProgress } from '../api';
+import { getBoxCounts, getConfig, getLogoUrl, resetProgress } from '../api';
+import { getString } from '../strings';
 
 const props = defineProps({
     activityName: { type: String, default: '' },
@@ -194,57 +195,6 @@ const loadCounts = async () => {
     catch (e) { console.error('Failed to load counts', e); }
 };
 
-// Fallback strings, used only if window.M.str.mod_leitbox failed to load
-// (Moodle's strings_for_js() normally always provides these - see view.php).
-const FALLBACKS = {
-    // Header
-    dashboardtitle: 'Your LeitBox Cards',
-    dashboardsbtitle: 'Select a learning deck to practice',
-    howitworks: 'How does this work?',
-    cards: 'Cards',
-    card_singular: 'Card',
-    loadingcards: 'Shuffling cards...',
-    progress_label: 'cards at Expert level',
-    progress_overall: '{percent}% overall progress',
-    progress_aria: 'Progress: {mastered} of {total} cards mastered',
-    // Box levels
-    box0: 'New',
-    box1: 'Beginner',
-    box2: 'Learner',
-    box3: 'Advanced',
-    box4: 'Experienced',
-    box5: 'Expert',
-    // Info modal
-    systemtitle: 'The Spaced Repetition System',
-    systemintro: 'This plugin is based on the Leitner System - invented in 1972 by the Austrian scientist Sebastian Leitner and globally recognized in learning research today. The goal is to move cards from left to right into the final deck.',
-    known_btn: 'Got it',
-    known_desc: 'Easy! The card moves one stack to the right.',
-    again_btn: 'Again',
-    again_desc: 'Not sure. The card stays in the current stack.',
-    hard_btn: 'Hard',
-    hard_desc: 'Did not know it! The card moves back one stack.',
-    systemtip: '<strong>Tip:</strong> Review the topics behind the cards you did not know - before you start a new attempt.',
-    gotit: 'Got it, let\'s go!',
-    close: 'Close',
-    cancel: 'Cancel',
-    // Reset
-    reset_progress: 'Reset Learning Progress',
-    reset_progress_confirm_title: 'Reset Learning Progress?',
-    reset_progress_confirm_msg: 'Warning: This will reset all your learning progress. All cards will be moved back to "New". This cannot be undone!',
-    reset_progress_btn: 'Yes, Reset',
-    reset_progress_cancel: 'Cancel',
-    reset_progress_done: 'Learning progress has been reset!',
-};
-
-const getString = (key) => {
-    // 1. Try Moodle's loaded strings
-    const moodleStr = window.M?.str?.mod_leitbox?.[key];
-    // 2. Only use Moodle string if it's valid (not a [[placeholder]])
-    if (moodleStr && !moodleStr.startsWith('[[')) return moodleStr;
-    // 3. Fall back to hardcoded defaults
-    return FALLBACKS[key] ?? key;
-};
-
 onMounted(loadCounts);
 
 const getBoxEmoji = (box) => ['🆕','🔁','📖','🔥','💡','🏆'][box] ?? '📦';
@@ -269,12 +219,12 @@ const doReset = async () => {
     resetSuccess.value = false;
     resetError.value = '';
     try {
-        const appConfig = JSON.parse(document.getElementById('v-app-mod-leitbox')?.dataset?.config || '{}');
-        await resetProgress(appConfig.instanceid);
+        await resetProgress(getConfig().instanceid);
         await loadCounts();
         showReset.value = false;
     } catch (e) {
-        resetError.value = 'Fehler beim Zurücksetzen: ' + (e.message || 'Unbekannter Fehler');
+        console.error('Failed to reset progress', e);
+        resetError.value = getString('reset_progress_error');
     } finally {
         resetting.value = false;
     }

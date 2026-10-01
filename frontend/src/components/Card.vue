@@ -60,24 +60,7 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-
-const FALLBACKS = {
-    showhint:    'Hinweis anzeigen',
-    hint:        'Hinweis',
-    taptoflip:   'Antippen zum Umdrehen',
-    hard_btn:    'Schwer',
-    action_back: 'Zurück',
-    again_btn:   'Nochmal',
-    action_stay: 'Bleibt',
-    known_btn:   'Gewusst',
-    action_next: 'Nächste',
-};
-
-const getString = (key) => {
-    const moodleStr = window.M?.str?.mod_leitbox?.[key];
-    if (moodleStr && !moodleStr.startsWith('[[')) return moodleStr;
-    return FALLBACKS[key] ?? key;
-};
+import { getString } from '../strings';
 
 const props = defineProps({
     card: { type: Object, required: true }

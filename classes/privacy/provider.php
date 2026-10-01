@@ -31,11 +31,21 @@ use core_privacy\local\request\approved_userlist;
 use core_privacy\local\metadata\provider as metadata_provider;
 use core_privacy\local\request\plugin\provider as plugin_provider;
 use core_privacy\local\request\core_userlist_provider;
+use core_privacy\local\request\transform;
 
 /**
  * Privacy API provider for mod_leitbox.
  */
 class provider implements core_userlist_provider, metadata_provider, plugin_provider {
+    /**
+     * Subquery for the card ids of one leitbox instance (one positional parameter).
+     *
+     * Deletes from {leitbox_progress} filter by this list of card ids. The
+     * subquery must not read {leitbox_progress} itself: MySQL rejects a
+     * DELETE that selects from its own target table (error 1093).
+     */
+    private const CARDS_SQL = 'SELECT id FROM {leitbox_cards} WHERE leitboxid = ?';
+
     /**
      * Returns metadata about the personal data stored by this plugin.
      *
@@ -139,12 +149,12 @@ class provider implements core_userlist_provider, metadata_provider, plugin_prov
                     $exportdata = [];
                     foreach ($progressrecords as $rec) {
                         $exportdata[] = (object)[
-                            'question' => format_text($rec->question),
-                            'answer' => format_text($rec->answer),
+                            'question' => format_text($rec->question, FORMAT_HTML, ['context' => $context]),
+                            'answer' => format_text($rec->answer, FORMAT_HTML, ['context' => $context]),
                             'box_number' => $rec->box_number,
                             'count_correct' => $rec->count_correct,
                             'count_wrong' => $rec->count_wrong,
-                            'last_reviewed' => date('Y-m-d H:i:s', $rec->last_reviewed),
+                            'last_reviewed' => transform::datetime($rec->last_reviewed),
                         ];
                     }
 
@@ -169,11 +179,7 @@ class provider implements core_userlist_provider, metadata_provider, plugin_prov
         }
 
         if ($cm = get_coursemodule_from_id('leitbox', $context->instanceid)) {
-            $sql = "SELECT p.id
-                      FROM {leitbox_progress} p
-                      JOIN {leitbox_cards} c ON c.id = p.cardid
-                     WHERE c.leitboxid = ?";
-            $DB->delete_records_select('leitbox_progress', "id IN ($sql)", [$cm->instance]);
+            $DB->delete_records_select('leitbox_progress', 'cardid IN (' . self::CARDS_SQL . ')', [$cm->instance]);
         }
     }
 
@@ -192,11 +198,11 @@ class provider implements core_userlist_provider, metadata_provider, plugin_prov
         foreach ($contextlist->get_contexts() as $context) {
             if ($context->contextlevel == CONTEXT_MODULE) {
                 if ($cm = get_coursemodule_from_id('leitbox', $context->instanceid)) {
-                    $sql = "SELECT p.id
-                              FROM {leitbox_progress} p
-                              JOIN {leitbox_cards} c ON c.id = p.cardid
-                             WHERE c.leitboxid = ? AND p.userid = ?";
-                    $DB->delete_records_select('leitbox_progress', "id IN ($sql)", [$cm->instance, $userid]);
+                    $DB->delete_records_select(
+                        'leitbox_progress',
+                        'cardid IN (' . self::CARDS_SQL . ') AND userid = ?',
+                        [$cm->instance, $userid]
+                    );
                 }
             }
         }
@@ -221,15 +227,8 @@ class provider implements core_userlist_provider, metadata_provider, plugin_prov
 
         if ($cm = get_coursemodule_from_id('leitbox', $context->instanceid)) {
             [$insql, $inparams] = $DB->get_in_or_equal($userids);
-
-            $sql = "SELECT p.id
-                      FROM {leitbox_progress} p
-                      JOIN {leitbox_cards} c ON c.id = p.cardid
-                     WHERE c.leitboxid = ? AND p.userid $insql";
-
             $params = array_merge([$cm->instance], $inparams);
-
-            $DB->delete_records_select('leitbox_progress', "id IN ($sql)", $params);
+            $DB->delete_records_select('leitbox_progress', 'cardid IN (' . self::CARDS_SQL . ") AND userid $insql", $params);
         }
     }
 }

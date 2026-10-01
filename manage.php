@@ -37,7 +37,7 @@ $leitbox = $DB->get_record('leitbox', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
-require_capability('moodle/course:manageactivities', $context);
+require_capability('mod/leitbox:managecards', $context);
 
 $PAGE->set_url('/mod/leitbox/manage.php', ['id' => $cm->id]);
 $PAGE->set_title(format_string($leitbox->name));
@@ -46,34 +46,23 @@ $PAGE->set_context($context);
 
 // Action processing (data changes only, no HTML output yet).
 
-if ($action === 'delete' && $cardid && confirm_sesskey()) {
-    $DB->delete_records('leitbox_progress', ['cardid' => $cardid]);
-    $DB->delete_records('leitbox_cards', ['id' => $cardid, 'leitboxid' => $leitbox->id]);
+if ($action === 'delete' && $cardid) {
+    require_sesskey();
+    // Security check first: the card must belong to this leitbox instance.
+    // Only then are the card and its learners' progress deleted.
+    $card = $DB->get_record('leitbox_cards', ['id' => $cardid, 'leitboxid' => $leitbox->id], '*', MUST_EXIST);
+    leitbox_delete_cards($leitbox->id, [$card->id]);
     redirect(
         new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]),
         get_string('carddeleted', 'mod_leitbox')
     );
 }
 
-if ($action === 'bulkdelete' && data_submitted() && confirm_sesskey()) {
+if ($action === 'bulkdelete' && data_submitted()) {
+    require_sesskey();
+    // Ids that do not belong to this leitbox instance are ignored.
     $cardids      = optional_param_array('cardids', [], PARAM_INT);
-    $deletedcount = 0;
-
-    if (!empty($cardids)) {
-        [$in, $params] = $DB->get_in_or_equal($cardids);
-        $params[]  = $leitbox->id;
-        $validcards = $DB->get_fieldset_sql(
-            "SELECT id FROM {leitbox_cards} WHERE id $in AND leitboxid = ?",
-            $params
-        );
-
-        if (!empty($validcards)) {
-            $deletedcount = count($validcards);
-            [$invalid, $paramsvalid] = $DB->get_in_or_equal($validcards);
-            $DB->delete_records_select('leitbox_progress', "cardid $invalid", $paramsvalid);
-            $DB->delete_records_select('leitbox_cards', "id $invalid", $paramsvalid);
-        }
-    }
+    $deletedcount = leitbox_delete_cards($leitbox->id, $cardids);
 
     if ($deletedcount > 0) {
         redirect(
@@ -85,7 +74,8 @@ if ($action === 'bulkdelete' && data_submitted() && confirm_sesskey()) {
     }
 }
 
-if ($action === 'export' && confirm_sesskey()) {
+if ($action === 'export') {
+    require_sesskey();
     $cards         = $DB->get_records('leitbox_cards', ['leitboxid' => $leitbox->id], 'id ASC');
     $exportcontent = "";
     // Resolve language-neutral demo card markers (e.g. ##demo_q1##) to plain
@@ -112,7 +102,8 @@ if ($action === 'export' && confirm_sesskey()) {
     die();
 }
 
-if ($action === 'add' && data_submitted() && confirm_sesskey()) {
+if ($action === 'add' && data_submitted()) {
+    require_sesskey();
     $currentcount = $DB->count_records('leitbox_cards', ['leitboxid' => $leitbox->id]);
     if ($currentcount >= 200) {
         redirect(
@@ -142,7 +133,8 @@ if ($action === 'add' && data_submitted() && confirm_sesskey()) {
     }
 }
 
-if ($action === 'update' && data_submitted() && confirm_sesskey() && $cardid) {
+if ($action === 'update' && data_submitted() && $cardid) {
+    require_sesskey();
     // Security check: ensure the card belongs to this leitbox instance.
     if (!$DB->record_exists('leitbox_cards', ['id' => $cardid, 'leitboxid' => $leitbox->id])) {
         throw new \moodle_exception('invalidrecord');
@@ -166,7 +158,8 @@ if ($action === 'update' && data_submitted() && confirm_sesskey() && $cardid) {
     }
 }
 
-if ($action === 'import' && data_submitted() && confirm_sesskey()) {
+if ($action === 'import' && data_submitted()) {
+    require_sesskey();
     // PARAM_RAW is required here because the bulk-import block uses a custom
     // Q:/A:/H:/===CARD=== text syntax that must keep its exact line breaks to
     // be parsed correctly. The syntax itself carries no HTML. Every field
@@ -315,6 +308,7 @@ $templatedata = [
     'strdeleteselected'  => get_string('deleteselected', 'mod_leitbox'),
     'strexportcards'     => get_string('exportcards', 'mod_leitbox'),
     'strselectall'       => get_string('selectall', 'moodle'),
+    'strselectcard'      => get_string('selectcard', 'mod_leitbox'),
 
     // Card form fields.
     'isedit'      => (bool)$editcard,

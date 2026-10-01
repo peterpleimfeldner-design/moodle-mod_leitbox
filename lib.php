@@ -54,6 +54,38 @@ function leitbox_auto_delete_demos($leitboxid) {
 }
 
 /**
+ * Deletes cards of one LeitBox activity together with all learner progress on them.
+ *
+ * Card ids that do not belong to the given activity are ignored, so a card
+ * id taken from another activity or course can never delete that card or
+ * its learners' progress. The ids are verified first; progress and cards
+ * are only deleted for the verified ids.
+ *
+ * @param int $leitboxid The leitbox instance id the cards must belong to.
+ * @param int[] $cardids The card ids to delete.
+ * @return int The number of cards deleted.
+ */
+function leitbox_delete_cards(int $leitboxid, array $cardids): int {
+    global $DB;
+
+    if (empty($cardids)) {
+        return 0;
+    }
+
+    [$insql, $params] = $DB->get_in_or_equal($cardids);
+    $params[] = $leitboxid;
+    $validids = $DB->get_fieldset_select('leitbox_cards', 'id', "id $insql AND leitboxid = ?", $params);
+    if (empty($validids)) {
+        return 0;
+    }
+
+    [$validsql, $validparams] = $DB->get_in_or_equal($validids);
+    $DB->delete_records_select('leitbox_progress', "cardid $validsql", $validparams);
+    $DB->delete_records_select('leitbox_cards', "id $validsql", $validparams);
+    return count($validids);
+}
+
+/**
  * Adds a new leitbox instance
  *
  * @param stdClass $leitbox
@@ -258,12 +290,14 @@ function leitbox_reset_userdata($data) {
     $status = [];
 
     if (!empty($data->reset_leitbox_progress)) {
-        $sql = "SELECT p.id
-                  FROM {leitbox_progress} p
-                  JOIN {leitbox_cards} c ON c.id = p.cardid
-                  JOIN {leitbox} l ON l.id = c.leitboxid
-                 WHERE l.course = :courseid";
-        $DB->delete_records_select('leitbox_progress', "id IN ($sql)", ['courseid' => $data->courseid]);
+        // The subquery reads only {leitbox_cards} and {leitbox}, never
+        // {leitbox_progress} itself: MySQL rejects a DELETE that selects from
+        // its own target table (error 1093).
+        $cardsql = "SELECT c.id
+                      FROM {leitbox_cards} c
+                      JOIN {leitbox} l ON l.id = c.leitboxid
+                     WHERE l.course = :courseid";
+        $DB->delete_records_select('leitbox_progress', "cardid IN ($cardsql)", ['courseid' => $data->courseid]);
 
         $status[] = [
             'component' => get_string('modulenameplural', 'mod_leitbox'),
@@ -284,7 +318,7 @@ function leitbox_reset_userdata($data) {
 function leitbox_extend_settings_navigation(settings_navigation $settings, navigation_node $leitboxnode) {
     global $PAGE;
 
-    if (has_capability('moodle/course:manageactivities', $PAGE->cm->context)) {
+    if (has_capability('mod/leitbox:managecards', $PAGE->cm->context)) {
         $url = new moodle_url('/mod/leitbox/manage.php', ['id' => $PAGE->cm->id]);
         $leitboxnode->add(
             get_string('managecards', 'mod_leitbox'),

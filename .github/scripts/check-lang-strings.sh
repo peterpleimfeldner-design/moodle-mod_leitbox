@@ -47,10 +47,41 @@ for key in $used_keys; do
     fi
 done
 
+# The Vue frontend reads its strings from M.str, which view.php fills via
+# strings_for_js(). It has no built-in fallback texts, so every key it uses
+# must be exported in view.php ($vuestrings) and defined in both language
+# files. Box names are built dynamically as 'box' + number (0-5).
+vue_keys=$( (grep -rhoE "getString\('[A-Za-z0-9_]+'\)" frontend/src \
+    | sed -E "s/getString\('([A-Za-z0-9_]+)'\)/\1/"; printf 'box%s\n' 0 1 2 3 4 5) | sort -u)
+
+vuestrings_block=$(sed -n '/^\$vuestrings = \[/,/^\];/p' view.php)
+
+for key in $vue_keys; do
+    if ! grep -qE "'${key}'" <<< "$vuestrings_block"; then
+        echo "Frontend string '${key}' is used in frontend/src but not exported in view.php (\$vuestrings)"
+        missing=1
+    fi
+    for lang in en de; do
+        if ! grep -qF "\$string['${key}']" "lang/${lang}/leitbox.php"; then
+            echo "Frontend string '${key}' is not defined in lang/${lang}/leitbox.php"
+            missing=1
+        fi
+    done
+done
+
+# Both language files must define the same keys.
+en_keys=$(grep -oE "^.string\['[^']+'\]" lang/en/leitbox.php | sort)
+de_keys=$(grep -oE "^.string\['[^']+'\]" lang/de/leitbox.php | sort)
+if [ "$en_keys" != "$de_keys" ]; then
+    echo "lang/en and lang/de define different string keys:"
+    diff <(echo "$en_keys") <(echo "$de_keys") || true
+    missing=1
+fi
+
 if [ "$missing" -eq 1 ]; then
     echo ""
-    echo "One or more get_string() keys used in the code are not defined in ${LANGFILE}."
+    echo "One or more language strings are missing (see above)."
     exit 1
 fi
 
-echo "All get_string('key', 'mod_leitbox') references are defined in ${LANGFILE}."
+echo "All get_string() and frontend getString() keys are defined in lang/en and lang/de."

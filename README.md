@@ -34,8 +34,8 @@ Three answer options give learners full control:
 | Answer | Effect |
 |--------|--------|
 | **Got it** | Card advances one box |
-| **Again** | Card stays in its current box, repeated later in the same session – no penalty |
-| **Hard** | Card falls back exactly **one box** (never all the way to the start) |
+| **Again** | Card stays in its current box – no penalty |
+| **Hard** | Card falls back **one box**, but never below Beginner (never all the way to the start) |
 
 A single mistake never erases all progress. Learners choose when and how often to practise – LeitBox
 does not schedule reminders or due dates.
@@ -70,9 +70,10 @@ be exported or deleted via standard Moodle Data Privacy tools.
 - Full Backup & Restore API support
 - Integrates with Moodle's standard Course Reset tool, so reusing a course for a new term cleanly
   clears the previous cohort's learning progress
-- No CSS bleeding, no external dependencies
+- Styles are limited to LeitBox pages, no external services
 - Uses only Moodle's built-in role, permission and session management
-- Compatible with all standard Moodle themes
+- A dedicated capability, `mod/leitbox:managecards`, controls who may add, edit, import, export and
+  delete cards (editing teachers and managers by default)
 
 ### Calm by Design
 No ranking, no leaderboards, no game points, no images on cards – LeitBox is built for focus and
@@ -101,6 +102,24 @@ the database upgrade.
 
 > **Important:** The ZIP root must contain exactly one directory named `leitbox`. Do not rename or
 > restructure it.
+
+---
+
+## Building the learner view (for developers)
+
+The learner view is a Vue 3 application. Its source is shipped in `frontend/`; the built bundle
+that Moodle loads is `dist/assets/index.js`. After changing anything in `frontend/`, rebuild it with
+Node.js 18 or later:
+
+```bash
+cd frontend
+npm ci
+npm run build
+```
+
+The build writes `dist/assets/index.js` (a single self-contained script, including its CSS). The
+bundle calls the plugin's web services through Moodle's `core/ajax` module and reads all texts from
+the plugin's language files.
 
 ---
 

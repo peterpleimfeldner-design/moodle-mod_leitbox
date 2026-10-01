@@ -42,13 +42,6 @@ $PAGE->set_title(format_string($leitbox->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 
-// Needed so the Vue app's own axios-based calls to lib/ajax/service.php
-// (see frontend/src/api.js) share the page with a correctly initialised
-// AMD/YUI environment - omitting this surfaces as unrelated-looking core
-// JS errors (e.g. inside require.min.js) once any extra footer script is
-// present, not as anything obviously tied to this call.
-$PAGE->requires->js_call_amd('core/ajax', 'init');
-
 // Export strings for Vue frontend.
 $vuestrings = [
     'dashboardtitle', 'dashboardsbtitle', 'howitworks', 'cards', 'card_singular', 'systemtitle',
@@ -58,7 +51,7 @@ $vuestrings = [
     'cardxofy_x', 'cardxofy_y', 'loadingcards', 'sessiondone', 'sessiondonedesc',
     'completed', 'error_loading_cards', 'box_empty_now', 'box0', 'box1', 'box2', 'box3', 'box4', 'box5',
     'reset_progress', 'reset_progress_confirm_title', 'reset_progress_confirm_msg',
-    'reset_progress_btn', 'reset_progress_cancel', 'reset_progress_done',
+    'reset_progress_btn', 'reset_progress_cancel', 'reset_progress_done', 'reset_progress_error',
     'progress_label', 'progress_overall', 'progress_aria',
     'feedback_grand_title', 'feedback_grand_desc', 'feedback_perfect_title', 'feedback_perfect_desc',
     'feedback_good_title', 'feedback_good_desc', 'feedback_okay_title', 'feedback_okay_desc',
@@ -108,10 +101,9 @@ if (!empty(trim($leitbox->intro))) {
     echo $OUTPUT->box(format_module_intro('leitbox', $leitbox, $cm->id), 'generalbox mod_introbox', 'intro');
 }
 
-// Pass parameters to the Vue app via a data attribute.
+// Pass parameters to the Vue app via a data attribute. The app calls the web
+// services through Moodle's core/ajax module, which adds the sesskey itself.
 $appdata = [
-    'wwwroot'      => $CFG->wwwroot,
-    'sesskey'      => sesskey(),
     'instanceid'   => (int)$leitbox->id,
     'cmid'         => (int)$cm->id,
     'activityname' => format_string($leitbox->name),

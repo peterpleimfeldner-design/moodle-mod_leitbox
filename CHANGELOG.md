@@ -1,629 +1,544 @@
 # Changelog
 
-Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
-
-## [1.6.0] - 2026-09-19 (Live-UI-Test-Runde: Kartenladen, Kurs-Reset, Design, Sicherheit)
-
-Vollständige, manuelle Durchtestung der Aktivität in einer echten lokalen Moodle-Instanz
-(Browser-gesteuert, nicht nur statischer Code-Review), inklusive Massen-Import, Backup/Restore,
-Privacy-API, Berechtigungen und XSS-Härtungstest. Dabei wurden mehrere funktionale Bugs
-gefunden und live verifiziert behoben.
-
-### Behoben (Funktionalität)
-- **Karten luden nie:** `get_cards_by_box` gab `question`/`answer`/`hint` unbereinigt zurück,
-  obwohl die Rückgabedefinition `PARAM_CLEANHTML` verlangt – Moodles strikte
-  Rückgabewert-Validierung (`clean_returnvalue()`) lehnte jede Karte mit Formatierung
-  (`<b>`, `<br>`) mit `invalidresponse` ab. Werte werden jetzt vor der Rückgabe mit
-  `clean_param(..., PARAM_CLEANHTML)` normalisiert.
-- **Demo-Tutorial in zufälliger statt fortlaufender Reihenfolge:** Die fünf Einführungskarten
-  (`##demo_q1##`–`##demo_q5##`) wurden durch die Zufalls-Durchmischung in beliebiger Reihenfolge
-  gezeigt; nur eine einzelne Karte wurde hart nach vorne gezogen. Demo-Karten werden jetzt aus
-  der Durchmischung ausgenommen und immer nach ID sortiert vorangestellt.
-- **Export löste Demo-Marker nicht auf:** `manage.php`-Export gab bei noch unveränderten
-  Demo-Karten die rohen Platzhalter (`##demo_q1##`) statt des tatsächlichen Texts aus.
-- **Grammatikfehler "1 Karten" statt "1 Karte"** in Box-Zählungen (DE und EN) behoben.
-- **`mod/leitbox:manageactivities`-Check bestätigt:** Schüler/innen können Karten ansehen, aber
-  nicht verwalten – keine Änderung nötig, per Test mit echten Test-Accounts verifiziert.
-- **Kurs-Reset nicht unterstützt:** `leitbox_reset_userdata()` fehlte komplett. Bei einer
-  Kurs-Wiederverwendung (z. B. neues Semester) blieb der gesamte Lernfortschritt der alten
-  Kohorte dauerhaft in der Datenbank. Jetzt implementiert inkl. eigenem Abschnitt im
-  Kurs-Reset-Formular ("LeitBox" → Lernfortschritt aller Teilnehmer/innen löschen).
-
-### Behoben (Frontend-Stabilität)
-- **JS-Fehler auf jeder LeitBox-Seite** (`Y.NodeList is not a constructor`,
-  `amd.init is not a function`): Das Vue-Bundle war nicht in eine IIFE gekapselt, wodurch Vues
-  minifizierte interne Funktion `Y()` versehentlich Moodles globalen YUI-Namespace `window.Y`
-  überschrieb. Vite baut jetzt mit `format: 'iife'`.
-  Zusätzlich wurde Tailwinds globaler CSS-Reset (`@tailwind base` / Preflight) deaktiviert, da er
-  ungezielt auf die gesamte Moodle-Seite wirkte statt nur auf die eigene Komponente.
-- **Kopfzeile brach bei langen Kurstiteln komplett auseinander** (Buttons rutschten unkontrolliert
-  weg, Logo wirkte fehlplatziert): Layout neu strukturiert – Logo, Titel und Buttons bleiben in
-  einer Zeile, lange Titel werden mit Ellipsis gekürzt (voller Text als Tooltip).
-- **Leere Box beim Sitzungsstart** (z. B. durch Bearbeitung in einem zweiten Tab/Gerät) zeigt
-  jetzt eine verständliche Meldung statt eines leeren "Karte 0 von 0"-Zustands.
-
-### Geändert
-- Dashboard-Titel zeigt jetzt den tatsächlichen Aktivitätsnamen statt einer festen Phrase;
-  LeitBox-Logo verkleinert, um die Redundanz zur Moodle-eigenen Kopfzeile zu reduzieren.
-- Fortschrittsbalken zeigt jetzt den gewichteten Lernfortschritt über alle sechs Leitner-Boxen
-  (Box 0 = 0 %, Box 5 = 100 %, dazwischen anteilig), unabhängig von etwaigen
-  Abschlussbedingungen – vorher wurden nur vollständig gemeisterte Karten gezählt.
-- `pix/monologo.png` neu erstellt: transparenter Hintergrund statt eines eigenen
-  Quadrat-Hintergrunds, der sich mit Moodles eigener Icon-Umrandung zu einem doppelten Rahmen
-  überlagerte.
-
-### Sicherheit (verifiziert, keine Änderung nötig)
-- XSS-Härtungstest mit `<script>`- und `<img onerror>`-Payloads in Kartenfeldern: In der
-  Verwaltungsansicht und in der Lernenden-Oberfläche wird beides zuverlässig bereinigt
-  (Script-Tag entfernt, gefährliche Attribute gestrippt), keine Codeausführung möglich.
-- Das im UI beworbene 200-Karten-Limit ist serverseitig durchgesetzt (Einzelkarte und
-  Massen-Import), nicht nur eine Frontend-Anzeige.
-
-## [1.5.13] - 2026-09-18 (Vollständiger Review-Fix: Issues #10-#12, #16 + Sicherheitsaudit)
-
-Alle vier seit der zweiten Moodle-Plugin-Directory-Einreichung offenen GitHub-Issues wurden
-behoben und live gegen eine echte Moodle-4.x-Testinstanz (PHP-CLI, reale Datenbank) verifiziert,
-nicht nur statisch geprüft. Zusätzlich wurde ein vollständiger Review-Durchlauf gegen die
-Moodle-Plugin-Directory-Richtlinien durchgeführt (Struktur, Sicherheit, Code-Qualität, APIs,
-Frontend/Third-Party), der mehrere weitere, bisher ungemeldete Probleme aufgedeckt hat.
-
-### Behoben (offene GitHub-Issues)
-- **Issue #16 – Missing language string definitions:** `import_placeholder` und
-  `frontendnotfound` waren trotz gegenteiliger Behauptung im CHANGELOG-Eintrag zu v1.5.6 nie
-  tatsächlich in `lang/en/leitbox.php`/`lang/de/leitbox.php` definiert worden. Beide Strings
-  jetzt ergänzt und per Live-`get_string()`-Aufruf gegen eine echte Moodle-Instanz verifiziert.
-- **Issue #11 – PARAM_RAW Security Risk:** Der eigentliche Fehler war nicht der `PARAM_RAW` auf
-  dem rohen Bulk-Import-Textblock (der ist als Rohtext für den eigenen Q:/A:/H:-Parser
-  gerechtfertigt), sondern dass `classes/import_handler.php::parse_text()` (vormals
-  `classes/import.php`) keinerlei Sanitisierung durchführt und die geparsten Felder in
-  `manage.php` bis dato ungefiltert per `insert_record()` gespeichert wurden – anders als beim
-  Einzel-Hinzufügen/Bearbeiten, das bereits `PARAM_CLEANHTML` nutzte. Jedes importierte Feld
-  (`question`/`answer`/`hint`) wird jetzt vor dem Speichern mit `clean_param(..., PARAM_CLEANHTML)`
-  bereinigt. Mit einem echten `<script>`-Payload gegen eine Live-Moodle-Instanz getestet:
-  wird zuverlässig entfernt.
-- **Issue #12 – Missing File Boilerplate Headers:** Der volle "This file is part of Moodle"-
-  GPL-Header fehlte in `styles.css`, `frontend/src/style.css`, `templates/manage.mustache`
-  (hatte nur einen `@copyright`-Docblock ohne Lizenztext) sowie in allen Frontend-Build-Configs
-  (`frontend/src/api.js`, `frontend/src/main.js`, `frontend/postcss.config.js`,
-  `frontend/tailwind.config.js`, `frontend/vite.config.js`) – jetzt ergänzt. Die zwei
-  Debug-/Pen-Test-Skripte `test_completion.php` und `test_completion_db.php` im Plugin-Root
-  (Letzteres mit hartkodierten lokalen Windows-Pfaden eines Entwicklerrechners, u.a. Verweis
-  auf ein fremdes Projekt) wurden vollständig aus dem Repository entfernt statt nur per
-  `.gitattributes export-ignore` versteckt zu werden.
-- **Issue #10 – Invalid or Stale AMD Build Artifact:** `amd/build/manage.min.js` war eine
-  byte-identische 1:1-Kopie von `amd/src/manage.js` (nie durch einen Minifier gelaufen). Jetzt
-  über Terser echt minifiziert (4170 → 2039 Bytes) inkl. Sourcemap
-  (`amd/build/manage.min.js.map`). CI-Pipeline um einen `moodle-plugin-ci grunt --tasks=amd`-
-  Schritt ergänzt, damit ein zukünftig veraltetes Build-Artefakt automatisch auffällt.
-
-### Behoben (zusätzliche Funde aus dem Vollreview)
-- **`classes/import.php` → `classes/import_handler.php` umbenannt (neu entdeckter Bug):** Die
-  Datei enthielt die Klasse `\mod_leitbox\import_handler`, was gegen Moodles
-  Autoloader-Konvention (Dateiname muss Klassenname entsprechen) verstößt. Funktionierte bisher
-  nur, weil `manage.php` die Datei manuell per `require_once` einband. Live gegen eine
-  Moodle-Instanz verifiziert: `class_exists('\mod_leitbox\import_handler')` schlug vor dem Fix
-  fehl, danach nicht mehr. Der manuelle `require_once` in `manage.php` wurde entfernt (nicht
-  mehr nötig, Moodle autoloaded die Klasse jetzt korrekt).
-- **`view.php`:** Die Vue-Frontend-Assets wurden per `echo '<script>'`/`echo '<link>'` roh
-  ausgegeben (Issue #6/#15 nicht vollständig erledigt). Jetzt über die offiziellen APIs
-  `$PAGE->requires->js()`/`css()` geladen (Moodle-Caching/-Aggregation).
-- **`thirdpartylibs.xml`:** Axios-Version von `1.6.x` auf die tatsächlich gebündelte, exakte
-  Version `1.13.5` korrigiert (verifiziert gegen `frontend/package-lock.json` und den
-  Versions-String im gebauten `dist/assets/index.js`-Bundle).
-- **`frontend/src/components/Dashboard.vue`:** Zwei hartkodierte deutsche Strings
-  (`'Schließen'`, `'Abbrechen'`) durch `getString('close')`/`getString('cancel')` ersetzt; neue
-  Strings `close`/`cancel` in beiden Sprachdateien ergänzt. Das komplette deutsche
-  JS-Fallback-Objekt (greift nur, falls Moodles `strings_for_js()` je fehlschlägt) auf Englisch
-  umgestellt, damit kein anderssprachiger Nutzer im Fehlerfall deutschen Text sieht.
-- **`styles.css`:** Deutsches Wort "linksbündig" aus einem Kommentar entfernt.
-- **`classes/external.php`:** `submit_answer()` validiert jetzt den `rating`-Parameter
-  (0–2), analog zur bereits vorhandenen Validierung in `get_cards_by_box()`.
-- **`db/services.php`:** Optionales `capabilities`-Feld für alle vier External Functions
-  ergänzt (Dokumentations-/Tooling-Zweck, Laufzeitprüfung war bereits korrekt).
-- **`templates/manage.mustache`:** Toten, nie gerenderten Kontextwert `strdidacticnotice`
-  entfernt (der Hinweistext wird separat über `$OUTPUT->notification()` ausgegeben); fehlende
-  `jsconfig`-Variable im "Example context (json)"-Dokumentationsblock ergänzt.
-- **`.gitattributes`:** `LICENSE` nicht mehr von `git archive` ausgeschlossen – das
-  veröffentlichte Release-ZIP enthielt bisher keine Lizenzdatei. `user-logo/` und die
-  gelöschten Test-Dateien aus der `export-ignore`-Liste entfernt (nicht mehr vorhanden).
-- **`user-logo/`-Verzeichnis entfernt:** Verwaiste, byteidentische Duplikate der `pix/`-Assets
-  (~6 MB toter Ballast, nirgends referenziert).
-- **CI:** Neuer Schritt `.github/scripts/check-lang-strings.sh`, der jeden
-  `get_string('key', 'mod_leitbox')`-Aufruf gegen `lang/en/leitbox.php` abgleicht und den Build
-  bricht, falls ein Key fehlt – genau die Fehlerklasse, die zu Issue #16 führte, wird damit
-  künftig automatisch vor der Einreichung erkannt statt erst vom Moodle-Reviewer.
-
-### Verifikation
-Alle Fixes wurden gegen eine reale lokale Moodle-4.x-Testinstanz (PHP 8.2, MariaDB) per CLI
-verifiziert: Plugin-Erkennung, alle 140 Sprachstring-Keys, Klassen-Autoloading, Mustache-
-Template-Rendering (inkl. korrekter `{{#js}}`-Queuing über `$PAGE->requires`), Backup/Restore-
-Dateistruktur, DB-Schema-Abgleich, External-Function-Registrierung sowie ein funktionaler
-XSS-Payload-Test gegen die neue Import-Sanitisierung. `php -l` über alle geänderten Dateien und
-ein frischer `npm run build` des Vue-Frontends liefen fehlerfrei.
-
----
-
-## [1.5.12] - 2026-03-31 (Fix: js_call_amd 1024-Zeichen-Limit)
-
-### Behoben
-- **Moodle-Warnung "Too much data passed as arguments to js_call_amd":** Der AMD-Aufruf für `mod_leitbox/manage` wurde von `$PAGE->requires->js_call_amd()` in einen `{{#js}}`-Block im Mustache-Template verschoben. Die Prompt-Templates überschritten Moodles eingebautes 1024-Zeichen-Limit für direkte AMD-Argumente. Im Mustache-Template gilt dieses Limit nicht. Die Daten werden via `json_encode()` in `$templatedata['jsconfig']` bereitgestellt und mit `{{{jsconfig}}}` (triple-stash, kein HTML-Escaping) in den `require()`-Aufruf injiziert.
-- Betroffene Dateien: `manage.php`, `templates/manage.mustache`
-
----
-
-## [1.5.11] - 2026-03-31 (Finale Review-Compliance: PARAM_RAW, Kommentare, CI/CD)
-
-### Behoben
-- **Issue #4 – PARAM_RAW (Nachfix external.php):** In `classes/external.php` wurden `question`, `answer` und `hint` von `PARAM_RAW` auf `PARAM_CLEANHTML` umgestellt, `category` auf `PARAM_TEXT`. Der vorherige Fix in v1.5.6 hatte nur `manage.php` erfasst; die externe Web-Service-Schnittstelle wurde nachgezogen.
-- **Issue #7 – Non-English Comments (Nachfix):** Verbleibende deutsche Kommentare in `classes/external.php` (3 Stellen) und `classes/completion/custom_completion.php` (5 Stellen) wurden ins Englische übersetzt. Der vorherige Fix in v1.5.6 hatte nur `lib.php` erfasst.
-- **Issue #8 – thirdpartylibs.xml (Nachfix):** Axios 1.6.x (MIT) in `thirdpartylibs.xml` eingetragen. Axios wird als Runtime-Dependency in `dist/assets/index.js` gebündelt und war daher dokumentationspflichtig.
-
-### Hinzugefügt
-- **Issue #1 – GitHub Actions CI/CD:** `.github/workflows/ci.yml` mit `moodlehq/moodle-plugin-ci` erstellt. Testet automatisch auf Moodle 4.1, 4.4 und 4.5 mit PHP 8.1, 8.2 und 8.3 (PostgreSQL). Prüfschritte: PHPLint, CodeChecker, PHPDoc, Validate, Mustache Lint, JS Lint, PHPUnit, Behat.
+All notable changes to this project are documented in this file.
+A German version is kept in the repository as `CHANGELOG.de.md` (not part of the release package).
+
+## [1.6.1] - 2026-10-01 (Moodle Plugins directory review, round 3)
+
+### Security
+- **Card deletion could remove learner progress in other activities** (GitHub issue #17): the
+  single-card delete action in `manage.php` deleted all `leitbox_progress` rows for the submitted
+  card id before checking that the card belongs to the current activity. A teacher who could manage
+  one LeitBox activity could therefore erase the learning progress of a card in another course. The
+  card is now loaded together with the activity id first (`MUST_EXIST`); the card and its progress
+  are deleted only afterwards, through the new `leitbox_delete_cards()`, which the bulk deletion
+  uses as well. Card ids from other activities are ignored.
+- All card management actions in `manage.php` now use `require_sesskey()`.
+
+### Fixed
+- **Privacy API deletion and course reset failed on MySQL** (#18): the queries deleted from
+  `leitbox_progress` with a subquery on the same table, which MySQL rejects (error 1093). They now
+  filter by card id with a subquery on `leitbox_cards` only. This affected
+  `delete_data_for_all_users_in_context()`, `delete_data_for_user()`, `delete_data_for_users()` and
+  `leitbox_reset_userdata()`.
+- **JavaScript error on every activity view** (#23): `view.php` called `init()` on `core/ajax`,
+  which has no such function, so the page kept a pending JavaScript marker. The call is removed.
+  The learner view now calls the web services through Moodle's `core/ajax` module instead of Axios,
+  so Moodle handles the sesskey, session expiry and errors. Axios is no longer bundled (bundle size
+  163 KB to 124 KB).
+- **`styles.css` affected other activities** (#21): the rules for the completion settings form
+  applied to every activity type on the site. They are removed. All remaining rules are limited to
+  LeitBox pages and use no `!important`.
+- The Vue learner view contained hard-coded fallback texts (partly German). All texts now come from
+  the language files; the error shown when resetting progress fails is a new language string.
+- The learner view now starts only after Moodle's AMD loader has provided `core/ajax`, so the
+  language strings are always available on the first render.
+- The text of demo card 4 promised that a card rated "Again" is shown again in the same session.
+  The plugin does not do this, so the sentence was removed (English and German).
+- Privacy export: dates are exported with `transform::datetime()`, card texts are formatted in the
+  module context.
+
+### Changed
+- **New capability `mod/leitbox:managecards`** (#22): adding, editing, importing, exporting and
+  deleting cards is controlled by this capability (editing teachers and managers by default)
+  instead of `moodle/course:manageactivities`.
+- **Plugin icons** (#19): new single-colour vector icon `pix/monologo.svg` (3 KB). The 4.5 MB
+  `pix/icon.svg` (embedded PNG images) and `pix/monologo.png` are removed, `pix/icon.png` is now
+  64 x 64 pixels and `pix/logo.png` is resized to twice its display size. The release package
+  shrinks from 6.4 MB to well under 1 MB. The header logo is loaded through Moodle's theme image
+  URL, so browsers fetch the new file after an update.
+- **Source code in the release package** (#20): the Vue source (`frontend/`, without
+  `node_modules`) and the tests are now part of the release ZIP. The README documents the build.
+- **English change log** (#24): this file is now in English.
+- Card management page: form labels are linked to their fields, the selection check boxes have
+  accessible names, inline styles moved to `styles.css`, Bootstrap 4-only utility classes replaced.
+- Language files are sorted alphabetically.
+- Frontend build tools updated (Vite 6); `npm audit` reports no vulnerabilities.
+- README: the description of the "Again" and "Hard" buttons now matches what the plugin does.
+
+### Tests and continuous integration
+- New PHPUnit tests for the privacy provider (all functions, with a second activity and a second
+  learner that must stay untouched), the course reset, card deletion across activities and the new
+  capability.
+- New Behat tests for the learner view and for card management.
+- CI now runs on PostgreSQL, MySQL 8.4 and MariaDB, on Moodle 4.1, 4.4, 4.5, 5.0 and 5.1. Code
+  checker and PHPDoc warnings fail the build, all Grunt tasks run (including Stylelint and Gherkin
+  lint), and a new check verifies the release package (size, required source files, no internal
+  files, English text outside the German language pack). The language string check now also covers
+  the strings used by the Vue frontend.
+
+## [1.6.0] - 2026-09-19 (Live UI test round: card loading, course reset, design, security)
+
+A complete manual test of the activity in a real local Moodle site (driven in the browser, not only
+a static code review), including bulk import, backup and restore, the Privacy API, permissions and
+an XSS hardening test. Several functional bugs were found and fixed and verified live.
+
+### Fixed (functionality)
+- **Cards never loaded:** `get_cards_by_box` returned `question`, `answer` and `hint` without
+  cleaning them, although the return definition requires `PARAM_CLEANHTML`. Moodle's strict return
+  value validation (`clean_returnvalue()`) rejected every formatted card (`<b>`, `<br>`) with
+  `invalidresponse`. The values are now normalised with `clean_param(..., PARAM_CLEANHTML)`.
+- **Demo tutorial shown in random order:** the five introduction cards (`##demo_q1##` to
+  `##demo_q5##`) were shuffled; only one card was forced to the front. Demo cards are now excluded
+  from shuffling and always come first, sorted by id.
+- **Export did not resolve demo markers:** the export in `manage.php` wrote the raw placeholders
+  (`##demo_q1##`) instead of the demo text.
+- **Grammar "1 Cards" instead of "1 Card"** in the box counts (German and English) fixed.
+- **Permission check confirmed:** learners can view cards but not manage them (the check used
+  `moodle/course:manageactivities`). No change needed; verified with real test accounts.
+- **Course reset not supported:** `leitbox_reset_userdata()` was missing, so the learning progress
+  of the previous cohort stayed in the database when a course was reused. Now implemented, with its
+  own section in the course reset form ("LeitBox": delete the learning progress of all participants).
+
+### Fixed (frontend stability)
+- **JavaScript errors on every LeitBox page** (`Y.NodeList is not a constructor`): the Vue bundle
+  was not wrapped in an IIFE, so a minified internal Vue function `Y()` overwrote Moodle's global
+  YUI namespace `window.Y`. Vite now builds with `format: 'iife'`. In addition, Tailwind's global
+  CSS reset (Preflight) was disabled because it affected the whole Moodle page instead of only the
+  plugin's own component.
+- **Header broke apart with long course titles** (buttons moved around, logo looked misplaced):
+  logo, title and buttons now stay on one line; long titles are shortened with an ellipsis (full
+  text as tooltip).
+- **Empty box when starting a session** (for example after editing in a second tab or device) now
+  shows a clear message instead of an empty "Card 0 of 0" state.
+
+### Changed
+- The dashboard title now shows the activity name instead of a fixed phrase; the LeitBox logo was
+  made smaller so it repeats Moodle's own header less.
+- The progress bar now shows the weighted learning progress across all six Leitner boxes (box 0 =
+  0 %, box 5 = 100 %, proportional in between), independent of any completion conditions. Before,
+  only fully mastered cards counted.
+- `pix/monologo.png` recreated with a transparent background instead of its own square background,
+  which created a double frame together with Moodle's icon border.
+
+### Security (verified, no change needed)
+- XSS hardening test with `<script>` and `<img onerror>` payloads in card fields: both are cleaned
+  reliably in the management view and in the learner view (script tag removed, dangerous attributes
+  stripped); no code execution possible.
+- The 200-card limit shown in the interface is enforced on the server (single card and bulk
+  import), not only in the frontend.
+
+## [1.5.13] - 2026-09-18 (Review fixes: issues #10 to #12, #16, plus security audit)
+
+All four GitHub issues still open since the second Plugins directory submission were fixed and
+verified against a real Moodle 4.x test site (PHP CLI, real database), not only checked statically.
+A full review against the Plugins directory guidelines (structure, security, code quality, APIs,
+frontend and third-party code) found several further problems that had not been reported.
+
+### Fixed (open GitHub issues)
+- **Issue #16, missing language string definitions:** `import_placeholder` and `frontendnotfound`
+  had never actually been defined in `lang/en/leitbox.php` and `lang/de/leitbox.php`, although the
+  change log entry for 1.5.6 said so. Both strings added and verified with live `get_string()`
+  calls.
+- **Issue #11, PARAM_RAW security risk:** the actual problem was not the `PARAM_RAW` for the raw
+  bulk import text (needed for the plugin's own Q:/A:/H: parser), but that
+  `classes/import_handler.php::parse_text()` (formerly `classes/import.php`) did no cleaning, and
+  `manage.php` stored the parsed fields unfiltered with `insert_record()`, unlike single add and
+  edit, which already used `PARAM_CLEANHTML`. Every imported field (`question`, `answer`, `hint`)
+  is now cleaned with `clean_param(..., PARAM_CLEANHTML)` before it is saved. Tested with a real
+  `<script>` payload: removed reliably.
+- **Issue #12, missing file boilerplate headers:** the full "This file is part of Moodle" GPL
+  header was missing in `styles.css`, `frontend/src/style.css`, `templates/manage.mustache` and all
+  frontend build configuration files; now added. The debug scripts `test_completion.php` and
+  `test_completion_db.php` (the latter with hard-coded local Windows paths) were removed from the
+  repository.
+- **Issue #10, invalid or stale AMD build artifact:** `amd/build/manage.min.js` was a byte-identical
+  copy of `amd/src/manage.js`. It is now really minified with Terser (4170 to 2039 bytes), with a
+  source map. The CI pipeline runs `moodle-plugin-ci grunt --tasks=amd`, so an outdated build fails
+  automatically.
+
+### Fixed (further findings of the full review)
+- **`classes/import.php` renamed to `classes/import_handler.php`:** the file contained the class
+  `\mod_leitbox\import_handler`, which breaks Moodle's autoloader convention. It only worked because
+  `manage.php` included the file manually. The manual `require_once` was removed.
+- **`view.php`:** the Vue frontend assets were printed as raw `<script>` and `<link>` tags. They are
+  now loaded through `$PAGE->requires->js()` and `css()`.
+- **`thirdpartylibs.xml`:** Axios version corrected to the exact bundled version `1.13.5`.
+- **`frontend/src/components/Dashboard.vue`:** two hard-coded German strings replaced by
+  `getString('close')` and `getString('cancel')`; the JavaScript fallback texts switched to English.
+- **`styles.css`:** German word removed from a comment.
+- **`classes/external.php`:** `submit_answer()` now validates the `rating` parameter (0 to 2).
+- **`db/services.php`:** the optional `capabilities` field added for all four external functions.
+- **`templates/manage.mustache`:** unused context value `strdidacticnotice` removed; missing
+  `jsconfig` added to the example context.
+- **`.gitattributes`:** `LICENSE` is no longer excluded from the release ZIP.
+- **`user-logo/` folder removed:** unused duplicates of the `pix/` files (about 6 MB).
+- **CI:** new step `.github/scripts/check-lang-strings.sh`, which checks every
+  `get_string('key', 'mod_leitbox')` call against `lang/en/leitbox.php`.
+
+### Verification
+All fixes were verified against a real local Moodle 4.x test site (PHP 8.2, MariaDB) via CLI:
+plugin detection, all language string keys, class autoloading, Mustache rendering, backup and
+restore file structure, database schema, external function registration and an XSS payload test
+against the new import cleaning. `php -l` on all changed files and a fresh `npm run build` passed.
+
+## [1.5.12] - 2026-03-31 (Fix: js_call_amd 1024 character limit)
+
+### Fixed
+- **Moodle warning "Too much data passed as arguments to js_call_amd":** the AMD call for
+  `mod_leitbox/manage` moved from `$PAGE->requires->js_call_amd()` into a `{{#js}}` block in the
+  Mustache template, because the prompt templates exceeded the 1024 character limit for AMD
+  arguments. The data is provided through `json_encode()` in `$templatedata['jsconfig']`.
+- Files: `manage.php`, `templates/manage.mustache`.
+
+## [1.5.11] - 2026-03-31 (Review compliance: PARAM_RAW, comments, CI)
+
+### Fixed
+- **Issue #4, PARAM_RAW (follow-up in external.php):** `question`, `answer` and `hint` in
+  `classes/external.php` changed from `PARAM_RAW` to `PARAM_CLEANHTML`, `category` to `PARAM_TEXT`.
+- **Issue #7, non-English comments (follow-up):** remaining German comments in
+  `classes/external.php` and `classes/completion/custom_completion.php` translated.
+- **Issue #8, thirdpartylibs.xml (follow-up):** Axios (MIT) added, as it was bundled in
+  `dist/assets/index.js`.
+
+### Added
+- **Issue #1, GitHub Actions CI:** `.github/workflows/ci.yml` with `moodlehq/moodle-plugin-ci`,
+  testing Moodle 4.1, 4.4 and 4.5 with PHP 8.1 to 8.3 (PostgreSQL).
+
+## [1.5.10] - 2026-03-18 (Backup file names)
+
+### Fixed
+- Backup and restore task files renamed from `.php` to `.class.php`, so Moodle finds the task
+  classes. Courses could not be backed up before ("Class 'backup_leitbox_activity_task' not found").
+
+## [1.5.9] - 2026-03-18
+
+### Fixed
+- Preparatory version for the backup fix.
+
+## [1.5.8] - 2026-03-11 (Delete dialog)
+
+### Fixed
+- **Delete confirmation flickered:** `Notification.confirm` was replaced by `window.confirm()`,
+  which stays open until the user confirms or cancels. The dependency on `core/notification` in the
+  AMD module was removed.
+
+## [1.5.7] - 2026-03-11 (Bug fixes after testing)
+
+### Fixed
+- **Missing AMD build file:** `amd/build/manage.min.js` recreated. Without it the module did not
+  load in production mode, so neither the AI prompt selector nor the delete confirmations worked.
+- **AMD guard:** `amd/src/manage.js` checks `params` and `params.prompts` before use.
+- **AMD initialisation:** the prompt preview shows the selected option right after page load.
+- **Mustache boolean:** `'selected' => true` instead of `1` in `manage.php`.
+
+### Checked (no change needed)
+- Review of all files changed in 1.5.6 (events, PARAM types, Output API, backup, template, CI).
+
+## [1.5.6] - 2026-03-11 (Plugins directory compliance fixes)
+
+### Fixed
+- **Issue #9, hard-coded language strings:** user-visible strings in `manage.php` and `view.php`
+  replaced by `get_string()` calls.
+- **Issue #8, missing thirdpartylibs.xml:** file created, documenting Vue.js 3.5.29 (MIT) bundled
+  in `dist/assets/`.
+- **Issue #7, non-English comments:** German comments in `lib.php` and
+  `classes/completion/custom_completion.php` translated.
+- **Issue #6, templates, Output API and AMD modules:** `manage.php` moved to the Output API with
+  the new template `templates/manage.mustache` and the AMD module `amd/src/manage.js`.
+- **Issue #5, missing events:** new event class `classes/event/course_module_viewed.php`, triggered
+  by `view.php`.
+- **Issue #4, PARAM_RAW:** `question`, `answer` and `hint` in `manage.php` changed to
+  `PARAM_CLEANHTML`; `importdata` stays `PARAM_RAW` for the import parser.
+- **Issue #3, backup and restore:** all four backup files checked; no change needed.
+- **Issue #2, repository name:** renamed to `moodle-mod_leitbox`.
+- **Issue #1, CI:** new workflow `.github/workflows/ci.yml`.
+
+## [1.5.5] - 2026-03-01 (Multilingual demo cards)
+
+### Fixed
+- Demo cards are stored with language-neutral markers (`##demo_q1##`) and shown in the user's
+  current language (`classes/external.php` resolves them with `get_string()`).
+
+## [1.5.4] - 2026-03-01 (dist folder in git)
+
+### Added
+- The `dist/` folder with the built frontend is now part of the repository, so the assets do not
+  have to be built during installation.
+
+## [1.5.3] - 2026-03-01 (Icon)
+
+### Changed
+- `pix/icon.svg`: placeholder icon replaced by the LeitBox icon.
+
+## [1.5.2] - 2026-03-01 (Line endings and icon)
+
+### Fixed
+- `.gitattributes` enforces LF line endings for PHP, XML, CSS, JS and Markdown files; all files
+  renormalised. The Plugins directory validator could not parse files with CRLF line endings.
+
+### Added
+- `pix/icon.svg`.
+
+## [1.5.1] - 2026-03-01
+
+### Added
+- `index.php`, required for activity modules: lists all LeitBox activities of a course.
+
+## [1.5.0] - 2026-03-01 (First public release)
+
+### Changed
+- Version 1.5.0 for the first submission to the Moodle Plugins directory.
+- **Activity completion** reworked for Moodle 4.x: only active completion rules are written to
+  `customdata`; `update_state` is called with `COMPLETION_UNKNOWN`; `get_cm()` always receives the
+  course module id; help icons in the completion settings aligned.
+- **Language:** English and German strings use inclusive wording ("learners").
+- **Completion logic:** `completion_min_cards` counts cards with `box_number >= 1` (answered
+  correctly at least once).
+
+## [1.4.33] - 2026-03-01 (Language clean-up and completion audit)
+
+### Changed
+- German `modulename_help` uses inclusive wording.
+- Unused `completion_min_correct` strings removed (covered by `completion_min_cards`).
 
----
+## [1.4.32] - 2026-03-01
 
-## [1.5.10] - 2026-03-18 (Backup-Dateinamen: Moodle Discovery Fix)
+### Fixed
+- `mod_form.php`: the third completion rule (`completion_all_mastered`) uses `addGroup` like rules
+  1 and 2, so its help button is placed consistently.
 
-### Behoben
-- **Backup-Dateinamen:** Backup/Restore-Task-Dateien wurden von `.php` zu `.class.php` umbenannt, um Moodles automatische Klassen-Erkennung zu aktivieren.
-  - `backup/moodle2/backup_leitbox_activity_task.php` → `backup_leitbox_activity_task.class.php`
-  - `backup/moodle2/restore_leitbox_activity_task.php` → `restore_leitbox_activity_task.class.php`
-- **Fehler behoben:** Kurse konnten nicht gesichert werden (Fehler: "Class 'backup_leitbox_activity_task' not found").
-  - Moodles Backup-Discovery-Mechanismus sucht nach `.class.php` Dateien für Activity Task Klassen.
-  - Diese Konvention ist Teil des Moodle Backup-API Standards.
+## [1.4.31] - 2026-03-01
 
----
+### Changed
+- `styles.css`: selectors for completion help icons extended to group and single elements.
 
-## [1.5.9] - 2026-03-18 (Backup File Naming Intermediate)
+## [1.4.30] - 2026-03-01 (Completion strings)
 
-### Behoben
-- Vorbereitende Version für Backup-Fix
+### Changed
+- Completion help texts improved in German and English, including a warning that the threshold
+  must not exceed the number of cards. `styles.css` aligns the completion help icons.
 
----
+## [1.4.29] - 2026-03-01 (Completion: correct cards)
 
-## [1.5.8] - 2026-03-11 (Delete-Dialog Fix)
+### Changed
+- `completion_min_cards` counts only cards with `box_number >= 1` (answered correctly at least
+  once), not every card with a progress record. Strings updated accordingly.
 
-### Behoben
-- **Lösch-Bestätigungsdialog flackerte:** `Notification.confirm` (Moodle asynchrones Modal) wurde durch `window.confirm()` ersetzt. Das native Browser-Dialogfenster ist synchron und blockierend — es bleibt geöffnet bis der Nutzer explizit bestätigt oder abbricht, unabhängig vom Moodle-Modal-Stack. Die Abhängigkeit auf `core/notification` im AMD-Modul wurde entfernt.
+## [1.4.28] - 2026-03-01
 
----
+### Changed
+- English completion strings reworded.
 
-## [1.5.7] - 2026-03-11 (Post-Test Bugfixes & Expert Review)
+## [1.4.27] - 2026-03-01
 
-### Behoben
-- **AMD Build-Datei fehlte:** `amd/build/manage.min.js` wurde neu erstellt. Moodle Production-Mode serviert ausschließlich Dateien aus `amd/build/` — ohne diese Datei lud das AMD-Modul `mod_leitbox/manage` lautlos nicht, wodurch weder der AI-Prompt-Selector noch die Lösch-Bestätigungsdialoge funktionierten.
-- **AMD Defensive Guard:** In `amd/src/manage.js` wurde ein Null-Guard für `params` und `params.prompts` hinzugefügt. Verhindert `TypeError` falls das AMD-Modul ohne korrekte Parameter aufgerufen wird.
-- **AMD Sofort-Initialisierung:** Der Prompt-`<pre>`-Block synchronisiert sich nun beim Laden der Seite sofort mit der aktuell ausgewählten Option im Dropdown.
-- **Mustache Boolean-Typ:** In `manage.php` wurde `'selected' => 1` (Integer) auf `'selected' => true` (nativer PHP-Boolean) für den Mustache-Section-Wert geändert. Entspricht Moodle Coding Standards und besteht `moodle-plugin-ci mustachelint`.
+### Changed
+- German completion strings reworded.
 
-### Geprüft (kein Handlungsbedarf)
-- Vollständiger Moodle-Experten-Review aller in v1.5.6 geänderten Dateien durchgeführt. Alle Implementierungen (Event-System, PARAM-Typen, Output-API, Backup-Struktur, Mustache-Template, CI-Workflow) wurden als korrekt bestätigt.
+## [1.4.26] - 2026-03-01 (Completion state)
 
----
+### Fixed
+- `classes/external.php` sends `COMPLETION_UNKNOWN` instead of `COMPLETION_COMPLETE` to
+  `update_state`, so Moodle re-evaluates completion after every answer (also after a reset).
 
-## [1.5.6] - 2026-03-11 (Moodle Plugin Directory: Compliance Fixes)
+## [1.4.25] - 2026-03-01
 
-### Behoben
-- **Issue #9 – Hard-coded language strings:** Alle direkt eingebetteten, benutzersichtbaren Strings in `manage.php` und `view.php` wurden entfernt und durch `get_string()`-Aufrufe ersetzt. Fehlende String-Keys (`import_placeholder`, `frontendnotfound`) wurden in `lang/en/leitbox.php` und `lang/de/leitbox.php` ergänzt.
-- **Issue #8 – thirdpartylibs.xml fehlend:** Neue Datei `thirdpartylibs.xml` im Plugin-Root erstellt. Dokumentiert Vue.js 3.5.29 (MIT-Lizenz), das als kompiliertes Bundle in `dist/assets/` gebündelt ist.
-- **Issue #7 – Non-English comments:** Alle deutschen Code-Kommentare in `lib.php` und `classes/completion/custom_completion.php` ins Englische übersetzt. Inhalt und Bedeutung unverändert.
-- **Issue #6 – Templates, Output API, AMD JavaScript Modules:** `manage.php` vollständig auf Moodle Output-API umgestellt. HTML wurde in ein neues Mustache-Template ausgelagert (`templates/manage.mustache`). Interaktionen (Lösch-Bestätigungen, Bulk-Select, Prompt-Selektor) wurden in ein neues AMD-Modul ausgelagert (`amd/src/manage.js`). Alle Funktionen wurden 1:1 erhalten.
-- **Issue #5 – Missing Required Events:** Neue Event-Klasse `classes/event/course_module_viewed.php` erstellt. `view.php` feuert das Event nun korrekt bei jedem Aktivitätsaufruf. Die Aktivität wird damit in Moodles Aktivitätslog korrekt erfasst.
-- **Issue #4 – PARAM_RAW Security Risk:** In `manage.php` wurden die Parameter `question`, `answer` und `hint` von `PARAM_RAW` auf `PARAM_CLEANHTML` umgestellt. Der `importdata`-Parameter behält `PARAM_RAW`, da er rohen, vom Import-Parser verarbeiteten Text enthält.
-- **Issue #3 – Backup/Restore:** Alle 4 Backup-Dateien wurden überprüft und sind korrekt implementiert. `FEATURE_BACKUP_MOODLE2` ist in `leitbox_supports()` gesetzt. Kein Handlungsbedarf.
-- **Issue #2 – Incorrect repository name:** Repository auf GitHub umbenannt: `leitbox` → `moodle-mod_leitbox`. Entspricht dem empfohlenen Moodle-Namensschema `moodle-{plugintype}_{pluginname}`.
-- **Issue #1 – GitHub Actions CI/CD:** Neuer Workflow `.github/workflows/ci.yml` mit `moodlehq/moodle-plugin-ci` für automatisierte Tests auf Moodle 4.1–4.5 und PHP 8.1–8.3 erstellt.
+### Fixed
+- `classes/external.php` passed the instance id instead of the course module id to
+  `$modinfo->get_cm()`, which aborted saving progress.
 
-### Hinzugefügt
-- `thirdpartylibs.xml` (neu)
-- `classes/event/course_module_viewed.php` (neu)
-- `templates/manage.mustache` (neu)
-- `amd/src/manage.js` (neu)
-- `.github/workflows/ci.yml` (neu)
+## [1.4.24] - 2026-03-01
 
----
+### Changed
+- `custom_completion.php` uses only the `customdata` array filled in `lib.php`; redundant database
+  queries removed.
 
-## [1.5.5] - 2026-03-01 (Mehrsprachige Demo-Karten)
+## [1.4.23] - 2026-03-01
 
-### Behoben
-- **Demo-Karten Sprache:** Demo-Karten werden nun immer in der aktiven Moodle-Sprache des Nutzers angezeigt, unabhängig davon in welcher Sprache die Aktivität erstellt wurde.
-  - `lib.php`: Demo-Karten werden mit sprach-neutralen Marker-Keys gespeichert (`##demo_q1##` statt übersetztem Text).
-  - `classes/external.php`: Beim Abruf der Karten werden Marker-Keys automatisch in die aktuelle Nutzersprache aufgelöst (`get_string()`).
+### Fixed
+- `lib.php` uses `leitbox_get_coursemodule_info` to fill `cached_cm_info` with the completion
+  `customdata`; `classes/external.php` uses `get_fast_modinfo()` to pass proper `cm_info` objects to
+  `update_state`.
 
----
+## [1.4.22] - 2026-03-01
 
-## [1.5.4] - 2026-03-01 (dist-Ordner in git aufgenommen)
+### Fixed
+- Completion handling for Moodle 4.x reworked (`customdata`, form pre- and post-processing with
+  `get_suffix()`).
 
-### Hinzugefügt
-- **`.gitattributes`:** Eintrag für `dist/` hinzugefügt, um sicherzustellen, dass der Ordner im Repository verfolgt wird.
-- **`dist/`:** Der `dist`-Ordner, der die kompilierten Frontend-Assets enthält, wurde dem Git-Repository hinzugefügt. Dies vereinfacht die Installation und das Deployment, da die Assets nicht mehr manuell kompiliert werden müssen.
+## [1.4.21] - 2026-03-01
 
----
+### Fixed
+- Disabled completion conditions no longer count as complete, so a new activity is not marked
+  complete immediately.
+- The old Moodle 3.x function `leitbox_get_completion_state()` removed.
+- `view.php` checks `is_enabled()` before marking the activity as viewed.
 
-## [1.5.3] - 2026-03-01 (Branding: Custom SVG Icon)
+## [1.4.20] - 2026-03-01
 
-### Geändert
-- **`pix/icon.svg`:** Platzhalter-Icon ("L") durch das offizielle LeitBox-Markenicon ersetzt.
+### Fixed
+- Completion check boxes keep their values in Moodle 4.3+ (form field suffixes for bulk editing),
+  following the approach of `mod_quiz`.
 
----
+## [1.4.19] - 2026-03-01
 
-## [1.5.2] - 2026-03-01 (Moodle Marketplace: Zeilenenden & Icon)
+### Fixed
+- Completion form: numeric rules are active when a number greater than 0 is entered.
 
-### Behoben
-- **Zeilenenden (CRLF → LF):** `.gitattributes` Datei hinzugefügt, die für alle PHP-, XML-, CSS-, JS- und Markdown-Dateien zwingend LF-Zeilenenden (`\n`) vorschreibt. Ohne diese Korrektur konnte der Moodle Marketplace-Validator `version.php`, `lib.php` und die Sprachdateien nicht korrekt parsen, weil er Linux-Tools verwendet.
-- **Alle Textdateien renormalisiert:** `git add --renormalize` hat alle bestehenden CRLF-Dateien im Repository in LF konvertiert.
+## [1.4.18] - 2026-03-01
 
-### Hinzugefügt
-- **`pix/icon.svg`:** SVG-Icon für den Moodle Marketplace ergänzt. Der Marketplace bevorzugt Vektor-Icons gegenüber PNG.
+### Fixed
+- Completion API for Moodle 4: new class `mod_leitbox\completion\custom_completion`.
 
----
+## [1.4.17] - 2026-03-01
 
-## [1.5.1] - 2026-03-01 (Moodle Marketplace Fix)
+### Fixed
+- `mod_form.php`: missing `data_preprocessing()` added, so custom completion conditions are loaded
+  correctly when the activity is edited.
 
-### Hinzugefügt
-- **`index.php`:** Pflichtdatei für alle Moodle Activity Modules hinzugefügt. Listet alle LeitBox-Instanzen eines Kurses auf und ist für die Moodle Marketplace-Validierung zwingend erforderlich.
+## [1.4.16] - 2026-03-01
 
----
+### Added
+- Support email address (`leitbox.moodle@gmail.com`) added to the project documents.
 
-## [1.5.0] - 2026-03-01 (Erste öffentliche Veröffentlichung – Moodle Marketplace)
+## [1.4.15] - 2026-03-01
 
-### Geändert
-- **Version:** Sprung von 1.4.33 auf 1.5.0 für die erste offizielle Einreichung im Moodle Plugin-Verzeichnis (Moodle Marketplace).
-- **Activity Completion:** Vollständig überarbeitetes und stabilisiertes Completion-System für Moodle 4.x:
-  - Nur aktive Completion-Regeln werden in `customdata` geschrieben (deaktivierte Regeln blockieren den Abschluss nicht mehr).
-  - Deaktivierte Regeln geben `COMPLETION_COMPLETE` zurück (keine blockierenden Fehler).
-  - `update_state` wird mit `COMPLETION_UNKNOWN` aufgerufen (zwingt Moodle zur Neuberechnung in beide Richtungen).
-  - `get_cm()` erhält immer die korrekte Course Module ID (kein Exception-Bug mehr).
-  - Hilfe-Icons (?) in der Completion-Einstellungsseite sind konsistent linksbündig ausgerichtet.
-- **Sprache:** Alle Strings in DE und EN auf inklusive, didaktische Sprache aktualisiert ("Lernende" statt "Schüler/in").
-- **Completion-Logik:** `completion_min_cards` zählt nun Karten mit `box_number >= 1` (mindestens einmal grün bewertet) – nicht mehr alle Interaktionen.
+### Changed
+- English text of the "How does this work?" dialogue corrected.
 
----
+## [1.4.14] - 2026-03-01
 
-## [1.4.33] - 2026-03-01 (Sprachbereinigung & Completion-Audit)
+### Changed
+- "How does this work?" dialogue: the method is attributed to Sebastian Leitner (1972).
 
-### Geändert
-- **Sprache (DE):** `modulename_help` – "Schülern" durch "Lernenden" ersetzt (konsistente, inklusive Sprache).
-- **Sprache (DE/EN):** Verwaiste `completion_min_correct` Strings aus beiden Sprachdateien entfernt. Die Regel `completion_min_cards` deckt diesen Use-Case bereits vollständig ab (SQL: `box_number >= 1`).
+## [1.4.13] - 2026-03-01
 
-### Überprüft (keine Änderung notwendig)
-- `completion_all_mastered_desc/help` (DE): "Schüler/in" → "Lernende" war bereits in 1.4.30 korrekt gesetzt.
-- `completion_min_mastered_help` (DE/EN): Kartenanzahl-Warnung war bereits in 1.4.30 korrekt gesetzt.
+### Fixed
+- Duplicate, outdated language strings removed.
 
----
+### Added
+- Help buttons for the three completion conditions in the activity settings.
 
-## [1.4.32] - 2026-03-01 (Completion-Formular: Hilfe-Icon-Position)
+## [1.4.12] - 2026-03-01
 
-### Behoben
-- **mod_form.php:** Die dritte Completion-Regel (`completion_all_mastered`) wurde von einem einzelnen `addElement('checkbox')` auf das `addGroup`-Pattern umgestellt (identisch zu den Regeln 1 und 2). Moodle platziert den Hilfe-Button (?) bei Gruppen standardmäßig links – beim einzelnen Checkbox-Element erschien er rechts, was das Layout inkonsistent machte.
+### Changed
+- Automatic deletion of the demo cards checks whether own (non-demo) cards exist.
 
----
+### Added
+- PHPUnit tests for invalid box numbers and for counting unique cards in completion tracking.
 
-## [1.4.31] - 2026-03-01 (Completion-Formular: Hilfe-Icons CSS)
+## [1.4.11] - 2026-03-01 (Code review)
 
-### Geändert
-- **styles.css:** CSS-Override für Completion-Hilfe-Icons erweitert. Selektoren für `[id*="fgroup_id_completion"]` und `[id*="fitem_id_completion"]` ergänzt, damit sowohl Gruppen- als auch Einzelelement-Hilfe-Icons linksbündig ausgerichtet werden.
+### Fixed
+- Backup: invalid `annotate_ids` call removed.
+- `print_error()` replaced by `throw new \moodle_exception()`.
+- Demo cards are identified by the category `demo` instead of text comparisons.
+- `get_cards_by_box` validates the box number (0 to 5).
+- Upgrade step version numbers corrected.
 
----
+## [1.4.10] - 2026-03-01
 
-## [1.4.30] - 2026-03-01 (Completion-Strings & Sprachqualität)
+### Fixed
+- `mod_form.php`: the "All cards mastered" check box is saved correctly.
 
-### Geändert
-- **Sprache (DE):** `completion_all_mastered_desc/help` – "Schüler/in" durch "Lernende" ersetzt.
-- **Sprache (DE):** `completion_min_mastered_help` – Warnung ergänzt, dass der Schwellwert die Gesamtkartenanzahl nicht überschreiten darf (sonst unerreichbar).
-- **Sprache (EN):** Analoge Anpassungen in `completion_all_mastered_desc/help` und `completion_min_mastered_help`.
-- **styles.css:** CSS-Eintrag für linksbündige Ausrichtung der Completion-Hilfe-Icons hinzugefügt.
-- **Sprache (DE/EN):** `completion_min_correct` Strings ergänzt (wurden in 1.4.33 wieder entfernt, da redundant).
+## [1.4.9] - 2026-03-01
 
----
+### Changed
+- Completion SQL queries use `DISTINCT` to avoid counting cards twice.
 
-## [1.4.29] - 2026-03-01 (Completion-Logik: Korrekte Karten neu definiert)
+## [1.4.8] - 2026-03-01
 
-### Geändert
-- **Activity Completion (Logik):** SQL-Query in `classes/completion/custom_completion.php` für die Regel `completion_min_cards` überarbeitet. Zählt nun ausschließlich Karten mit `box_number >= 1` (mindestens einmal grün bewertet), anstatt alle Karten mit einem Progress-Eintrag. Karten die nur rot/gelb bewertet wurden zählen nicht mehr.
-- **Sprache (DE):** `completion_min_cards` Strings auf "Mindestanzahl richtig beantworteter Karten" aktualisiert.
-- **Sprache (EN):** `completion_min_cards` Strings auf "Minimum cards answered correctly" aktualisiert.
+### Changed
+- "Minimum cards" completion query uses `COUNT(DISTINCT cardid)`.
 
----
+## [1.4.7] - 2026-03-01
 
-## [1.4.28] - 2026-03-01 (Completion-Strings: Englisch)
+### Fixed
+- Completion state no longer assumes success by default.
 
-### Geändert
-- **Sprache (EN):** `completion_min_cards` Strings auf "Minimum practice rounds" aktualisiert (Zwischenstand, in 1.4.29 weiter präzisiert).
-- **Sprache (EN):** `completion_all_mastered_desc/help` und `completion_min_mastered_desc/help` auf pluralinklusive Formulierungen ("Students must...") umgestellt.
+## [1.4.6] - 2026-03-01
 
----
+### Fixed
+- Completion was set to complete after the first answered card; Moodle's evaluation is now called
+  with `COMPLETION_UNKNOWN`.
+- "Minimum cards" counts unique cards, not clicks.
 
-## [1.4.27] - 2026-03-01 (Moodle 4.x Completion String Fix)
+## [1.4.5] - 2026-03-01
 
-### Geändert
-- **Activity Completion (UX):** Anpassung der Sprach-Strings in `lang/de/leitbox.php`. Da die Regel für die minimale Anzahl nun korrekter- und gerechterweise *Evaluierungen* zählt anstatt *Karten* (dieselbe Karte mehrfach auf "Rot" zu klicken zählt als zusätzlicher Lerndurchgang), lautet die Einstellung nun didaktisch korrekt "Mindestanzahl Lerndurchgänge" statt "Minimale Anzahl zu übender Karten".
+### Fixed
+- PHP parse error in `view.php`.
 
----
+## [1.4.4] - 2026-03-01
 
-## [1.4.26] - 2026-03-01 (Moodle 4.x Completion State Reset)
+### Fixed
+- `leitbox_get_custom_completion_rules()` added, required with `FEATURE_COMPLETION_HAS_RULES`.
 
-### Behoben
-- **Activity Completion (Fix):** Korrigiert den Completion-Trigger in `classes/external.php`. Es wird nun zwingend `COMPLETION_UNKNOWN` statt `COMPLETION_COMPLETE` an `update_state` gesendet. Dadurch wertet Moodle die Progress-Bedingungen nach jeder Antwort live vollständig neu aus, anstatt fälschlicherweise immer "Erledigt" zu erzwingen. Damit funktioniert auch der Downgrade der Completion (z.B. nach einem Reset) wieder fehlerfrei.
+## [1.4.3] - 2026-03-01
 
----
+### Fixed
+- Invalid SQL query in `lib.php` replaced by `count_records`.
 
-## [1.4.25] - 2026-03-01 (Moodle 4.x Completion ID Fix)
+## [1.4.2] - 2026-03-01
 
-### Behoben
-- **Activity Completion (Bugfix):** Behebt eine Exception in `classes/external.php`, die den Fortschritts-Speichervorgang abgebrochen hat. Der Methoden-Aufruf `$modinfo->get_cm()` erwartet die *Course Module ID*, es wurde jedoch fälschlicherweise die Leitbox *Instance ID* übergeben. Der Code bezieht die korrekte CM-ID nun vorab über `get_coursemodule_from_instance`. 
+### Fixed
+- `view.php` loads `completionlib.php` before using the completion API.
 
----
+## [1.4.1] - 2026-03-01
 
-## [1.4.24] - 2026-03-01 (Moodle 4.x Completion Logic Cleanup)
+### Fixed
+- Completion is updated after every answered card; `view.php` marks the activity as viewed.
 
-### Optimiert
-- **Activity Completion (Cleanup):** Refactoring von `custom_completion.php`. Die `get_state()` Funktion nutzt nun exklusiv das `customdata` Array, welches in `lib.php` befüllt wird. Redundante Datenbankabfragen auf die `leitbox`-Tabelle wurden entfernt, was die Ausführungsgeschwindigkeit der Completion Evaluierung drastisch verbessert. Deaktivierte Regeln werden nun blitzschnell und direkt als `INCOMPLETE` gewertet.
+## [1.4.0] - 2026-03-01 (Rebranding and custom completion)
 
----
+### Changed
+- Plugin renamed from "Recall" to "LeitBox".
+- New transparent logos (`logo.png`, `icon.png`).
 
-## [1.4.23] - 2026-03-01 (Moodle 4.x Completion State Fix)
+### Added
+- New completion condition "All cards mastered" (all cards in box 5).
 
-### Behoben
-- **Activity Completion (Critical):** Fixes a Moodle 4 completion state update race condition where custom rules were lost during answering/resetting cards:
-  - `lib.php`: Ersetzt `leitbox_cm_info_static` durch die offiziell vorgesehene Moodle-Schnittstelle `leitbox_get_coursemodule_info`, um `cached_cm_info` korrekt mit dem `customdata` Array für Completion abzufüllen.
-  - `classes/external.php`: Ersetzt veraltete `get_coursemodule_from_instance` Aufrufe durch `get_fast_modinfo`, damit `update_state` mit korrekten `cm_info` Objektklassen versorgt wird anstatt mit leeren Standard-Objekten.
+## [1.3.1] - 2026-02-28 (Performance)
 
----
+### Changed
+- New web service `mod_leitbox_get_box_counts` returns the six box counts instead of six full card
+  lists.
 
-## [1.4.22] - 2026-03-01 (Ultimate Moodle 4.x Completion Fixes)
+### Fixed
+- Fallback texts for missing frontend strings.
+- Backup and restore: `LEITBOXINDEX` decode rules added.
 
-### Behoben
-- **Activity Completion (Bugfix):** Die Moodle 4.x Kompatibilität wurde grundlegend überarbeitet und stabilisiert:
-  - `lib.php`: Fügt den fehlenden `leitbox_cm_info_static` Callback hinzu. Dieser ist essenziell in Moodle 4, damit Moodle weiß, welche Custom Rules aktuell für eine Instanz aktiviert sind.
-  - `custom_completion.php`: Die Evaluierung greift nun verlässlich auf das von `leitbox_cm_info_static` gefüllte `$cm->customdata` Array zu (anstatt blind die Datenbank abzufragen). Unkonfigurierte Regeln werden nun immer ignoriert.
-  - `mod_form.php`: Komplettes Re-Write der formularseitigen Rule-Verarbeitung (Preprocessing und Postprocessing) für eine fehlerfreie Speicherung aktivierter/deaktivierter Checkboxen via `$this->get_suffix()`.
+## [1.2.0] - 2026-02-28 (Card management and AI prompts)
 
----
+### Added
+- Six AI prompt templates (standard, true/false, vocabulary, cloze, Jeopardy, transfer).
+- Bulk selection and deletion of cards.
+- Card export as a text file in the `===CARD===` format (can be imported again).
+- Limit of 200 cards per activity, enforced on the server.
+- Session feedback texts and progress bar texts in English and German.
 
-## [1.4.21] - 2026-03-01 (Moodle 4.x Completion Logic Fixes)
+### Changed
+- Plugin name "LeitBox"; neutral reset button; header layout; vendor-neutral AI prompt text.
 
-### Behoben
-- **Activity Completion (Bugfix):** Deaktivierte Abschlussbedingungen geben jetzt in Moodle 4.x korrekterweise `COMPLETION_INCOMPLETE` anstatt `COMPLETION_COMPLETE` zurück. Dadurch wird verhindert, dass eine neu erstellte Leitbox sofort als "Erledigt" markiert wird, weil deaktivierte Regeln im Hintergrund immer als "Erfüllt" gezählt wurden.
-- **Toter Code:** Die alte, für Moodle 3.x geschriebene Funktion `leitbox_get_completion_state()` wurde restlos aus `lib.php` entfernt, da Moodle 4 diese ignorierte oder zu fehlerhaften Nebeneffekten führte.
-- **Sicherheits-Check in view.php:** Bei der Markierung "Aktivität angezeigt" wird nun ordentlich vorher mit `is_enabled()` abgeprüft. Dadurch wirft Moodle keinen stillen Fehler mehr im Log.
+### Fixed
+- PHP warning on bulk deletion without selection; missing `cancel` string; two hard-coded strings.
 
----
+## [1.1.0] - 2026-02-28 (Feedback and onboarding)
 
-## [1.4.20] - 2026-03-01 (Moodle 4.3+ Checkbox State Fix)
+### Added
+- Session feedback in four levels and a special message when all cards are in the Expert box.
+- Statistics of "Got it", "Again" and "Hard" after each session.
 
-### Behoben
-- **Activity Completion (Bugfix):** Es wurde nun eine exakte Replikation der nativen `mod_quiz`-Logik für Moodle 4.3+ Abschlussbedingungen eingebaut. Moodle vergibt bei Sammelbearbeitungen (Bulk Edit) im Hintergrund Suffixe an Formularfelder, was dazu führte, dass die Checkboxen der Abschlussbedingungen ihre Werte beim Speichern und Laden (data_preprocessing / data_postprocessing) verloren haben. Die Checkboxen setzen jetzt den vorausgehenden Zahlenwert (z.B. 10 Karten) korrekt zurück, wenn sie deaktiviert werden, und ihr Haken bleibt verlässlich gespeichert!
+### Changed
+- The welcome demo card always comes first; texts revised; logo updated.
 
----
+## [1.0.0] - 2026-02-27 (Stable release)
 
-## [1.4.19] - 2026-03-01 (Moodle 4 Form UI Completion Fix)
+### Added
+- Reset of the own learning progress (web service and dialogue with warning).
+- Accessibility work in the Vue frontend (ARIA attributes, keyboard focus, semantic HTML).
+- Logos in the header and activity icon.
 
-### Behoben
-- **Activity Completion (Bugfix):** Es wurde ein kritischer Fehler im Einstellungsformular in Moodle 4.0+ behoben. Weil die neuen numerischen Moodle-Regeln intern in einer `Checkbox-Gruppe` zusammengefasst waren, hat die Formular-Validierung fälschlicherweise beim Speichern "Keine Regeln aktiviert" an die Backend-Datenbank von Moodle gemeldet, selbst wenn ein Wert wie "10 Karten" eingetippt wurde. Die verwirrenden Checkboxen für numerische Werte wurden komplett entfernt. Ab sofort reicht es, native Moodle-Logik anzuwenden: Tippt man eine Zahl (`>0`) ein, ist die Regel automatisch aktiv! Ist das Feld leer oder `0`, ist die Regel deaktiviert.
+### Changed
+- Renamed from `mod_smartcards` to `mod_leitbox`.
+- Box names instead of numbers ("Beginner" to "Expert").
+- "Hard" moves a card back one box instead of to the start.
+- Dashboard redesign; maturity set to `MATURITY_STABLE`.
 
----
+## [0.1.0] - Initial implementation (beta)
 
-## [1.4.18] - 2026-03-01 (Moodle 4+ Completion Tracking Fix)
-
-### Behoben
-- **Activity Completion (Bugfix):** Es wurde ein kritischer Fehler in der Kommunikation mit der Moodle 4+ Completion API behoben. Da die neuen `custom_completion` Standard-Klassen für Moodle 4 fehlten, interpretierte der Moodle-Core die Zwischenstände von LeitBox als "Ohne Regeln abgeschlossen" und markierte die Aktivität oft fälschlicherweise nach der ersten gelernten Karte als "Erledigt". Die Architektur wurde nun nativ an Moodle 4 (Klasse `mod_leitbox\completion\custom_completion`) angepasst und die Fallback-Berechnungen strikt abgedichtet.
-
----
-
-## [1.4.17] - 2026-03-01 (Completion Data Preprocessing Fix)
-
-### Behoben
-- **Activity Completion (Bugfix):** Ein Fehler wurde behoben, durch den benutzerdefinierte Abschlussbedingungen (z.B. "Mindestens 6 Karten üben") beim Bearbeiten der Aktivität im Moodle-Formular nicht korrekt geladen und beim erneuten Speichern der Aktivität ungewollt auf `0` (deaktiviert) zurückgesetzt wurden. Dies führte dazu, dass die Aktivität bereits nach der ersten Karte fälschlicherweise als "Erledigt" markiert wurde. Die fehlende `data_preprocessing`-Methode wurde in der `mod_form.php` nachgepflegt.
-
----
-
-## [1.4.16] - 2026-03-01 (Support Email Integration)
-
-### Hinzugefügt
-- **Kontakt & Support:** Die offizielle Support-E-Mail-Adresse (`leitbox.moodle@gmail.com`) wurde in die grundlegenden Projektdokumente (README, Marketing-Materialien, Code-Header) integriert, um eine zentrale Anlaufstelle für Anfragen und Bug-Reports zu etablieren.
-
----
-
-## [1.4.15] - 2026-03-01 (Wording Refinement English Translation)
-
-### Geändert
-- **Sprachdateien (Englisch):** Die methodische und historische Richtigstellung im 'Wie funktioniert das?' Modal wurde nun auch für die internationale Version in `lang/en/leitbox.php` akkurat ins Englische übersetzt und übernommen.
-
----
-
-## [1.4.14] - 2026-03-01 (Wording Refinement)
-
-### Geändert
-- **Modal "Wie funktioniert das?":** Der Einleitungstext, welcher das Lernstapel-System erklärt, wurde umgeschrieben. Die Methodik wird nun historisch korrekt Sebastian Leitner (1972) zugeschrieben, anstatt rein den allgemeinen Begriff "Spaced Repetition System" zu verwenden. Dies betrifft sowohl die PHP-Sprachdateien als auch die Hardcoded-Fallbacks im Vue-Frontend.
-
----
-
-## [1.4.13] - 2026-03-01 (Language String Cleanup & UX Polish)
-
-### Behoben
-- **Sprachdateien (Deutsch & Englisch):** Es wurden identische (doppelte) veraltete Übersetzungs-Strings für das Session-Feedback und den "Karte gelöscht" Hinweistext im Kopf der jeweiligen Dateien `lang/de/leitbox.php` und `lang/en/leitbox.php` identifiziert und sicher entfernt. Der Quellcode ist nun sauber und verwendet ausschließlich die aktuellen Übersetzungen.
-
-### Hinzugefügt
-- **Admin-Interface:** In den Aktivitäts-Einstellungen (`mod_form.php`) für Moodle-Trainer wurden die drei offiziellen **Hilfe-Buttons** (Fragezeichen-Icons) neben den Abschlussbedingungen "Minimale Anzahl zu übender Karten", "Minimale Anzahl gelernter Karten" und "Alle Karten lückenlos bis Status Experte lernen" reaktiviert. Die erklärenden Tooltips waren in den Sprachdateien bereits vorhanden, aber in der Nutzeroberfläche zuvor nicht angebunden.
-
----
-
-## [1.4.12] - 2026-03-01 (Robust Demo Deletion & Unit Tests)
-
-### Geändert
-- **Demo-Karten Bereinigung:** Die Logik zum automatischen Löschen der initialen Demo-Karten in `manage.php` wurde deutlich robuster programmiert. Anstatt blind die ersten 5 Karten zu betrachten, wertet das System nun per striktem Datenbank-Befehl aus, ob bereits eigene (Nicht-Demo) Karten angelegt wurden, bevor die Bereinigung zugelassen wird.
-
-### Hinzugefügt
-- **Unit Tests:** In `tests/external_test.php` wurden neue automatisierte PHPUnit-Tests hinzugefügt, um die Fehlerbehandlung bei ungültigen Box-Nummer-Abfragen (API Bounds Check) sowie die korrekte `DISTINCT`-Identifikation von einzigartigen Karten-Lernvorgängen innerhalb der Abschlussverfolgung mathematisch zu beweisen.
-
----
-
-## [1.4.11] - 2026-03-01 (Code Review & Cleanup)
-
-### Behoben
-- **Backup API:** Ein ungültiger (`annotate_ids`) Aufruf mit totem Code in `backup_leitbox_stepslib.php` wurde entfernt, da das Plugin keine direkten User-IDs in der Haupt-Tabelle speichert.
-- **Exception Handling:** Die veraltete Moodle 3.x Funktion `print_error()` in `manage.php` wurde durch die korrekte `throw new \moodle_exception()` ersetzt.
-- **Demo-Karten Erkennung:** Das Erkennen von automatisch generierten Demo-Karten basierte auf fragilen String-Vergleichen (Text-basiert), die bei Übersetzungen gebrochen wären. Die Demo-Karten erhalten nun bei Installation intern den Datenbank-Category-Flag `demo` und werden darüber manipulationssicher identifiziert und gelöscht.
-- **API Validierung:** In `external.php` wurde bei `get_cards_by_box` eine strenge Validierung für die Box-Nummer eingeführt (`$box < 0 || $box > 5`), die nun mit einem fatalen Fehler abbricht, wenn manipulierte REST-Anfragen gesendet werden.
-- **Upgrade Pfade:** Anachronistische Versionsnummern (2024...) in der `db/upgrade.php` wurden bereinigt und an das Release-Jahr 2026 angepasst.
-
----
-
-## [1.4.10] - 2026-03-01 (Moodle Forms API Checkbox Fix)
-
-### Behoben
-- **Abschlussbedingung Formular (Speicher-Bug):** Ein kritischer Fehler in `mod_form.php` wurde behoben. Die Checkbox für "Alle Karten gemeistert" war fälschlicherweise in einer Moodle Formular-Gruppe (`addGroup()`) gekapselt. Dies verursachte beim Speichern ein verschachteltes Array (`$data['completion_all_mastered_group']['completion_all_mastered']`), weshalb Moodle den Wert auf der obersten Ebene nicht fand und immer `0` (deaktiviert) in die Datenbank speicherte. Die Checkbox ist nun ein vollwertiges `addElement` auf Hauptebene. Das Feld wird nun korrekt aus den Einstellungen im Backend gespeichert.
-
----
-
-## [1.4.9] - 2026-03-01 (Completion SQL DISTINCT Fix)
-
-### Geändert
-- **Abschlussbedingung SQL (Fix für alle Bedingungen):** Alle 3 Completion-SQL-Abfragen verwenden jetzt `DISTINCT` um Mehrfachzählungen bei wiederholten Karten-Interaktionen zu verhindern. Bei der Bedingung "Alle Karten gemeistert" (Bedingung 3) wurde zudem der Aufruf von `count_records_sql` durch `get_field_sql` ersetzt, um eine fehlerhafte SQL-Übersetzung der Moodle-Core Engine beim Einsatz von `DISTINCT` abzufangen.
-
----
-
-## [1.4.8] - 2026-03-01 (SQL Semantic Refinement)
-
-### Geändert
-- **Abschlussbedingung "Minimale Anzahl zu übender Karten":** Die zugrunde liegende SQL-Abfrage verwendet nun explizit `COUNT(DISTINCT cardid)` anstelle von `COUNT(id)`. Dies erhöht die semantische Klarheit massiv und garantiert, dass immer streng nach einzigartigen gelernten Karten (und nicht nach der Anzahl der Klicks) abgerechnet wird, falls zukünftige Updates die Struktur der Progress-Tabelle erweitern sollten.
-
----
-
-## [1.4.7] - 2026-03-01 (Completion Default Logic Overhaul)
-
-### Behoben
-- **Vorzeitiger Abschluss (Basislogik):** Die interne Logik der Moodle-Abschlussverfolgung in `lib.php` (`leitbox_get_completion_state`) wurde von Grund auf korrigiert. Bisher ging das System optimistisch von `$completed = true` aus und suchte nur nach Fehlern. Dies führte bei neu angelegten Aktivitäten dazu, dass Bedingungen sofort "erfüllt" wurden, bevor der Schüler überhaupt startete. Die Funktion verlangt nun explizite, messbare Erfolge (Echte Datenbankeinträge) pro aktivierter Regel.
-
----
-
-## [1.4.6] - 2026-03-01 (Completion Logic & Trigger Hotfix)
-
-### Behoben
-- **Vorzeitiger Abschluss (API Event):** Die in `1.4.1` eingeführte Live-Aktualisierung überschrieb Moodles Berechnungs-Logik ungeprüft mit `COMPLETION_COMPLETE`, weshalb bei der allerersten beantworteten Karte sofort alle Regeln als erfüllt galten. Das Skript ruft Moodles Evaluierungsnetzwerk nun formal mit dem Flag `COMPLETION_UNKNOWN` auf, wodurch die echten Backend-Regeln wieder das Zepter übernehmen.
-- **Logikfehler "Mindestkarten":** Die Bedingung "Mindestanzahl an Karten" zählte bisher versehentlich alle Karteikarten-Klicks (also auch, wenn man drei Mal dieselbe Karte gelernt hat). Der SQL-Query zählt nun korrekterweise strikt die Anzahl an einzigartigen (einzelnen) Karteikarten, mit denen der User interagiert hat.
-
----
-
-## [1.4.5] - 2026-03-01 (Syntax Error Hotfix)
-
-### Behoben
-- **Server Error (PHP Parse Error):** Behebt einen fatalen Syntaxfehler (fehlende Array-Klammer `];`) in der `view.php`, der aus einem fehlerhaften automatischen Merge des Completion-Tracker-Updates resultierte und zum HTTP 500 Fehler führte.
-
----
-
-## [1.4.4] - 2026-03-01 (Moodle API Registration Fix)
-
-### Behoben
-- **Server Error (`coding_exception`):** Der verbleibende HTTP 500 Fehler trat bei der Neuanlage von LeitBox-Aktivitäten mit aktiven Abschlussbedingungen auf. Dies war eine sehr strikte Moodle-Regel: Ein Plugin, das Abschlussregeln definiert (`FEATURE_COMPLETION_HAS_RULES = true`), erfordert zwangsweise die Callback-Funktion `pluginname_get_custom_completion_rules()`. Diese fehlte im Moodle-Core des Plugins und wurde nun in `lib.php` nachgerüstet. Moodle stürzt beim Anlegen jetzt nicht mehr ab.
-
----
-
-## [1.4.3] - 2026-03-01 (Moodle Core Database Hotfix)
-
-### Behoben
-- **Server Error (`dml_read_exception`):** Der verbleibende HTTP 500 Fehler wurde behoben. Die Ursache lag in einer systemfremden SQL-Abfrage (`SELECT ... ohne FROM`) innerhalb der `lib.php`, an der die strenge Moodle 4.x Datenbank-API bei der Abschluss-Prüfung abstürzte. Die Abfrage wurde in native Moodle-Funktionen (`count_records`) umgeschrieben.
-
----
-
-## [1.4.2] - 2026-03-01 (HTTP 500 Hotfix)
-
-### Behoben
-- **Server Error (`view.php`):** Behebt einen kritischen HTTP 500 Fehler, der auftrat, weil die Moodle `completionlib.php` Bibliothek vor dem Aufruf des Trackers nicht explizit in die Laufzeit geladen wurde.
-
----
-
-## [1.4.1] - 2026-03-01 (Completion Hotfix)
-
-### Behoben
-- **Abschlussverfolgung (Echtzeit):** Die Aktivität triggerte Moodles Abschluss-API (`update_state`) nicht korrekt live im AJAX-Backend. Die Abschlussprüfung wird nun nach jeder Karte sofort ausgelöst.
-- **Abschlussverfolgung (Anzeige):** Aufruf von `$completion->set_module_viewed($cm)` zur `view.php` hinzugefügt, sodass "Aktivität muss aufgerufen werden" ebenfalls zuverlässig erfüllt wird.
-
----
-
-## [1.4.0] - 2026-03-01 (Rebranding & Custom Completion Update)
-
-### Geändert
-- **Komplette Umbenennung:** Der Plugin-Name wurde aufgrund von Namenskonflikten projektweit von "Recall" in "LeitBox" umgewandelt (Dateien, Variablen, Pfade, Language-Strings).
-- **Logos & Branding:** Einbau der neuen, zu 100% freigestellten transparenten PNG-Logos (`logo.png`, `icon.png`).
-
-### Hinzugefügt
-- **Neue Moodle-Abschlussbedingung ("Alle Karten gelernt"):** Lehrer können nun erzwingen, dass eine LeitBox-Aktivität erst dann den grünen Haken erhält, wenn der Schüler ausnahmslos *alle* Lernkarten erfolgreich in die Experten-Box (Box 5) befördert hat. Die Datenbank und Backupfunktionen wurden hierfür erweitert.
-
----
-
-## [1.3.1] - 2026-02-28 (Performance & Reliability Update)
-
-### Geändert
-- **Performance (Dashboard Load):** Die `getBoxCounts` Funktion triggert nicht länger 6 parallele API-Aufrufe mit dem gesamten Kartendatenstrom. Ein neuer dedizierter, aggregierter REST-Endpunkt `mod_leitbox_get_box_counts` summiert die Karten serverseitig in Millisekunden und überträgt nur noch die 6 Zahlenwerte. Dies reduziert den Netzwerk-Payload bei 200 Karten um ca. 98%.
-
-### Behoben
-- **Race-Condition bei Frontend-Übersetzungen:** Wenn Moodle beim Ladezyklus Strings blockierte oder nicht fand, zeigte die Ansicht leere Platzhalter wie `[[showhint]]`. Ein robustes Fallback-Dictionary (`FALLBACKS`) in `Card.vue` fängt dies nun verlässlich ab.
-- **Backup & Restore Link-Dekodierung:** Fehlende `LEITBOXINDEX` Decode-Rules in `restore_leitbox_activity_task.php` ergänzt, sodass in Kursen platzierte Links auf Flashcard-Decks bei der Wiederherstellung korrekt aufgelöst statt als `$@LEITBOXVIEWBYID*...` roh im Text stehengelassen werden. Abwärtskompatibilität für alte `SMARTCARDS`-Backups bleibt bestehen.
-
----
-
-## [1.2.0] - 2026-02-28 (Kartenverwaltung & KI-Prompt Update)
-
-### Hinzugefügt
-- **KI-Prompt-Vorlagenauswahl:** 6 verschiedene Prompt-Templates (Standard, Wahr/Falsch, Vokabeln, Lückentext, Jeopardy, Transfer & Alltagsbezug) per Dropdown auswählbar. Der gewählte Prompt wird live im Vorschaufenster angezeigt und kann direkt kopiert werden.
-- **Massenauswahl & Bulk-Delete:** Checkbox-System mit „Alle auswählen"-Funktion zum gleichzeitigen Löschen mehrerer Karten.
-- **Kartenexport (.txt):** Exportfunktion, die alle Karten im nativen `===CARD===`-Format als Textdatei herunterlädt (reimportfähig).
-- **Didaktisches Kartenlimit:** Hartes Limit von 200 Karten pro Aktivität mit erklärendem Hinweis. Server-seitig für Einzelkarten und Massenimport erzwungen.
-- **Session-Feedback-Übersetzungen:** Alle 10 Feedback-Texte (Meisterwerk, Starkes Ergebnis, etc.) sind jetzt vollständig in Deutsch und Englisch verfügbar.
-- **Fortschrittsbalken-Übersetzung:** Der Fortschrittstext und sein barrierefreies aria-label sind jetzt korrekt internationalisiert.
-
-### Geändert
-- **Plugin-Name vereinfacht:** Von „LeitBox Aktivität" zu „LeitBox" – konsistent mit Moodle-Namenskonventionen (Forum, Glossar, etc.).
-- **Reset-Button:** Visuelle Umgestaltung von rot zu neutralem Grau für ein harmonischeres Dashboard-Layout.
-- **Header-Layout:** Logo/Titel links, Buttons rechts – bündige Ausrichtung mit dem Fortschrittsbalken darunter.
-- **KI-Prompt-Text:** Herstellerunabhängig formuliert („nutze ihn mit einer beliebigen KI" statt spezifischer Markennamen).
-
-### Behoben
-- **PHP Warning bei Bulk-Delete ohne Auswahl:** `Undefined variable $valid_cards` behoben, wenn „Ausgewählte löschen" ohne Checkbox-Auswahl geklickt wurde.
-- **Fehlender `cancel`-String:** Der „Abbrechen"-Button zeigte `[[cancel]]` statt des übersetzten Texts – Sprachstring wiederhergestellt.
-- **Hardcodierte deutsche Strings im Frontend:** Zwei Fortschrittstexte im Vue-Frontend waren nicht übersetzbar – durch `getString()` ersetzt.
-
----
-
-## [1.1.0] - 2026-02-28 (Feedback & Onboarding Update)
-
-### Hinzugefügt
-- **Abgestuftes Session-Feedback:** Dynamisches 4-Stufen-Feedback (Starkes Ergebnis, Solide Leistung, Auf dem richtigen Weg, Wiederholung empfohlen) nach Abschluss eines Stapels basierend auf dem Anteil korrekter Antworten.
-- **Masterpiece-Feedback:** Ein spezielles "Meisterwerk"-Erfolgsfenster erscheint, wenn alle Karten des Systems in der Experten-Box liegen und fehlerfrei absolviert wurden.
-- **Visuelle Statistiken:** Zeigt nach dem Absolvieren einen Fortschrittsbalken und Couter für "Gewusst" (Grün), "Nochmal" (Gelb) und "Schwer" (Rot) in der jeweiligen Durchgangs-Zusammenfassung an.
-
-### Geändert
-- **Gezielte Ersteindruck-Kontrolle:** Die "Willkommen bei LeitBox"-Demokarte wird nun serverseitig *immer* an die erste Stelle gezwungen, selbst wenn die "Karten mischen"-Option in Moodle aktiv ist.
-- **Texte & Sprachpakete:** Sämtliche Demotexte sowie die Feedback-Meldungen wurden sachlicher und erwachsener formuliert ("alle" statt "die meisten"). Vue-Fallbacks hinzugefügt, um Cache-Fehler zu vermeiden.
-- **Logo Update:** Das LeitBox-Logo in der Moodle-Aktivität verwendet nun die saubere, freigestellte PNG-Version.
-
----
-
-## [1.0.0] - 2026-02-27 (Stable Marketplace Release)
-
-### Hinzugefügt
-- **Reset-Funktion (API & UI):** Neues Moodle Web-Service-Backend und ein User-Interface Icon (`🔄`), um den eigenen Lernfortschritt sicher (inkl. Warnungs-Pop-up) vor Prüfungen auf "Neu" zurückzusetzen.
-- **Barrierefreiheit (WCAG 2.1 AA):** Komplette Überarbeitung des Vue-Frontends für volle Screenreader-Kompatibilität (`aria`-Attribute), Tastaturfokus und semantisches HTML.
-- **Branding-Assets:** Integration der finalen Logos (`Symbol.png` und `logo.png` im Header) mit angepasster Icon-Platzierung für Moodle-Aktivitäten.
-- **Umbrella Fallbacks:** Neues Fallback-String-System in Vue integriert, um Platzhalter `[[...]]` bei noch nicht geladenen Sprachpaketen zu verhindern.
-
-### Geändert
-- **Rebranding zu "LeitBox":** Kompletter Rename aller Dateien, Sprachpakete und Datenbanktabellen von `mod_smartcards` auf `mod_leitbox`.
-- **Didaktik-Update & Benennung:** Motivierende Box-Namen ("Einsteiger", "Lernender", "Fortgeschritten", "Erfahren", "Experte") statt nackter Zahlen integriert.
-- **Spaced Repetition Logik:** "Schwer/Nicht gewusst"-Karten fallen nun motivierend nur um 1 Box zurück, anstatt komplett auf Box 0 zurückzusetzen.
-- **Visuelles Branding & UI:** Komplettes Redesign des Dashboards mit entspannenden Teal/Navy Pastellfarben, schwebenden Boxen und dezenten Fortschrittsbalken.
-- **Maturity Level:** Moodle Plugin-Status offiziell auf `MATURITY_STABLE` gesetzt (`version.php` Bump auf `2026022707`).
-- Frontend Bundle neu kompiliert (`npm run build`), optimiert für Production.
-
----
-
-## [0.1.0] - Initial Implementation (Beta)
-### Hinzugefügt
-- Grundlegendes Moodle-Modul-Setup mit Datenbanktabellen.
-- Vue.js / Tailwind CSS Frontend-Basis.
-- Leitner-System-Logik (Standard).
-- Text-Import-Handler für KI-generierte Karteikarten.
-- Basis Moodle Backup/Restore & Privacy APIs implementiert.
+### Added
+- Moodle activity module with database tables.
+- Vue.js and Tailwind CSS frontend.
+- Leitner system logic.
+- Text import for AI-generated flashcards.
+- Backup and restore and Privacy API.

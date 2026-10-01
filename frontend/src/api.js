@@ -14,36 +14,43 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Thin wrapper around Moodle's core AJAX web service endpoint.
+ * Calls the mod_leitbox web services through Moodle's core/ajax module.
+ *
+ * core/ajax adds the sesskey, handles an expired session and reports errors
+ * the Moodle way. main.js loads it through Moodle's AMD loader and passes it
+ * in via initApi() before the Vue app is mounted.
  *
  * @module    mod_leitbox/frontend/api
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-import axios from 'axios';
 
 let config = {};
+let ajax = null;
 
-export const initApi = (cfg) => {
+/**
+ * Stores the page configuration and the core/ajax module.
+ *
+ * @param {Object} cfg The configuration from the data-config attribute in view.php.
+ * @param {Object} ajaxModule Moodle's core/ajax module.
+ */
+export const initApi = (cfg, ajaxModule) => {
     config = cfg;
+    ajax = ajaxModule;
 };
 
 export const getConfig = () => config;
 
-export const moodleCall = async (methodname, args) => {
-    const url = `${config.wwwroot}/lib/ajax/service.php?sesskey=${config.sesskey}`;
-    const payload = [{
-        index: 0,
-        methodname,
-        args
-    }];
-    const response = await axios.post(url, payload);
-    const data = response.data[0];
-    if (data.error) {
-        throw new Error(data.exception);
-    }
-    return data.data;
+/**
+ * Calls one Moodle web service function.
+ *
+ * @param {string} methodname The web service function name.
+ * @param {Object} args The function arguments.
+ * @returns {Promise} Resolves with the function's return value.
+ */
+export const moodleCall = (methodname, args) => {
+    return ajax.call([{methodname, args}])[0];
 };
 
 export const getCardsByBox = (boxnumber) => {
@@ -53,12 +60,12 @@ export const getCardsByBox = (boxnumber) => {
     });
 };
 
-export const getBoxCounts = async () => {
+export const getBoxCounts = async() => {
     const counts = await moodleCall('mod_leitbox_get_box_counts', {
         instanceid: config.instanceid
     });
 
-    const result = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    const result = {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0};
     for (const item of counts) {
         result[item.box_number] = item.count;
     }
@@ -72,10 +79,10 @@ export const submitAnswer = (cardid, rating) => {
     });
 };
 
-export const getLogoUrl = () => {
-    return `${config.wwwroot}/mod/leitbox/pix/logo.png`;
-};
+// Served through Moodle's theme image handler, which adds the theme revision
+// to the URL, so browsers load the new file after an update.
+export const getLogoUrl = () => window.M.util.image_url('logo', 'mod_leitbox');
 
 export const resetProgress = (instanceid) => {
-    return moodleCall('mod_leitbox_reset_progress', { instanceid });
+    return moodleCall('mod_leitbox_reset_progress', {instanceid});
 };

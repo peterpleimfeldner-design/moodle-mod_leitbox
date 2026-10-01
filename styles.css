@@ -16,34 +16,30 @@
  */
 
 /**
- * Standard Moodle CSS to fix UI issues.
+ * Styles for the LeitBox card management page (manage.php).
+ *
+ * Moodle loads every plugin's styles.css on every page, so every rule here
+ * is limited to LeitBox pages with the .path-mod-leitbox body class.
+ * The learner view (view.php) is styled by the Vue bundle in dist/assets.
  *
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/* Fix distortion of the activity icon in the header */
-.path-mod-leitbox .activity-header .activity-icon {
-    width: 64px !important;
-    height: 64px !important;
-    object-fit: contain !important;
-    background-color: transparent !important;
+.path-mod-leitbox .mod-leitbox-manage .leitbox-cancel-btn {
+    margin-left: 10px;
 }
 
-/* Ensure the icon in the breadcrumbs/activity selector is also crisp */
-.path-mod-leitbox .page-header-image img {
-    object-fit: contain !important;
+.path-mod-leitbox .mod-leitbox-manage .leitbox-prompt-display {
+    white-space: pre-wrap;
+    font-size: 0.9em;
 }
 
-/* Completion form: left-align help icons.
- * Targets both addGroup-based rules (fgroup_id_*) and
- * standalone checkbox rules (fitem_id_*) in the completion section. */
-#page-course-modedit .completion-rule .form-group .helptooltip,
-#page-course-modedit [id*="fgroup_id_completion"] .helptooltip,
-#page-course-modedit [id*="fitem_id_completion"] .helptooltip,
-.completion-rule .helptooltip {
-    float: left !important;
+.path-mod-leitbox .mod-leitbox-manage .leitbox-edit-card {
     margin-right: 8px;
-    margin-left: 0;
+}
+
+.path-mod-leitbox .mod-leitbox-manage .leitbox-export-row {
+    text-align: right;
 }

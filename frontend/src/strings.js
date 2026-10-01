@@ -14,15 +14,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * PostCSS build configuration for the LeitBox Vue frontend.
+ * Access to the language strings that view.php passes to the page.
  *
+ * All learner-facing text comes from lang/<language>/leitbox.php through
+ * $PAGE->requires->strings_for_js() in view.php. There are deliberately no
+ * built-in fallback texts here. A key that view.php does not export shows
+ * up as [[key]], the same marker Moodle itself uses for a missing string.
+ *
+ * @module    mod_leitbox/frontend/strings
  * @package   mod_leitbox
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-export default {
-    plugins: {
-        tailwindcss: {},
-        autoprefixer: {},
-    },
+
+/**
+ * Returns a mod_leitbox language string.
+ *
+ * @param {string} key The string identifier.
+ * @returns {string} The string in the current language.
+ */
+export const getString = (key) => {
+    const value = window.M?.str?.mod_leitbox?.[key];
+    return value ?? `[[${key}]]`;
 };

@@ -56,6 +56,7 @@
         "strdeleteselected": "Delete selected",
         "strexportcards": "Export cards (.txt)",
         "strselectall": "Select all",
+        "strselectcard": "Select card",
         "isedit": false,
         "editcardid": 0,
         "qval": "",
@@ -98,23 +99,23 @@
             {{/isedit}}
 
             <div class="mb-3">
-                <label>{{strquestion}}</label><br>
-                <textarea name="question" rows="2" class="form-control w-100" required>{{qval}}</textarea>
+                <label for="leitbox-question">{{strquestion}}</label><br>
+                <textarea id="leitbox-question" name="question" rows="2" class="form-control w-100" required>{{qval}}</textarea>
             </div>
 
             <div class="mb-3">
-                <label>{{stranswer}}</label><br>
-                <textarea name="answer" rows="2" class="form-control w-100" required>{{aval}}</textarea>
+                <label for="leitbox-answer">{{stranswer}}</label><br>
+                <textarea id="leitbox-answer" name="answer" rows="2" class="form-control w-100" required>{{aval}}</textarea>
             </div>
 
             <div class="mb-3">
-                <label>{{strhint}} ({{stroptional}})</label><br>
-                <textarea name="hint" rows="1" class="form-control w-100">{{hval}}</textarea>
+                <label for="leitbox-hint">{{strhint}} ({{stroptional}})</label><br>
+                <textarea id="leitbox-hint" name="hint" rows="1" class="form-control w-100">{{hval}}</textarea>
             </div>
 
             {{#isedit}}
             <input type="submit" value="{{strupdatecard}}" class="btn btn-primary">
-            <a href="{{managebaseurl}}?id={{cmid}}" class="btn btn-secondary" style="margin-left:10px;">{{strcancel}}</a>
+            <a href="{{managebaseurl}}?id={{cmid}}" class="btn btn-secondary leitbox-cancel-btn">{{strcancel}}</a>
             {{/isedit}}
             {{^isedit}}
             <input type="submit" value="{{straddcard}}" class="btn btn-primary">
@@ -128,8 +129,8 @@
         <p>{{strbulkimportdesc}}</p>
 
         <div class="mb-2">
-            <strong>{{strprompttypesel}}</strong><br>
-            <select id="leitbox-prompt-selector" class="custom-select form-control mb-3 mt-1 w-100">
+            <label for="leitbox-prompt-selector"><strong>{{strprompttypesel}}</strong></label><br>
+            <select id="leitbox-prompt-selector" class="custom-select form-select mb-3 mt-1 w-100">
                 {{#prompttypes}}
                 <option value="{{key}}" {{#selected}}selected{{/selected}}>{{label}}</option>
                 {{/prompttypes}}
@@ -139,8 +140,7 @@
         <div class="mb-4">
             <strong>{{strpromptinstruct}}</strong><br>
             <pre id="leitbox-prompt-display"
-                 class="bg-light p-3 border rounded"
-                 style="white-space: pre-wrap; font-size: 0.9em;">{{initialprompt}}</pre>
+                 class="bg-light p-3 border rounded leitbox-prompt-display">{{initialprompt}}</pre>
         </div>
 
         <form action="{{managebaseurl}}" method="post" class="mform">
@@ -149,7 +149,8 @@
             <input type="hidden" name="sesskey" value="{{sesskey}}">
 
             <div class="mb-3">
-                <textarea name="importdata" rows="10" class="form-control w-100"
+                <textarea id="leitbox-importdata" name="importdata" rows="10" class="form-control w-100"
+                          aria-label="{{strimportcards}}"
                           placeholder="{{strimportph}}"></textarea>
             </div>
 
@@ -171,7 +172,7 @@
         <table class="generaltable w-100">
             <thead>
                 <tr>
-                    <th><input type="checkbox" id="leitbox-selectall" title="{{strselectall}}"></th>
+                    <th><input type="checkbox" id="leitbox-selectall" title="{{strselectall}}" aria-label="{{strselectall}}"></th>
                     <th>#</th>
                     <th>{{strquestioncol}}</th>
                     <th>{{stranswercol}}</th>
@@ -182,13 +183,13 @@
             <tbody>
                 {{#cards}}
                 <tr>
-                    <td><input type="checkbox" name="cardids[]" value="{{id}}" class="leitbox-cardcheckbox"></td>
+                    <td><input type="checkbox" name="cardids[]" value="{{id}}" class="leitbox-cardcheckbox" aria-label="{{strselectcard}} {{rownum}}"></td>
                     <td>{{rownum}}</td>
                     <td>{{{question}}}</td>
                     <td>{{{answer}}}</td>
                     <td>{{{hint}}}</td>
                     <td>
-                        <a href="{{editurl}}" style="margin-right:8px;">{{{editiconhtml}}}</a>
+                        <a href="{{editurl}}" class="leitbox-edit-card">{{{editiconhtml}}}</a>
                         <a href="{{delurl}}" class="leitbox-delete-card">{{{deleteiconhtml}}}</a>
                     </td>
                 </tr>
@@ -203,7 +204,7 @@
 
     {{{pagingbarbottom}}}
 
-    <div class="mt-5 text-right">
+    <div class="mt-5 leitbox-export-row">
         <a href="{{exporturl}}" class="btn btn-outline-secondary">{{strexportcards}}</a>
     </div>
     {{/hascards}}

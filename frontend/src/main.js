@@ -21,18 +21,20 @@
  * @copyright 2026 Peter Pleimfeldner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
-import { initApi } from './api'
+import {createApp} from 'vue';
+import './style.css';
+import App from './App.vue';
+import {initApi} from './api';
 
-// Look for the config injected by Moodle block
-const rootElement = document.getElementById('v-app-mod-leitbox')
+const rootElement = document.getElementById('v-app-mod-leitbox');
 
 if (rootElement) {
-    const config = JSON.parse(rootElement.getAttribute('data-config') || '{}')
-    initApi(config)
-    createApp(App).mount('#v-app-mod-leitbox')
-} else {
-    console.error("Mount point #v-app-mod-leitbox not found.");
+    const config = JSON.parse(rootElement.getAttribute('data-config') || '{}');
+    // Moodle's AMD loader is present on every Moodle page. Mounting inside
+    // its callback also guarantees that the language strings (M.str), which
+    // Moodle prints after this script, are defined before the first render.
+    window.require(['core/ajax'], (Ajax) => {
+        initApi(config, Ajax);
+        createApp(App).mount(rootElement);
+    });
 }

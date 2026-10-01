@@ -1,7 +1,6 @@
-# Alle Textdateien immer mit LF speichern
+# Always store text files with LF line endings.
 * text=auto eol=lf
 
-# PHP explizit
 *.php text eol=lf
 *.xml text eol=lf
 *.md text eol=lf
@@ -9,18 +8,21 @@
 *.js text eol=lf
 *.json text eol=lf
 *.txt text eol=lf
+*.vue text eol=lf
+*.svg text eol=lf
 
-# Binärdateien
+# Binary files.
 *.png binary
 *.jpg binary
 *.gif binary
 *.zip binary
 
-# --- Export-Ignore: Diese Dateien/Ordner werden NICHT ins release-ZIP (git archive) eingebaut ---
+# Not part of the release ZIP (git archive). The Vue source in frontend/ and
+# the tests in tests/ ARE included: the GPL requires the source in its
+# preferred form for modification next to the built dist/assets/index.js.
 .gitattributes export-ignore
 .gitignore export-ignore
 .github export-ignore
-frontend export-ignore
-tests export-ignore
 .claude export-ignore
 docs export-ignore
+CHANGELOG.de.md export-ignore
