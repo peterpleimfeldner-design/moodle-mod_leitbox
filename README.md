@@ -83,7 +83,7 @@ speed rather than competition.
 
 ## Requirements
 
-- **Moodle:** 4.1 LTS or later (tested up to 4.5)
+- **Moodle:** 4.1 to 5.1 (automatically tested on 4.1, 4.4, 4.5, 5.0 and 5.1)
 - **PHP:** 8.1 to 8.3
 - **Database:** MySQL, MariaDB, or PostgreSQL
 - No additional PHP extensions or server dependencies required
