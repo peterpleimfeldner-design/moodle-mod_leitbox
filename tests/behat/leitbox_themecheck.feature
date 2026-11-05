@@ -39,24 +39,34 @@ Feature: The LeitBox learning view works with the theme Boost Union
     Then I should see "Card 1 of 5"
     And I should see "Tap to flip"
     # Each rating replaces the card with an animation; the next card is flipped only once the
-    # rating buttons of the previous card are gone.
+    # rating buttons of the previous card are gone. Turning a card takes 0.7 seconds, and the
+    # rating buttons can only be clicked once the back side faces the learner.
     And I click on ".flip-container" "css_element"
+    And I wait "1" seconds
     And I click on "Hard" "button"
     And I should see "Card 2 of 5"
+    And I wait "1" seconds
     And "Got it" "button" should not exist
     And I click on ".flip-container" "css_element"
+    And I wait "1" seconds
     And I click on "Again" "button"
     And I should see "Card 3 of 5"
+    And I wait "1" seconds
     And "Got it" "button" should not exist
     And I click on ".flip-container" "css_element"
+    And I wait "1" seconds
     And I click on "Got it" "button"
     And I should see "Card 4 of 5"
+    And I wait "1" seconds
     And "Got it" "button" should not exist
     And I click on ".flip-container" "css_element"
+    And I wait "1" seconds
     And I click on "Got it" "button"
     And I should see "Card 5 of 5"
+    And I wait "1" seconds
     And "Got it" "button" should not exist
     And I click on ".flip-container" "css_element"
+    And I wait "1" seconds
     And I click on "Got it" "button"
     # Three of five known and one uncertain is the result "Solid Performance".
     And I should see "Solid Performance"
