@@ -92,7 +92,7 @@ speed rather than competition.
 
 ## Installation
 
-1. Download the latest release ZIP: `mod_leitbox_vX.Y.Z.zip`
+1. Download the latest release ZIP (`mod_leitbox_vX.Y.Z.zip`) from the [GitHub releases page](https://github.com/peterpleimfeldner-design/moodle-mod_leitbox/releases/latest)
 2. In Moodle: **Site administration → Plugins → Install plugins**
 3. Upload the ZIP and follow the on-screen instructions
 
