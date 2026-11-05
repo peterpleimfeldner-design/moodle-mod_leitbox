@@ -3,12 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LeitBox — Karteikarten nach Leitner, direkt in Moodle</title>
-<meta name="description" content="LeitBox ist ein kostenloses, quelloffenes Moodle-Aktivitäts-Plugin für Karteikarten nach der Leitner-Methode. Schnelle KI-taugliche Kartenerstellung, sechs Lernstufen, keine externen Dienste, datenschutzfreundlich von Grund auf.">
+<title>LeitBox – Karteikarten für Moodle (Lernkartei nach Leitner)</title>
+<meta name="description" content="Kostenloses Karteikarten-Plugin für Moodle nach dem Leitner-Karteikasten: sechs Stapel, Import mit KI-Vorlagen, Abschlussregeln, keine externen Dienste. Moodle 4.1 bis 5.1.">
 <link rel="icon" type="image/png" href="../assets/icon.png">
+<link rel="canonical" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/">
+<link rel="alternate" hreflang="en" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/">
+<link rel="alternate" hreflang="de" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/">
+<link rel="alternate" hreflang="x-default" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/">
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "LeitBox – Karteikarten nach Leitner für Moodle", "alternateName": "mod_leitbox", "applicationCategory": "EducationalApplication", "applicationSubCategory": "Moodle plugin", "operatingSystem": "Moodle 4.1–5.1", "softwareVersion": "1.6.2", "inLanguage": "de", "description": "Kostenloses Karteikarten-Plugin für Moodle nach dem Leitner-Karteikasten: sechs Stapel, Import mit KI-Vorlagen, Abschlussregeln, keine externen Dienste. Moodle 4.1 bis 5.1.", "url": "https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/", "downloadUrl": "https://github.com/peterpleimfeldner-design/moodle-mod_leitbox/releases/latest", "sameAs": ["https://github.com/peterpleimfeldner-design/moodle-mod_leitbox", "https://www.youtube.com/@CourseToolbox"], "codeRepository": "https://github.com/peterpleimfeldner-design/moodle-mod_leitbox", "license": "https://www.gnu.org/licenses/gpl-3.0.html", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "author": {"@type": "Person", "name": "Peter Pleimfeldner"}, "image": "https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/assets/social-preview.png"}
+</script>
 <meta property="og:type" content="website">
-<meta property="og:title" content="LeitBox — Karteikarten nach Leitner, direkt in Moodle">
-<meta property="og:description" content="Kostenloses, quelloffenes Moodle-Aktivitäts-Plugin für Karteikarten nach der Leitner-Methode. Schnelle KI-taugliche Kartenerstellung, sechs Lernstufen, keine externen Dienste.">
+<meta property="og:title" content="LeitBox – Karteikarten für Moodle (Lernkartei nach Leitner)">
+<meta property="og:description" content="Kostenloses Karteikarten-Plugin für Moodle nach dem Leitner-Karteikasten: sechs Stapel, Import mit KI-Vorlagen, Abschlussregeln, keine externen Dienste. Moodle 4.1 bis 5.1.">
 <meta property="og:url" content="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/">
 <meta property="og:image" content="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/assets/social-preview.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -180,9 +187,10 @@
     <h1>Karteikarten direkt in Moodle, gebaut auf der Leitner-Methode.</h1>
     <p class="lead">LeitBox macht aus jedem Kursinhalt einen Karteikartenstapel zum eigenständigen Üben — sechs Lernstufen, schnelle KI-taugliche Kartenerstellung für Lehrende, und keine Daten verlassen jemals den eigenen Moodle-Server.</p>
     <div class="cta-row" style="margin-bottom:14px;">
-      <a class="btn btn-primary" href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox">Auf GitHub ansehen</a>
+      <a class="btn btn-primary" href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox/releases/latest">Download (GitHub-Release)</a>
+      <a class="btn btn-secondary" href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox">Quellcode auf GitHub</a>
     </div>
-    <p style="color:var(--text-muted); font-size:0.9rem; margin:0 0 40px;">Moodle Marketplace: demnächst verfügbar</p>
+    <p style="color:var(--text-muted); font-size:0.9rem; margin:0 0 40px;">Version 1.6.2 · Moodle 4.1 bis 5.1 · Deutsch, English · Moodle Marketplace: in Prüfung</p>
     <div class="carousel" id="screenshots">
       <div class="carousel-viewport">
         <div class="carousel-track">
@@ -216,7 +224,7 @@
 
   <section id="was" class="wrap">
     <h2>Wofür LeitBox gedacht ist</h2>
-    <p class="section-lead">Benannt nach Sebastian Leitner, dem österreichischen Wissenschaftler, der die Karteikarten-Methode 1972 erfand. LeitBox bringt diese Methode direkt in Moodle — ohne zusätzliche Anmeldung, ohne externe Werkzeuge.</p>
+    <p class="section-lead">Benannt nach Sebastian Leitner, dem Wissenschaftsjournalisten, der die Karteikasten-Methode 1972 beschrieb. LeitBox bringt diese Methode direkt in Moodle — ohne zusätzliche Anmeldung, ohne externe Werkzeuge.</p>
     <div class="grid-cards">
       <div class="card">
         <h3>Karten in Minuten statt Stunden</h3>
@@ -224,7 +232,7 @@
       </div>
       <div class="card">
         <h3>Nichts geht verloren</h3>
-        <p>Eine falsche Antwort wirft eine Karte genau eine Stufe zurück, nie ganz an den Anfang. Karten und Fortschritt sind in normalen Moodle-Kurssicherungen enthalten.</p>
+        <p>Eine falsche Antwort wirft eine Karte genau eine Stufe zurück, nie unter „Einsteiger“. Karten und Fortschritt sind in normalen Moodle-Kurssicherungen enthalten.</p>
       </div>
       <div class="card">
         <h3>Keine externen Dienste</h3>

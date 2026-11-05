@@ -3,12 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LeitBox — Leitner flashcards, native to Moodle</title>
-<meta name="description" content="LeitBox is a free, open-source Moodle activity plugin for Leitner-method flashcards. Fast AI-ready card creation, six learning boxes, no external services, GDPR by design.">
+<title>LeitBox – flashcards plugin for Moodle (Leitner box method)</title>
+<meta name="description" content="LeitBox is a free, open-source flashcards plugin for Moodle based on the Leitner box: six stacks, AI-ready bulk import, completion rules, no external services. Moodle 4.1 to 5.1.">
 <link rel="icon" type="image/png" href="assets/icon.png">
+<link rel="canonical" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/">
+<link rel="alternate" hreflang="en" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/">
+<link rel="alternate" hreflang="de" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/">
+<link rel="alternate" hreflang="x-default" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/">
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "LeitBox – Leitner flashcards for Moodle", "alternateName": "mod_leitbox", "applicationCategory": "EducationalApplication", "applicationSubCategory": "Moodle plugin", "operatingSystem": "Moodle 4.1–5.1", "softwareVersion": "1.6.2", "inLanguage": "en", "description": "LeitBox is a free, open-source flashcards plugin for Moodle based on the Leitner box: six stacks, AI-ready bulk import, completion rules, no external services. Moodle 4.1 to 5.1.", "url": "https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/", "downloadUrl": "https://github.com/peterpleimfeldner-design/moodle-mod_leitbox/releases/latest", "sameAs": ["https://github.com/peterpleimfeldner-design/moodle-mod_leitbox", "https://www.youtube.com/@CourseToolbox"], "codeRepository": "https://github.com/peterpleimfeldner-design/moodle-mod_leitbox", "license": "https://www.gnu.org/licenses/gpl-3.0.html", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "author": {"@type": "Person", "name": "Peter Pleimfeldner"}, "image": "https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/assets/social-preview.png"}
+</script>
 <meta property="og:type" content="website">
-<meta property="og:title" content="LeitBox — Leitner flashcards, native to Moodle">
-<meta property="og:description" content="Free, open-source Moodle activity plugin for Leitner-method flashcards. Fast AI-ready card creation, six learning boxes, no external services, GDPR by design.">
+<meta property="og:title" content="LeitBox – flashcards plugin for Moodle (Leitner box method)">
+<meta property="og:description" content="LeitBox is a free, open-source flashcards plugin for Moodle based on the Leitner box: six stacks, AI-ready bulk import, completion rules, no external services. Moodle 4.1 to 5.1.">
 <meta property="og:url" content="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/">
 <meta property="og:image" content="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/assets/social-preview.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -180,9 +187,10 @@
     <h1>Flashcards that live inside Moodle, built on the Leitner box method.</h1>
     <p class="lead">LeitBox turns any course material into a deck of flashcards learners can practise on their own — six learning boxes, fast AI-ready card creation for teachers, and no data ever leaving your Moodle server.</p>
     <div class="cta-row" style="margin-bottom:14px;">
-      <a class="btn btn-primary" href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox">View on GitHub</a>
+      <a class="btn btn-primary" href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox/releases/latest">Download (GitHub Release)</a>
+      <a class="btn btn-secondary" href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox">Source code on GitHub</a>
     </div>
-    <p style="color:var(--text-muted); font-size:0.9rem; margin:0 0 40px;">Moodle Marketplace listing: coming soon</p>
+    <p style="color:var(--text-muted); font-size:0.9rem; margin:0 0 40px;">Version 1.6.2 · Moodle 4.1 to 5.1 · English, Deutsch · Moodle Marketplace listing: in review</p>
     <div class="carousel" id="screenshots">
       <div class="carousel-viewport">
         <div class="carousel-track">
@@ -216,7 +224,7 @@
 
   <section id="what" class="wrap">
     <h2>What LeitBox is for</h2>
-    <p class="section-lead">Named after Sebastian Leitner, the Austrian scientist who invented the flashcard box method in 1972. LeitBox brings that method natively into Moodle — no extra login, no external tools.</p>
+    <p class="section-lead">Named after Sebastian Leitner, the science journalist who described the flashcard box method in 1972. LeitBox brings that method natively into Moodle — no extra login, no external tools.</p>
     <div class="grid-cards">
       <div class="card">
         <h3>Cards in minutes, not hours</h3>
@@ -224,7 +232,7 @@
       </div>
       <div class="card">
         <h3>Nothing gets lost</h3>
-        <p>A wrong answer moves a card back exactly one box, never all the way to the start. Cards and progress are included in standard Moodle course backups.</p>
+        <p>A wrong answer moves a card back exactly one box, never below “Beginner”. Cards and progress are included in standard Moodle course backups.</p>
       </div>
       <div class="card">
         <h3>No external services</h3>
