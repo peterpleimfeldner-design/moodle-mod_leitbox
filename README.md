@@ -1,6 +1,6 @@
 #### LeitBox – Leitner Flashcards for Moodle
 
-> **Named after Sebastian Leitner** – the Austrian scientist who invented the flashcard box learning
+> **Named after Sebastian Leitner** – the science journalist who described the flashcard box learning
 > system in 1972. LeitBox brings his method natively into Moodle.
 
 LeitBox is a native Moodle activity plugin that turns passive course content into flashcard decks

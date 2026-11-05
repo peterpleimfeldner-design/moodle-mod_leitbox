@@ -27,6 +27,8 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
+use Behat\Mink\Exception\ExpectationException;
+
 /**
  * Behat steps and page definitions for mod_leitbox.
  */
@@ -49,6 +51,25 @@ class behat_mod_leitbox extends behat_base {
                 return new moodle_url('/mod/leitbox/manage.php', ['id' => $cm->id]);
             default:
                 throw new Exception('Unrecognised mod_leitbox page type "' . $type . '."');
+        }
+    }
+
+    /**
+     * Checks the theme the current page was rendered with, as Moodle tells its JavaScript (M.cfg.theme),
+     * so a scenario for another theme cannot silently run with Boost when that theme is missing.
+     * The step name differs from the one in mod_leafr, so both plugins can share a test site.
+     *
+     * @Then /^the LeitBox page should use the "(?P<theme_string>[^"]*)" theme$/
+     * @param string $theme The theme name, e.g. "boost_union".
+     */
+    public function the_leitbox_page_should_use_the_theme(string $theme): void {
+        $this->require_javascript();
+        $actual = $this->evaluate_script('return (window.M && M.cfg) ? M.cfg.theme : null;');
+        if ($actual !== $theme) {
+            throw new ExpectationException(
+                'The page uses the theme "' . $actual . '", not "' . $theme . '"',
+                $this->getSession()
+            );
         }
     }
 }

@@ -148,6 +148,34 @@ final class external_test extends externallib_advanced_testcase {
     }
 
     /**
+     * The "Hard" rating as the help texts describe it: a new card goes to box 1,
+     * any other card moves back exactly one box, never below box 1.
+     *
+     * @covers \mod_leitbox\external::submit_answer
+     */
+    public function test_submit_answer_hard_matches_help_text(): void {
+        global $DB;
+        [$course, $student, $leitbox, $card] = $this->create_leitbox_activity();
+        $this->setUser($student);
+
+        // A new card (no progress yet, box 0) rated "Hard" goes to box 1.
+        $result = external::submit_answer($card->id, 0);
+        $result = external_api::clean_returnvalue(external::submit_answer_returns(), $result);
+        $this->assertEquals(1, $result['new_box']);
+
+        // A card in box 3 rated "Hard" moves back exactly one box.
+        $DB->set_field('leitbox_progress', 'box_number', 3, ['userid' => $student->id, 'cardid' => $card->id]);
+        $result = external::submit_answer($card->id, 0);
+        $result = external_api::clean_returnvalue(external::submit_answer_returns(), $result);
+        $this->assertEquals(2, $result['new_box']);
+
+        // The rating "Again" keeps the card in its box.
+        $result = external::submit_answer($card->id, 1);
+        $result = external_api::clean_returnvalue(external::submit_answer_returns(), $result);
+        $this->assertEquals(2, $result['new_box']);
+    }
+
+    /**
      * Test resetting progress.
      *
      * @covers \mod_leitbox\external::reset_progress

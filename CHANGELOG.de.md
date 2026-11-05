@@ -4,6 +4,27 @@ Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokument
 Maßgeblich und im Release-Paket enthalten ist die englische Fassung `CHANGELOG.md`; diese deutsche
 Fassung bleibt nur im Repository.
 
+## [1.6.2] - 2026-11-05
+
+Nur Textkorrekturen. Keine Datenbankänderung, keine Änderung daran, wie Karten zwischen den Stapeln wandern.
+
+### Behoben
+- Hilfetext des Knopfs „Schwer“ und Demo-Karte 3 beschreiben jetzt, was mit einer neuen Karte passiert:
+  Sie kommt nach „Einsteiger“. Andere Karten rücken einen Stapel zurück, nie unter „Einsteiger“. Ein neuer
+  PHPUnit-Test prüft das.
+- Zwei englische Texte am Rundenende enthielten „leitbox“ als Verb (Rest einer Umbenennung). Jetzt
+  „difficult to recall“ und „correctly recalled“.
+- Einführung und README nannten Sebastian Leitner einen „österreichischen Wissenschaftler“ und die Methode
+  „weltweit in der Lernforschung anerkannt“. Jetzt: Der Wissenschaftsjournalist Sebastian Leitner beschrieb
+  die Methode 1972 in seinem Buch „So lernt man lernen“.
+- Die Ladeanzeige sagte „Karten werden gemischt…“ auch bei fester Reihenfolge. Jetzt „Karten werden geladen…“.
+- Code-Kommentare in `classes/completion/custom_completion.php` nannten eine Funktion, die es nicht gibt.
+
+### Neu (nur Entwicklung, nicht im Release-Paket)
+- Browser-Prüfung für die Komplettprüfung vor einem Release (`.github/scripts/browsercheck/leitbox.py`).
+- CI-Jobs „Upgrade check“ (Update von 1.6.1 mit Lerndaten, keine Zeile darf verloren gehen oder sich
+  ändern) und „Theme check“ (Lernansicht mit dem Theme Boost Union).
+
 ## [1.6.1] - 2026-10-01 (Moodle-Plugin-Directory-Review, dritte Runde)
 
 ### Sicherheit

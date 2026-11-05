@@ -3,6 +3,28 @@
 All notable changes to this project are documented in this file.
 A German version is kept in the repository as `CHANGELOG.de.md` (not part of the release package).
 
+## [1.6.2] - 2026-11-05
+
+Text corrections only. No database changes, no change to how cards move between stacks.
+
+### Fixed
+- The help text of the "Hard" button and demo card 3 now describe what the plugin does with a new
+  card: it moves to "Beginner". Other cards move back one stack, never below "Beginner". A new
+  PHPUnit test checks this behaviour.
+- Two texts on the end-of-round screen contained "leitbox" as a verb (left over from a renaming).
+  They now read "difficult to recall" and "correctly recalled".
+- The introduction and the README described Sebastian Leitner as an "Austrian scientist" and the
+  method as "globally recognized in learning research". They now say that the science journalist
+  Sebastian Leitner described the method in 1972 in his book "So lernt man lernen".
+- The loading message said "Shuffling cards..." even when the activity shows cards in a fixed
+  order. It now says "Loading cards...".
+- Code comments in `classes/completion/custom_completion.php` named a function that does not exist.
+
+### Added (development only, not part of the release package)
+- Browser check for the full test before a release (`.github/scripts/browsercheck/leitbox.py`).
+- CI jobs "Upgrade check" (upgrade from 1.6.1 with learner data, no row may be lost or changed) and
+  "Theme check" (learner view with the Boost Union theme).
+
 ## [1.6.1] - 2026-10-01 (Moodle Plugins directory review, round 3)
 
 ### Security

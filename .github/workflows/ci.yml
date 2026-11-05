@@ -2,6 +2,11 @@ name: Moodle Plugin CI
 
 on: [push, pull_request]
 
+# A newer push to the same branch replaces a run that is still going.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -166,6 +171,209 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpunit --fail-on-warning
 
+      # The theme check feature needs Boost Union and runs in the job "Theme check" only.
       - name: Behat features
         if: ${{ !cancelled() }}
-        run: moodle-plugin-ci behat --profile chrome
+        run: moodle-plugin-ci behat --profile chrome --tags="@mod_leitbox&&~@leitbox_themecheck"
+
+  themes:
+    # Runs the learning view (dialogs, a round, ratings) with Boost Union, one of the most used
+    # themes, whose layers and scripts could get in the way of the Vue app and its dialogs.
+    name: Theme check (Boost Union, ${{ matrix.moodle-branch }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.3'
+            moodle-branch: 'MOODLE_405_STABLE'
+          - php: '8.3'
+            moodle-branch: 'MOODLE_501_STABLE'
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, pgsql, zip, gd, intl, soap, curl, xml, dom
+          ini-values: max_input_vars=5000
+          coverage: none
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          echo $(cd ci && pwd)/bin >> $GITHUB_PATH
+          echo $(cd ci && pwd)/vendor/bin >> $GITHUB_PATH
+          sudo locale-gen en_AU.UTF-8
+        env:
+          COMPOSER_NO_INTERACTION: 1
+
+      - name: Add Boost Union
+        # The theme's branches are named like Moodle's.
+        run: moodle-plugin-ci add-plugin --branch ${{ matrix.moodle-branch }} moodle-an-hochschulen/moodle-theme_boost_union
+
+      - name: Install moodle-plugin-ci
+        run: |
+          moodle-plugin-ci install \
+            --plugin ./plugin \
+            --db-host 127.0.0.1 \
+            --db-user postgres \
+            --db-pass postgres \
+            --db-name moodle \
+            --db-port 5432 \
+            --branch ${{ matrix.moodle-branch }} \
+            --db-type pgsql
+
+      - name: Behat with Boost Union
+        id: behat
+        run: moodle-plugin-ci behat --profile chrome --tags="@leitbox_themecheck"
+
+      - name: Upload Behat faildump
+        if: ${{ always() && steps.behat.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: behat-faildump-boostunion-${{ matrix.moodle-branch }}
+          path: ${{ github.workspace }}/moodledata/behat_dump
+          retention-days: 7
+          if-no-files-found: ignore
+
+  upgrade:
+    # Installs the previous release, creates data with it, upgrades to this commit and checks that
+    # no data was lost or changed (see .github/scripts/upgrade-check/README.md).
+    name: Upgrade check (${{ matrix.moodle-branch }}, ${{ matrix.database }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PREVIOUS_RELEASE: v1.6.1
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
+          MARIADB_CHARACTER_SET_SERVER: utf8mb4
+          MARIADB_COLLATION_SERVER: utf8mb4_unicode_ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The oldest and the newest supported Moodle version.
+          - php: '8.1'
+            moodle-branch: 'MOODLE_401_STABLE'
+            database: pgsql
+            db-user: postgres
+            db-pass: postgres
+            db-port: 5432
+          - php: '8.3'
+            moodle-branch: 'MOODLE_501_STABLE'
+            database: mariadb
+            db-user: root
+            db-pass: ''
+            db-port: 3306
+
+    steps:
+      - name: Check out this commit
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+          fetch-depth: 0
+
+      - name: Check out the previous release
+        run: git -C plugin worktree add "$GITHUB_WORKSPACE/plugin-previous" "$PREVIOUS_RELEASE"
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, pgsql, mysqli, zip, gd, intl, soap, curl, xml, dom
+          ini-values: max_input_vars=5000
+          coverage: none
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          echo $(cd ci && pwd)/bin >> $GITHUB_PATH
+          echo $(cd ci && pwd)/vendor/bin >> $GITHUB_PATH
+          sudo locale-gen en_AU.UTF-8
+        env:
+          COMPOSER_NO_INTERACTION: 1
+
+      - name: Install Moodle with the previous release
+        run: |
+          moodle-plugin-ci install \
+            --plugin ./plugin-previous \
+            --db-host 127.0.0.1 \
+            --db-user "${{ matrix.db-user }}" \
+            --db-pass "${{ matrix.db-pass }}" \
+            --db-name moodle \
+            --db-port "${{ matrix.db-port }}" \
+            --branch ${{ matrix.moodle-branch }} \
+            --db-type ${{ matrix.database }} \
+            --no-init
+
+      - name: Install the Moodle site
+        # moodle-plugin-ci only prepares the PHPUnit and Behat test sites; the upgrade needs a real site.
+        # The command line scripts stay in moodle/admin/cli also since Moodle 5.1 (public/ layout).
+        run: >-
+          php moodle/admin/cli/install_database.php --agree-license --fullname="Upgrade check"
+          --shortname=upgrade --adminpass="$(openssl rand -hex 16)Aa1!" --adminemail=admin@example.com
+
+      - name: Create data with the previous release and take a snapshot
+        run: |
+          php plugin/.github/scripts/upgrade-check/seed.php moodle/config.php
+          php plugin/.github/scripts/upgrade-check/snapshot.php moodle/config.php "$GITHUB_WORKSPACE/before.json"
+
+      - name: Upgrade to this commit
+        run: |
+          # Since Moodle 5.1 the code lives in moodle/public, so the paths come from $CFG->dirroot.
+          dirroot=$(php -r "define('CLI_SCRIPT', true); require('moodle/config.php'); echo \$CFG->dirroot;")
+          rm -rf "$dirroot/mod/leitbox"
+          mkdir -p "$dirroot/mod/leitbox"
+          git -C plugin archive HEAD | tar -x -C "$dirroot/mod/leitbox"
+          php moodle/admin/cli/upgrade.php --non-interactive
+
+      - name: Compare the data before and after the upgrade
+        run: |
+          php plugin/.github/scripts/upgrade-check/snapshot.php moodle/config.php "$GITHUB_WORKSPACE/after.json"
+          php plugin/.github/scripts/upgrade-check/compare.php "$GITHUB_WORKSPACE/before.json" "$GITHUB_WORKSPACE/after.json"

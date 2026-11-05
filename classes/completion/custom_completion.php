@@ -32,7 +32,7 @@ use core_completion\activity_custom_completion;
  *
  * HOW MOODLE 4.x CUSTOM COMPLETION WORKS:
  * ----------------------------------------
- * 1. leitbox_cm_info_static() in lib.php populates $cm->customdata with the
+ * 1. leitbox_get_coursemodule_info() in lib.php populates $cm->customdata with the
  *    active rules for this instance (e.g. ['completion_min_cards' => 10]).
  *
  * 2. Moodle calls get_state() for each rule defined in get_defined_custom_rules().
@@ -46,7 +46,7 @@ class custom_completion extends activity_custom_completion {
     /**
      * Fetches the list of custom completion rule names that this module defines.
      * This is the full list of possible rules — not which are active per instance.
-     * Active rules per instance are determined by leitbox_cm_info_static() in lib.php.
+     * Active rules per instance are determined by leitbox_get_coursemodule_info() in lib.php.
      *
      * @return array
      */
