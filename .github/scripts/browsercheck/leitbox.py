@@ -59,6 +59,13 @@ def run(ctx):
     act('Open "Reset progress"', '#v-app-mod-leitbox button.rc-btn-reset', lambda b, a: a['reset'])
     act('Cancel "Reset progress"', '.rc-overlay[role="alertdialog"] .rc-btn--ghost', lambda b, a: not a['reset'])
 
+    # The window sizes run one after another on the same site, so every size starts by resetting the
+    # progress of the previous one: all five demo cards are back in the first stack.
+    act('Open "Reset progress" again', '#v-app-mod-leitbox button.rc-btn-reset', lambda b, a: a['reset'])
+    act('Confirm "Reset progress"', '.rc-overlay[role="alertdialog"] .rc-btn--danger',
+        lambda b, a: not a['reset'] and ': 5 ' in a['boxes'].split(' / ')[0] + ' ', 2500)
+    start = state()
+
     # One round through the five demo cards: every way to turn a card and every rating button.
     act('Start round', ACTIVE_BOX, lambda b, a: not a['dashboard'] and a['question'] != '', 2500)
     ratings = [('Got it', 2), ('Again', 1), ('Hard', 0), ('Got it', 2), ('Got it', 2)]
