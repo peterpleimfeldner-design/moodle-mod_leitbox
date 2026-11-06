@@ -9,6 +9,19 @@ inside Moodle – no extra login, no external tools, no data leaving the institu
 
 ---
 
+## Videos
+
+[![LeitBox tour on YouTube (4:41)](https://img.youtube.com/vi/1vEPh3uCg-4/maxresdefault.jpg)](https://www.youtube.com/watch?v=1vEPh3uCg-4)
+
+**[Watch the full tour (4:41)](https://www.youtube.com/watch?v=1vEPh3uCg-4)** · German version:
+[Karteikarten in Moodle mit KI-Vorlagen](https://www.youtube.com/watch?v=r9TkDeJ876g)
+
+Short clips: [one learning round](https://www.youtube.com/watch?v=1DDacvDHq5Y) ·
+[from your notes to flashcards with AI](https://www.youtube.com/watch?v=FXz2S2bfxEI) ·
+[privacy and completion for administrators](https://www.youtube.com/watch?v=OMQOh1_QsMA)
+
+---
+
 ## Screenshots
 
 | | |
