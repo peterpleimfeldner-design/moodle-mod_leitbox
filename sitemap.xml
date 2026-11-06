@@ -2,14 +2,62 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/</loc>
-    <lastmod>2026-11-05</lastmod>
+    <lastmod>2026-11-06</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/"/>
   </url>
   <url>
     <loc>https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/</loc>
-    <lastmod>2026-11-05</lastmod>
+    <lastmod>2026-11-06</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/"/>
+  </url>
+  <url>
+    <loc>https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/</loc>
+    <lastmod>2026-11-06</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/anleitungen/"/>
+  </url>
+  <url>
+    <loc>https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/anleitungen/</loc>
+    <lastmod>2026-11-06</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/anleitungen/"/>
+  </url>
+  <url>
+    <loc>https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/create-flashcards-with-ai-moodle/</loc>
+    <lastmod>2026-11-06</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/create-flashcards-with-ai-moodle/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/anleitungen/karteikarten-mit-ki-erstellen-moodle/"/>
+  </url>
+  <url>
+    <loc>https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/anleitungen/karteikarten-mit-ki-erstellen-moodle/</loc>
+    <lastmod>2026-11-06</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/create-flashcards-with-ai-moodle/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/anleitungen/karteikarten-mit-ki-erstellen-moodle/"/>
+  </url>
+  <url>
+    <loc>https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/leitner-flashcards-moodle/</loc>
+    <lastmod>2026-11-06</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/leitner-flashcards-moodle/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/anleitungen/leitner-lernkartei-in-moodle/"/>
+  </url>
+  <url>
+    <loc>https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/anleitungen/leitner-lernkartei-in-moodle/</loc>
+    <lastmod>2026-11-06</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/leitner-flashcards-moodle/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/anleitungen/leitner-lernkartei-in-moodle/"/>
+  </url>
+  <url>
+    <loc>https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/moodle-flashcard-completion/</loc>
+    <lastmod>2026-11-06</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/moodle-flashcard-completion/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/anleitungen/abschluss-nach-lernstand-moodle/"/>
+  </url>
+  <url>
+    <loc>https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/anleitungen/abschluss-nach-lernstand-moodle/</loc>
+    <lastmod>2026-11-06</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/moodle-flashcard-completion/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/anleitungen/abschluss-nach-lernstand-moodle/"/>
   </url>
 </urlset>

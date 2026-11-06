@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create Moodle flashcards with AI (step by step) – LeitBox</title>
+<meta name="description" content="Turn your notes into Moodle flashcards: pick a question type, copy LeitBox&#x27;s prompt template, give it to any AI assistant and paste the answer into the bulk import. Five steps with screenshots.">
+<link rel="icon" type="image/png" href="../../assets/icon.png">
+<link rel="canonical" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/create-flashcards-with-ai-moodle/">
+<link rel="alternate" hreflang="en" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/create-flashcards-with-ai-moodle/">
+<link rel="alternate" hreflang="de" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/de/anleitungen/karteikarten-mit-ki-erstellen-moodle/">
+<link rel="alternate" hreflang="x-default" href="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/create-flashcards-with-ai-moodle/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Create Moodle flashcards with AI (step by step) – LeitBox">
+<meta property="og:description" content="Turn your notes into Moodle flashcards: pick a question type, copy LeitBox&#x27;s prompt template, give it to any AI assistant and paste the answer into the bulk import. Five steps with screenshots.">
+<meta property="og:url" content="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/create-flashcards-with-ai-moodle/">
+<meta property="og:image" content="https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+[{"@context": "https://schema.org", "@type": "TechArticle", "headline": "How to create Moodle flashcards with AI", "description": "Turn your notes into Moodle flashcards: pick a question type, copy LeitBox's prompt template, give it to any AI assistant and paste the answer into the bulk import. Five steps with screenshots.", "inLanguage": "en", "datePublished": "2026-11-06", "dateModified": "2026-11-06", "url": "https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/create-flashcards-with-ai-moodle/", "image": "https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/assets/guides/en/ki_1_fragetyp.webp", "author": {"@type": "Person", "name": "Peter Pleimfeldner"}, "about": {"@type": "SoftwareApplication", "name": "LeitBox", "applicationCategory": "EducationalApplication", "operatingSystem": "Moodle 4.1–5.1", "url": "https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/"}}, {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "LeitBox", "item": "https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/"}, {"@type": "ListItem", "position": 2, "name": "Guides", "item": "https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/"}, {"@type": "ListItem", "position": 3, "name": "How to create Moodle flashcards with AI", "item": "https://peterpleimfeldner-design.github.io/moodle-mod_leitbox/guides/create-flashcards-with-ai-moodle/"}]}]
+</script>
+<style>
+  :root { --teal-dark:#0E6A62; --teal-light:#6FC3B8; --bg:#ffffff; --bg-alt:#F4F8F7; --text:#182524; --text-muted:#4B5A58;
+    --border:#DCE6E4; --card-bg:#ffffff; --mark:#FFCD00; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#101716; --bg-alt:#16211F; --text:#EAF2F0; --text-muted:#A9BBB8;
+    --border:#26332F; --card-bg:#16211F; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); line-height:1.6;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  a { color:var(--teal-dark); }
+  @media (prefers-color-scheme: dark) { a { color:var(--teal-light); } }
+  .wrap { max-width:1040px; margin:0 auto; padding:0 20px; }
+  .narrow { max-width:760px; }
+  header.site { border-bottom:1px solid var(--border); padding:16px 0; }
+  header.site .wrap { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.15rem; text-decoration:none; color:var(--text); }
+  .brand img { width:28px; height:28px; }
+  nav.site-nav { display:flex; gap:20px; flex-wrap:wrap; font-size:0.95rem; }
+  nav.site-nav a { text-decoration:none; color:var(--text-muted); }
+  nav.site-nav a:hover, nav.site-nav a[aria-current] { color:var(--teal-dark); }
+  .lang-switch { font-size:0.85rem; } .lang-switch a { text-decoration:none; }
+  .crumbs { font-size:0.85rem; color:var(--text-muted); margin:24px 0 0; }
+  .crumbs a { color:var(--text-muted); }
+  h1 { font-size:clamp(1.7rem,3.6vw,2.4rem); line-height:1.2; margin:12px 0 16px; letter-spacing:-0.01em; }
+  h2 { font-size:1.4rem; margin:40px 0 12px; }
+  .lead { font-size:1.08rem; color:var(--text-muted); }
+  .updated { font-size:0.85rem; color:var(--text-muted); }
+  .need { background:var(--bg-alt); border:1px solid var(--border); border-radius:12px; padding:18px 22px; margin:24px 0 8px; }
+  .need h2 { margin:0 0 8px; font-size:1.05rem; }
+  .need ul { margin:0; padding-left:20px; } .need li { margin:4px 0; }
+  /* Schritte */
+  .steps { margin-top:12px; position:relative; width:min(1000px, calc(100vw - 40px)); left:50%; transform:translateX(-50%); }
+  .steps-bar { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px; }
+  .steps-count { font-weight:600; color:var(--teal-dark); }
+  .steps-toggle { background:none; border:1px solid var(--border); border-radius:8px; padding:6px 12px; color:var(--text);
+    font:inherit; font-size:0.9rem; cursor:pointer; }
+  .steps-toggle:hover { border-color:var(--teal-dark); color:var(--teal-dark); }
+  .steps-view { overflow:hidden; border-radius:12px; border:1px solid var(--border); background:var(--card-bg);
+    box-shadow:0 12px 32px rgba(14,106,98,0.12); transition:height 0.35s ease; }
+  .steps-track { display:flex; align-items:flex-start; transition:transform 0.35s ease; margin:0; padding:0; list-style:none; }
+  .step { flex:0 0 100%; margin:0; }
+  .step img { width:100%; height:auto; display:block; cursor:zoom-in; border-bottom:1px solid var(--border); }
+  .step .txt { padding:16px 22px 20px; }
+  .step .num { font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--teal-dark); }
+  .step h3 { margin:4px 0 6px; font-size:1.15rem; }
+  .step p { margin:0; }
+  .step b { background:linear-gradient(transparent 60%, rgba(255,205,0,0.45) 60%); font-weight:600; }
+  .steps-nav { display:flex; justify-content:center; align-items:center; gap:14px; margin-top:14px; }
+  .steps-nav button.arrow { width:42px; height:42px; border-radius:50%; border:1px solid var(--border); background:var(--card-bg);
+    color:var(--text); font-size:1.3rem; cursor:pointer; }
+  .steps-nav button.arrow:hover { border-color:var(--teal-dark); color:var(--teal-dark); }
+  .steps-nav button.arrow:disabled { opacity:0.35; cursor:default; }
+  .dots { display:flex; gap:8px; }
+  .dots button { width:9px; height:9px; border-radius:50%; border:none; padding:0; background:var(--border); cursor:pointer; }
+  .dots button.active { background:var(--teal-dark); }
+  .steps.all .steps-view { height:auto !important; box-shadow:none; border:none; background:none; overflow:visible; }
+  .steps.all .steps-track { display:block; transform:none !important; }
+  .steps.all .step { border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:22px; background:var(--card-bg); }
+  .steps.all .steps-nav, .steps.all .steps-count { visibility:hidden; }
+  .notes { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .note { border:1px solid var(--border); border-radius:12px; padding:16px 18px; background:var(--card-bg); }
+  .note h3 { margin:0 0 6px; font-size:1rem; } .note p { margin:0; color:var(--text-muted); font-size:0.95rem; }
+  .cta { display:flex; gap:12px; flex-wrap:wrap; margin:36px 0 8px; }
+  .btn { display:inline-block; padding:11px 22px; border-radius:8px; text-decoration:none; font-weight:600; font-size:0.95rem;
+    border:1px solid transparent; }
+  .btn-primary { background:var(--teal-dark); color:#fff !important; } .btn-primary:hover { background:#0a5951; }
+  .btn-secondary { color:var(--text); border-color:var(--border); } .btn-secondary:hover { border-color:var(--teal-dark); color:var(--teal-dark); }
+  .more { list-style:none; padding:0; margin:0; display:grid; gap:12px; }
+  .more a, .guide-card { display:block; border:1px solid var(--border); border-radius:12px; padding:16px 18px; text-decoration:none;
+    color:var(--text); background:var(--card-bg); }
+  .more a:hover, .guide-card:hover { border-color:var(--teal-dark); }
+  .more strong, .guide-card strong { color:var(--teal-dark); display:block; margin-bottom:4px; }
+  .more span, .guide-card span { color:var(--text-muted); font-size:0.95rem; }
+  .lightbox { position:fixed; inset:0; background:rgba(10,20,19,0.9); z-index:100; display:flex; align-items:center;
+    justify-content:center; padding:24px; }
+  .lightbox[hidden] { display:none; }
+  .lightbox img { max-width:100%; max-height:100%; border-radius:8px; }
+  .lightbox button { position:absolute; top:14px; right:20px; background:none; border:none; color:#fff; font-size:2rem; cursor:pointer; }
+  footer.site { border-top:1px solid var(--border); padding:32px 0 48px; margin-top:56px; text-align:center; color:var(--text-muted);
+    font-size:0.9rem; }
+  footer.site a { color:var(--text-muted); }
+  footer.site .foot-links { display:flex; gap:18px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../../"><img src="../../assets/icon.png" alt=""> LeitBox</a>
+    <nav class="site-nav">
+      <a href="../../guides/">Guides</a>
+      <a href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox">GitHub</a>
+    </nav>
+    <span class="lang-switch"><a href="../../de/anleitungen/karteikarten-mit-ki-erstellen-moodle/" hreflang="de" lang="de">Deutsch</a></span>
+  </div>
+</header>
+
+<main class="wrap narrow">
+  <p class="crumbs"><a href="../../">LeitBox</a> › <a href="../../guides/">Guides</a></p>
+  <h1>How to create Moodle flashcards with AI</h1>
+  <p class="lead">Moodle itself has no flashcard activity. With LeitBox you don't type cards one by one: LeitBox gives you a ready-made prompt for six question types. You give the prompt and your notes to an AI assistant of your choice and paste its answer back into LeitBox. All cards are created in one go.</p>
+  <p class="updated">Updated 6 November 2026</p>
+  <section class="need">
+    <h2>What you need</h2>
+    <ul>
+      <li>Moodle 4.1 to 5.1 with LeitBox installed by an administrator (<a href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox/releases/latest">download from GitHub</a>)</li>
+      <li>Editing rights in the course, for example as a teacher, and a LeitBox activity</li>
+      <li>Your teaching text, for example a script or a chapter, and access to an AI assistant (any chat AI)</li>
+    </ul>
+  </section>
+
+  <h2 id="steps">Step by step</h2>
+  <div class="steps" data-step="Step" data-of="of" data-goto="Go to step" data-all="Show all steps" data-carousel="Show as slideshow">
+    <div class="steps-bar"><span class="steps-count" aria-live="polite">Step 1 of 5</span>
+      <button type="button" class="steps-toggle">Show all steps</button></div>
+    <div class="steps-view">
+      <ol class="steps-track">
+        <li class="step" id="step-1">
+          <img src="../../assets/guides/en/ki_1_fragetyp.webp" width="1600" height="900" alt="Choose a question type">
+          <div class="txt"><div class="num">Step 1 of 5</div><h3>Choose a question type</h3><p>Open the LeitBox activity and the <b>Manage Cards</b> tab. Under <b>Bulk Import (AI / Text)</b>, choose a type in <b>Select a learning method / question type</b>, for example <b>Standard (Q&amp;A)</b>. The matching prompt appears below.</p></div>
+        </li>
+        <li class="step" id="step-2">
+          <img src="../../assets/guides/en/ki_2_kopieren.webp" width="1600" height="900" alt="Copy the prompt" loading="lazy">
+          <div class="txt"><div class="num">Step 2 of 5</div><h3>Copy the prompt</h3><p>Select the whole prompt and copy it. Paste it into your AI assistant and add your text at the end, where the prompt says so.</p></div>
+        </li>
+        <li class="step" id="step-3">
+          <img src="../../assets/guides/en/ki_3_einfuegen.webp" width="1600" height="900" alt="Paste the AI&#x27;s answer" loading="lazy">
+          <div class="txt"><div class="num">Step 3 of 5</div><h3>Paste the AI's answer</h3><p>The AI answers with cards in a fixed format: <code>===CARD===</code>, then <code>Q:</code> for the question, <code>A:</code> for the answer and an optional <code>H:</code> for a hint. Copy the whole answer into the text field.</p></div>
+        </li>
+        <li class="step" id="step-4">
+          <img src="../../assets/guides/en/ki_4_importieren.webp" width="1600" height="900" alt="Import the cards" loading="lazy">
+          <div class="txt"><div class="num">Step 4 of 5</div><h3>Import the cards</h3><p>Click <b>Import Cards</b>. LeitBox creates every card from the text. You need no file and no spreadsheet.</p></div>
+        </li>
+        <li class="step" id="step-5">
+          <img src="../../assets/guides/en/ki_5_tabelle.webp" width="1600" height="900" alt="Check the cards" loading="lazy">
+          <div class="txt"><div class="num">Step 5 of 5</div><h3>Check the cards</h3><p>The new cards appear in the table below. Each card can be edited or deleted. For variety, import a second question type into the same activity, for example fill-in-the-blank cards.</p></div>
+        </li>
+      </ol>
+    </div>
+    <div class="steps-nav">
+      <button type="button" class="arrow prev" aria-label="Previous step">‹</button>
+      <div class="dots"></div>
+      <button type="button" class="arrow next" aria-label="Next step">›</button>
+    </div>
+  </div>
+
+  <h2>Good to know</h2>
+  <div class="notes">
+      <div class="note"><h3>Check what the AI wrote</h3><p>An AI can get facts wrong. Read the cards before learners use them; every card stays editable.</p></div>
+      <div class="note"><h3>Up to 200 cards</h3><p>An activity holds up to 200 cards. For larger topics, split the material into several LeitBox activities, for example one per chapter.</p></div>
+      <div class="note"><h3>Your data</h3><p>LeitBox itself sends nothing to an AI. You decide which text you give to which AI assistant.</p></div>
+  </div>
+
+  <div class="cta">
+    <a class="btn btn-primary" href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox/releases/latest">Download LeitBox (GitHub release)</a>
+    <a class="btn btn-secondary" href="https://www.youtube.com/@CourseToolbox">Watch the video (5 min)</a>
+  </div>
+
+  <h2>More guides</h2>
+  <ul class="more">
+    <li><a href="../../guides/leitner-flashcards-moodle/"><strong>How learners use the Leitner box in Moodle</strong><span>Pick a stack, turn the card, rate yourself: what Got it, Again and Hard do with the card.</span></a></li>
+    <li><a href="../../guides/moodle-flashcard-completion/"><strong>How to set completion by learning progress for Moodle flashcards</strong><span>Decide when the activity is complete: correct answers, cards in the Expert stack, or all cards.</span></a></li>
+  </ul>
+</main>
+
+<div class="lightbox" id="lightbox" hidden><button type="button" aria-label="Close">×</button><img src="" alt=""></div>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-links">
+      <a href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox">GitHub repository</a>
+      <a href="https://github.com/peterpleimfeldner-design/moodle-mod_leitbox/issues">Report an issue</a>
+      <a href="https://www.youtube.com/@CourseToolbox">YouTube</a>
+    </div>
+    <p>LeitBox is open-source software (GPLv3). © 2026 Peter Pleimfeldner.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var box = document.querySelector('.steps');
+  if (!box) return;
+  var view = box.querySelector('.steps-view'), track = box.querySelector('.steps-track');
+  var steps = Array.prototype.slice.call(box.querySelectorAll('.step'));
+  var prev = box.querySelector('.prev'), next = box.querySelector('.next'), count = box.querySelector('.steps-count');
+  var dots = box.querySelector('.dots'), toggle = box.querySelector('.steps-toggle');
+  var lb = document.getElementById('lightbox'), lbImg = lb.querySelector('img'), i = 0;
+  steps.forEach(function (s, k) {
+    var d = document.createElement('button');
+    d.type = 'button'; d.setAttribute('aria-label', box.dataset.goto + ' ' + (k + 1));
+    d.addEventListener('click', function () { go(k); });
+    dots.appendChild(d);
+    s.querySelector('img').addEventListener('click', function () { lbImg.src = this.src; lbImg.alt = this.alt; lb.hidden = false; });
+  });
+  function height() { if (!box.classList.contains('all')) view.style.height = steps[i].offsetHeight + 'px'; }
+  function go(k) {
+    i = Math.max(0, Math.min(steps.length - 1, k));
+    track.style.transform = 'translateX(-' + (i * 100) + '%)';
+    Array.prototype.forEach.call(dots.children, function (d, n) { d.classList.toggle('active', n === i); d.setAttribute('aria-current', n === i ? 'step' : 'false'); });
+    steps.forEach(function (s, n) { s.setAttribute('aria-hidden', n === i || box.classList.contains('all') ? 'false' : 'true'); });
+    prev.disabled = i === 0; next.disabled = i === steps.length - 1;
+    count.textContent = box.dataset.step + ' ' + (i + 1) + ' ' + box.dataset.of + ' ' + steps.length;
+    height();
+  }
+  prev.addEventListener('click', function () { go(i - 1); });
+  next.addEventListener('click', function () { go(i + 1); });
+  toggle.addEventListener('click', function () {
+    var all = box.classList.toggle('all');
+    toggle.textContent = all ? box.dataset.carousel : box.dataset.all;
+    if (all) { view.style.height = ''; } go(i);
+  });
+  steps.forEach(function (s) { var im = s.querySelector('img'); if (!im.complete) im.addEventListener('load', height); });
+  window.addEventListener('resize', height);
+  var x0 = null;
+  view.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, {passive: true});
+  view.addEventListener('touchend', function (e) {
+    if (x0 === null || box.classList.contains('all')) return;
+    var dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 50) go(i + (dx < 0 ? 1 : -1));
+  });
+  document.addEventListener('keydown', function (e) {
+    if (!lb.hidden) { if (e.key === 'Escape') lb.hidden = true; return; }
+    if (box.classList.contains('all')) return;
+    if (e.key === 'ArrowRight') go(i + 1);
+    if (e.key === 'ArrowLeft') go(i - 1);
+  });
+  lb.addEventListener('click', function (e) { if (e.target !== lbImg) lb.hidden = true; });
+  go(0);
+})();
+</script>
+</body>
+</html>
